@@ -1,6 +1,6 @@
 {
-  "name": "@uniswap/interface",
-  "description": "Uniswap Interface",
+  "name": "Baoswap UI",
+  "description": "Baoswap Interface",
   "homepage": ".",
   "private": true,
   "devDependencies": {
@@ -76,7 +76,7 @@
     "start-server-and-test": "^1.11.0",
     "styled-components": "^4.2.0",
     "typescript": "^3.8.3",
-    "uniswap-xdai-sdk": "^3.0.2-a3"
+    "uniswap-xdai-sdk": "https://github.com/thebaoman/xdai-sdk"
   },
   "resolutions": {
     "@walletconnect/web3-provider": "1.1.1-alpha.0"

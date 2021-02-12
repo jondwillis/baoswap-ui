@@ -28,7 +28,7 @@ export default function ListIntroduction({ onSelectList }: { onSelectList: () =>
             alt="token-list-preview"
           />
           <Text style={{ marginBottom: '8px', textAlign: 'center' }}>
-            Baoswap now supports token lists. You can add your own custom lists via IPFS, HTTPS and ENS.{' '}
+            Honeyswap now supports token lists. You can add your own custom lists via IPFS, HTTPS and ENS.{' '}
           </Text>
           <ButtonPrimary onClick={onSelectList} id="list-introduction-choose-a-list">
             Choose a list
@@ -36,7 +36,8 @@ export default function ListIntroduction({ onSelectList }: { onSelectList: () =>
           <OutlineCard style={{ marginBottom: '8px', padding: '1rem' }}>
             <Text fontWeight={400} fontSize={14} style={{ textAlign: 'center' }}>
               Token lists are an{' '}
-              <ExternalLink href="https://github.com/baofinance/tokenlists">open specification</ExternalLink>.
+              <ExternalLink href="https://github.com/1Hive/token-lists">open specification</ExternalLink>. Check out{' '}
+              <ExternalLink href="https://tokenlists.1hive.org">tokenlists.1hive.org</ExternalLink> to learn more.
             </Text>
           </OutlineCard>
         </AutoColumn>
