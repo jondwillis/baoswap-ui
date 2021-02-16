@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text } from 'rebass'
-import { ExternalLink } from '../../theme'
+
 import { ButtonPrimary } from '../Button'
 import { OutlineCard } from '../Card'
 import Column, { AutoColumn } from '../Column'
@@ -9,7 +9,7 @@ import { useDarkModeManager } from '../../state/user/hooks'
 
 import listLight from '../../assets/images/token-list/lists-light.png'
 import listDark from '../../assets/images/token-list/lists-dark.png'
-
+//import { ExternalLink } from '../../theme'
 export default function ListIntroduction({ onSelectList }: { onSelectList: () => void }) {
   const [isDark] = useDarkModeManager()
 
