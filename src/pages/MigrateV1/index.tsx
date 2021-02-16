@@ -42,7 +42,7 @@ export default function MigrateV1() {
   const V1Exchanges = useAllTokenV1Exchanges()
   const V1LiquidityTokens: Token[] = useMemo(() => {
     return chainId
-      ? Object.keys(V1Exchanges).map(exchangeAddress => new Token(chainId, exchangeAddress, 18, 'UNI-V1', 'Honeyswap V1'))
+      ? Object.keys(V1Exchanges).map(exchangeAddress => new Token(chainId, exchangeAddress, 18, 'Bao-V1', 'Baoswap V1'))
       : []
   }, [chainId, V1Exchanges])
   const [V1LiquidityBalances, V1LiquidityBalancesLoading] = useTokenBalancesWithLoadingIndicator(
@@ -73,12 +73,12 @@ export default function MigrateV1() {
           <BackArrow to="/pool" />
           <TYPE.mediumHeader>Migrate V1 Liquidity</TYPE.mediumHeader>
           <div>
-            <QuestionHelper text="Migrate your liquidity tokens from Honeyswap V1 to Honeyswap V2." />
+            <QuestionHelper text="Migrate your liquidity tokens from Baoswap V1 to Baoswap V2." />
           </div>
         </AutoRow>
 
         <TYPE.body style={{ marginBottom: 8, fontWeight: 400 }}>
-          For each pool shown below, click migrate to remove your liquidity from Honeyswap V1 and deposit it into Honeyswap
+          For each pool shown below, click migrate to remove your liquidity from Baoswap V1 and deposit it into Baoswap
           V2.
         </TYPE.body>
 
@@ -106,7 +106,7 @@ export default function MigrateV1() {
             {allV1PairsWithLiquidity?.length > 0 ? (
               <>{allV1PairsWithLiquidity}</>
             ) : (
-              <EmptyState message="No V1 Liquidity found." />
+              <EmptyState message="No V1 Liquidity found. V1 was an internal alpha. It is unlikely you have V1 tokens." />
             )}
           </>
         )}
