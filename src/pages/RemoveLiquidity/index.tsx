@@ -114,7 +114,7 @@ export default function RemoveLiquidity({
     //   { name: 'verifyingContract', type: 'address' }
     // ]
     // const domain = {
-    //   name: 'Honeyswap V2',
+    //   name: 'Baoswap V2',
     //   version: '1',
     //   chainId: chainId,
     //   verifyingContract: pair.liquidityToken.address
