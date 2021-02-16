@@ -5,23 +5,20 @@
 
 An open source interface for Honeyswap -- a protocol for decentralized exchange of xDai tokens.
 
-- Website: [about.1hive.org](https://about.1hive.org/)
-- Interface: [honeyswap.org](https://app.honeyswap.org/)
-- Docs: [about.1hive.org/docs/](https://about.1hive.org/docs/honeyswap)
-- Twitter: [@1HiveOrg](https://twitter.com/1HiveOrg)
-- Discord: [1Hive](https://discord.gg/GfqnEGF)
+- Interface: [baoswap.xyz](https://baoswap.xyz/)
+- Docs: [docs.bao.finance](https://about.1hive.org/docs/honeyswap)
+- Twitter: [@thebaoman](https://twitter.com/thebaoman)
+- Discord: [Bao Finance Discord](https://discord.gg/BW3P62vJXT)
 
 ## Accessing the Uniswap Interface
 
 To access the Uniswap Interface, use an IPFS gateway link from the
 [latest release](https://github.com/1Hive/uniswap-interface/releases/latest),
-or visit [honeyswap.org](https://honeyswap.org).
+or visit [baoswap.xyz](https://baoswap.xyz).
 
 ## Listing a token
 
-Please see the
-[@1Hive/default-token-list](https://github.com/1Hive/default-token-list)
-repository.
+Bao uses token lists, which are community managed lists.
 
 ## Development
 
@@ -54,7 +51,3 @@ The interface will not work on other networks.
 
 **Please open all pull requests against the `master` branch.**
 CI checks will run against all PRs.
-
-## Accessing Honeyswap Interface V1
-
-The Honeyswap Interface supports swapping against, and migrating or removing liquidity from Honeyswap V1.
