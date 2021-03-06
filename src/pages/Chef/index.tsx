@@ -24,7 +24,7 @@ import { Dots } from '../../components/swap/styleds'
 export default function Chef() {
   const theme = useContext(ThemeContext)
   const { account } = useActiveWeb3React()
-  
+
   // toggle wallet when disconnected
   const toggleWalletModal = useWalletModalToggle()
 
@@ -37,17 +37,10 @@ export default function Chef() {
   const liquidityTokens = useMemo(() => tokenPairsWithLiquidityTokens.map(tpwlt => tpwlt.liquidityToken), [
     tokenPairsWithLiquidityTokens
   ])
-  const [v2PairsBalances, fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(
-    account ?? undefined,
-    liquidityTokens
-  )
+  const [fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(account ?? undefined, liquidityTokens)
 
   // fetch the reserves for all V2 pools in which the user has a balance
-  const liquidityTokensWithBalances = useMemo(
-    () =>
-      tokenPairsWithLiquidityTokens,
-    [tokenPairsWithLiquidityTokens, v2PairsBalances]
-  )
+  const liquidityTokensWithBalances = useMemo(() => tokenPairsWithLiquidityTokens, [tokenPairsWithLiquidityTokens])
 
   const v2Pairs = usePairs(liquidityTokensWithBalances.map(({ tokens }) => tokens))
   const v2IsLoading =
@@ -76,7 +69,7 @@ export default function Chef() {
 
             {!account ? (
               <LightCard padding="40px">
-              <ButtonLight onClick={toggleWalletModal}>Connect Wallet</ButtonLight>
+                <ButtonLight onClick={toggleWalletModal}>Connect Wallet</ButtonLight>
               </LightCard>
             ) : v2IsLoading ? (
               <LightCard padding="40px">
