@@ -46,9 +46,7 @@ export default function Chef() {
   // fetch the reserves for all V2 pools in which the user has a balance
   const liquidityTokensWithBalances = useMemo(
     () =>
-      tokenPairsWithLiquidityTokens.filter(({ liquidityToken }) =>
-        v2PairsBalances[liquidityToken.address]?.greaterThan('0')
-      ),
+      tokenPairsWithLiquidityTokens,
     [tokenPairsWithLiquidityTokens, v2PairsBalances]
   )
 
