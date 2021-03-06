@@ -12,7 +12,7 @@ import { StyledInternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
 import { RowBetween } from '../../components/Row'
-import { ButtonLight, ButtonPrimary, ButtonSecondary } from '../../components/Button'
+import { ButtonLight, ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
@@ -114,12 +114,6 @@ export default function Chef() {
           </AutoColumn>
         </AutoColumn>
       </AppBody>
-
-      <div style={{ display: 'flex', alignItems: 'center', marginTop: '1.5rem' }}>
-        <ButtonSecondary as={Link} style={{ width: 'initial' }} to="/migrate/v1">
-          Migrate V1 Liquidity
-        </ButtonSecondary>
-      </div>
     </>
   )
 }
