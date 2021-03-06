@@ -224,8 +224,8 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
             </FixedHeightRow>
 
             <AutoRow justify="center" marginTop={'10px'}>
-              <ExternalLink href={`https://info.baoswap.xyz/pair/${pair.liquidityToken.address}`}>
-                View pool information ↗
+              <ExternalLink href={`https://blockscout.com/poa/xdai/address/${pair.liquidityToken.address}`}>
+                View pool information on BlockScout ↗
               </ExternalLink>
             </AutoRow>
             <RowBetween marginTop="10px">
