@@ -358,7 +358,7 @@ export default function AccountDetails({
                             href={chainId && getEtherscanLink(chainId, ENSName, 'address')}
                           >
                             <LinkIcon size={16} />
-                            <span style={{ marginLeft: '4px' }}>View on blockscout</span>
+                            <span style={{ marginLeft: '4px' }}>View on Blockscout</span>
                           </AddressLink>
                         )}
                       </div>
