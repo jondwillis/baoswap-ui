@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'
-import FullPositionCard from '../../components/PositionCard'
+import { ChefPositionCard } from '../../components/PositionCard'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
 import { Text } from 'rebass'
@@ -21,9 +21,11 @@ import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 
+import { supportedPools } from '../../bao/lib/constants'
+
 export default function Chef() {
   const theme = useContext(ThemeContext)
-  const { account } = useActiveWeb3React()
+  const { account, chainId } = useActiveWeb3React()
 
   // toggle wallet when disconnected
   const toggleWalletModal = useWalletModalToggle()
@@ -37,7 +39,7 @@ export default function Chef() {
   const liquidityTokens = useMemo(() => tokenPairsWithLiquidityTokens.map(tpwlt => tpwlt.liquidityToken), [
     tokenPairsWithLiquidityTokens
   ])
-  const [fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(account ?? undefined, liquidityTokens)
+  const [, fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(account ?? undefined, liquidityTokens)
 
   // fetch the reserves for all V2 pools in which the user has a balance
   const liquidityTokensWithBalances = useMemo(() => tokenPairsWithLiquidityTokens, [tokenPairsWithLiquidityTokens])
@@ -46,7 +48,12 @@ export default function Chef() {
   const v2IsLoading =
     fetchingV2PairBalances || v2Pairs?.length < liquidityTokensWithBalances.length || v2Pairs?.some(V2Pair => !V2Pair)
 
-  const allV2PairsWithLiquidity = v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair))
+  // lookup bao contract for pair
+  const supportedLpTokenAddresses = chainId == 100 ? supportedPools.flatMap(poolInfo => poolInfo.lpAddresses[100]) : []
+
+  const allV2PairsWithLiquidity = v2Pairs
+    .map(([, pair]) => pair as Pair)
+    .filter(v2Pair => Boolean(v2Pair) && supportedLpTokenAddresses.includes(v2Pair.liquidityToken.address))
 
   return (
     <>
@@ -62,9 +69,9 @@ export default function Chef() {
           <AutoColumn gap="12px" style={{ width: '100%' }}>
             <RowBetween padding={'0 8px'}>
               <Text color={theme.text1} fontWeight={500}>
-                Yield Farming Pools
+                Stake LP tokens, earn BAOcx!
               </Text>
-              <Question text="After adding liquidity to a pool, you can stake to earn BAOcx rewards." />
+              <Question text="After you add liquidity to a pair, you are able to stake your position to earn BAOcx." />
             </RowBetween>
 
             {!account ? (
@@ -80,7 +87,7 @@ export default function Chef() {
             ) : allV2PairsWithLiquidity?.length > 0 ? (
               <>
                 {allV2PairsWithLiquidity.map(v2Pair => (
-                  <FullPositionCard key={v2Pair.liquidityToken.address} pair={v2Pair} />
+                  <ChefPositionCard key={v2Pair.liquidityToken.address} pair={v2Pair} />
                 ))}
               </>
             ) : (
