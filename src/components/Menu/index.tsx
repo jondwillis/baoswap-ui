@@ -117,11 +117,11 @@ export default function Menu() {
               BaoMasterFarmer
             </MenuItem>
           )}
-          <MenuItem id="link" href="https://github.com/baofinance/baofinance-xdai-ui-source">
+          <MenuItem id="link" href="https://github.com/baofinance/baoswap-ui">
             <Code size={14} />
             Original Code
           </MenuItem>
-          <MenuItem id="link" href="https://github.com/jondwillis/baofinance-xdai-ui-source">
+          <MenuItem id="link" href="https://github.com/jondwillis/baoswap-ui">
             <Code size={14} />
             Fork Code
           </MenuItem>
