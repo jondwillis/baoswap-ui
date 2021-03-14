@@ -23,7 +23,7 @@ import { Dots } from '../swap/styleds'
 import { getEtherscanLink } from '../../utils'
 import { FarmablePool } from '../../bao/lib/constants'
 import { useLPContract } from '../../hooks/useContract'
-import { useContractWETHBalance, usePoolWeight, useStakedAmount } from '../../data/Staked'
+import { useContractWETHBalance, usePoolWeight, useStakedAmount, useUserStakedBalance } from '../../data/Staked'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -278,18 +278,17 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
   const currency0 = unwrappedToken(pair.token0)
   const currency1 = unwrappedToken(pair.token1)
 
-  const [showMore, setShowMore] = useState(false)
-
   const userPoolBalance = useTokenBalance(account ?? undefined, pair.liquidityToken)
   const totalPoolTokens = useTotalSupply(pair.liquidityToken)
+
+  const userStakedBalance = useUserStakedBalance(pair.liquidityToken, farmablePool)
+
+  const showMore = userStakedBalance?.greaterThan(JSBI.BigInt(0)) ?? false
 
   const lpStakedPercentage =
     !!stakedAmount && !!totalPoolTokens && JSBI.greaterThanOrEqual(totalPoolTokens.raw, stakedAmount.raw)
       ? new Percent(stakedAmount.raw, totalPoolTokens.raw)
       : undefined
-
-	// const BLOCKS_PER_YEAR = new BigNumber(2336000)
-	// const BAO_BER_BLOCK = new BigNumber(256000)
 
   const [token0Deposited, token1Deposited] =
     !!pair &&
@@ -306,13 +305,14 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
   return (
     <HoverCard border={border}>
       <AutoColumn gap="12px">
-        <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer' }}>
+        <FixedHeightRow>
           <RowFixed>
             <DoubleCurrencyLogo currency0={currency0} currency1={currency1} margin={true} size={20} />
             <Text fontWeight={500} fontSize={20}>
               {!currency0 || !currency1 ? <Dots>Loading</Dots> : `${currency0.symbol}/${currency1.symbol}`}
             </Text>
           </RowFixed>
+          <RowFixed>{userStakedBalance?.toSignificant(8)}</RowFixed>
           <RowFixed>
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '10px' }} />
