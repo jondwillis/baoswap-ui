@@ -8,6 +8,7 @@ import { useMasterChefContract, useWETHContract } from '../hooks/useContract'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { FarmablePool } from '../bao/lib/constants'
 import { XDAI_WETH } from '../constants'
+import { useActiveWeb3React } from '../hooks'
 
 export function useTotalLiquidityAmount(token?: Token, contract?: Contract): TokenAmount | undefined {
   const balance = useSingleCallResult(contract, 'balanceOf', [contract?.address]).result?.[0]
@@ -28,6 +29,23 @@ export function useStakedAmount(token?: Token, contract?: Contract): TokenAmount
     balance,
     contract
   ])
+}
+
+export function useUserStakedBalance(lpToken?: Token, farmablePool?: FarmablePool): TokenAmount | undefined {
+  const masterChefContract = useMasterChefContract()
+  const { account } = useActiveWeb3React()
+  const userStakedBalance = useSingleCallResult(masterChefContract, 'userInfo', [
+    farmablePool?.pid ?? undefined,
+    account ?? undefined
+  ]).result?.[0]
+
+  return useMemo(
+    () =>
+      lpToken && farmablePool && userStakedBalance
+        ? new TokenAmount(lpToken, userStakedBalance?.toString())
+        : undefined,
+    [lpToken, farmablePool, userStakedBalance]
+  )
 }
 
 // see: useTotalSupply(token?:)
