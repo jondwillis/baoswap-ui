@@ -21,6 +21,9 @@ import DoubleCurrencyLogo from '../DoubleLogo'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
 import { Dots } from '../swap/styleds'
 import { getEtherscanLink } from '../../utils'
+import { FarmablePool } from '../../bao/lib/constants'
+import { useLPContract } from '../../hooks/useContract'
+import { useContractWETHBalance, usePoolWeight, useStakedAmount } from '../../data/Staked'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -246,8 +249,31 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
   )
 }
 
-export function ChefPositionCard({ pair, border }: PositionCardProps) {
+export interface PairFarmablePool {
+  pair: Pair
+  farmablePool: FarmablePool
+}
+
+interface ChefCardProps {
+  pairFarmablePool: PairFarmablePool
+  showUnwrapped?: boolean
+  border?: string
+}
+
+export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
   const { account, chainId } = useActiveWeb3React()
+  const { pair, farmablePool } = pairFarmablePool
+
+  const lpTokenContract = useLPContract(farmablePool.address)
+
+  const stakedAmount = useStakedAmount(pair.liquidityToken, lpTokenContract ?? undefined)
+  const poolWeight = usePoolWeight(farmablePool)
+  // currently shows amount of staked XDAI in pair
+  const contractWETHBalance = useContractWETHBalance(lpTokenContract ?? undefined)
+  console.log(poolWeight, 'poolWeight')
+  console.log(contractWETHBalance, 'contractWETHBalance')
+
+  // const portionLp = new BigNumber(stakedAmount?.raw)
 
   const currency0 = unwrappedToken(pair.token0)
   const currency1 = unwrappedToken(pair.token1)
@@ -257,10 +283,13 @@ export function ChefPositionCard({ pair, border }: PositionCardProps) {
   const userPoolBalance = useTokenBalance(account ?? undefined, pair.liquidityToken)
   const totalPoolTokens = useTotalSupply(pair.liquidityToken)
 
-  const poolTokenPercentage =
-    !!userPoolBalance && !!totalPoolTokens && JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
-      ? new Percent(userPoolBalance.raw, totalPoolTokens.raw)
+  const lpStakedPercentage =
+    !!stakedAmount && !!totalPoolTokens && JSBI.greaterThanOrEqual(totalPoolTokens.raw, stakedAmount.raw)
+      ? new Percent(stakedAmount.raw, totalPoolTokens.raw)
       : undefined
+
+	// const BLOCKS_PER_YEAR = new BigNumber(2336000)
+	// const BAO_BER_BLOCK = new BigNumber(256000)
 
   const [token0Deposited, token1Deposited] =
     !!pair &&
@@ -297,7 +326,7 @@ export function ChefPositionCard({ pair, border }: PositionCardProps) {
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  Pooled {currency0.symbol}:
+                  Staked {currency0.symbol}:
                 </Text>
               </RowFixed>
               {token0Deposited ? (
@@ -315,7 +344,7 @@ export function ChefPositionCard({ pair, border }: PositionCardProps) {
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  Pooled {currency1.symbol}:
+                  Staked {currency1.symbol}:
                 </Text>
               </RowFixed>
               {token1Deposited ? (
@@ -339,10 +368,10 @@ export function ChefPositionCard({ pair, border }: PositionCardProps) {
             </FixedHeightRow>
             <FixedHeightRow>
               <Text fontSize={16} fontWeight={500}>
-                Your pool share:
+                Total Liqudity Staked
               </Text>
               <Text fontSize={16} fontWeight={500}>
-                {poolTokenPercentage ? poolTokenPercentage.toFixed(2) + '%' : '-'}
+                {lpStakedPercentage ? lpStakedPercentage.toFixed(2) + '%' : '-'}
               </Text>
             </FixedHeightRow>
 
@@ -353,14 +382,17 @@ export function ChefPositionCard({ pair, border }: PositionCardProps) {
                 </ExternalLink>
               )}
             </AutoRow>
-            <RowBetween marginTop="10px">
-              <ButtonSecondary as={Link} to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`} width="48%">
-                Add
+            <FixedHeightRow marginTop="10px">
+              <ButtonSecondary as={Link} to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`} width="58%">
+                Harvest
               </ButtonSecondary>
-              <ButtonSecondary as={Link} width="48%" to={`/remove/${currencyId(currency0)}/${currencyId(currency1)}`}>
-                Remove
+              <ButtonSecondary as={Link} to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`} width="25%">
+                Unstake
               </ButtonSecondary>
-            </RowBetween>
+              <ButtonSecondary as={Link} width="8%" to={`/remove/${currencyId(currency0)}/${currencyId(currency1)}`}>
+                +
+              </ButtonSecondary>
+            </FixedHeightRow>
           </AutoColumn>
         )}
       </AutoColumn>

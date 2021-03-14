@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'
-import { ChefPositionCard } from '../../components/PositionCard'
+import { ChefPositionCard, PairFarmablePool } from '../../components/PositionCard'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
-import { TYPE } from '../../theme'
+import { ExternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
 import { RowBetween } from '../../components/Row'
@@ -21,7 +21,9 @@ import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 
-import { supportedPools } from '../../bao/lib/constants'
+import { useSupportedLpTokenMap } from '../../bao/lib/constants'
+import { useMasterChefContract } from '../../hooks/useContract'
+import { getEtherscanLink } from '../../utils'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -41,19 +43,28 @@ export default function Chef() {
   ])
   const [, fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(account ?? undefined, liquidityTokens)
 
-  // fetch the reserves for all V2 pools in which the user has a balance
-  const liquidityTokensWithBalances = useMemo(() => tokenPairsWithLiquidityTokens, [tokenPairsWithLiquidityTokens])
-
-  const v2Pairs = usePairs(liquidityTokensWithBalances.map(({ tokens }) => tokens))
+  const v2Pairs = usePairs(tokenPairsWithLiquidityTokens.map(({ tokens }) => tokens))
   const v2IsLoading =
-    fetchingV2PairBalances || v2Pairs?.length < liquidityTokensWithBalances.length || v2Pairs?.some(V2Pair => !V2Pair)
+    fetchingV2PairBalances || v2Pairs?.length < tokenPairsWithLiquidityTokens.length || v2Pairs?.some(V2Pair => !V2Pair)
 
   // lookup bao contract for pair
-  const supportedLpTokenAddresses = chainId == 100 ? supportedPools.flatMap(poolInfo => poolInfo.lpAddresses[100]) : []
+  // TODO: useMemo
 
-  const allV2PairsWithLiquidity = v2Pairs
-    .map(([, pair]) => pair as Pair)
-    .filter(v2Pair => Boolean(v2Pair) && supportedLpTokenAddresses.includes(v2Pair.liquidityToken.address))
+  const supportedLpTokenMap = useSupportedLpTokenMap()
+
+  const allV2PairsWithLiquidity = useMemo(() => {
+    return v2Pairs
+      .map(([, pair]) => pair as Pair)
+      .flatMap(v2Pair => {
+        const farmablePool = Boolean(v2Pair) && supportedLpTokenMap.get(v2Pair.liquidityToken.address)
+        return farmablePool && { pair: v2Pair, farmablePool: farmablePool }
+      })
+      .filter((pairFarmablePool): pairFarmablePool is PairFarmablePool => !!pairFarmablePool)
+  }, [v2Pairs, supportedLpTokenMap])
+
+  console.log(allV2PairsWithLiquidity, 'pairFarmablePool')
+
+  const masterChefContract = useMasterChefContract()
 
   return (
     <>
@@ -67,6 +78,16 @@ export default function Chef() {
           </ButtonPrimary>
 
           <AutoColumn gap="12px" style={{ width: '100%' }}>
+            {chainId && masterChefContract && (
+              <RowBetween padding={'0 8px'}>
+                <ExternalLink id="link" href={getEtherscanLink(chainId, masterChefContract.address, 'address')}>
+                  BaoMasterFarmer
+                  <TYPE.body color={theme.text3} textAlign="center">
+                    {masterChefContract.address}
+                  </TYPE.body>
+                </ExternalLink>
+              </RowBetween>
+            )}
             <RowBetween padding={'0 8px'}>
               <Text color={theme.text1} fontWeight={500}>
                 Stake LP tokens, earn BAOcx!
@@ -87,7 +108,7 @@ export default function Chef() {
             ) : allV2PairsWithLiquidity?.length > 0 ? (
               <>
                 {allV2PairsWithLiquidity.map(v2Pair => (
-                  <ChefPositionCard key={v2Pair.liquidityToken.address} pair={v2Pair} />
+                  <ChefPositionCard key={v2Pair.farmablePool.address} pairFarmablePool={v2Pair} />
                 ))}
               </>
             ) : (
