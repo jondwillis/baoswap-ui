@@ -4,9 +4,11 @@ import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.
 import { Interface } from '@ethersproject/abi'
 import { useActiveWeb3React } from '../hooks'
 
-import { useMultipleContractSingleData } from '../state/multicall/hooks'
+import { useMultipleContractSingleData, useSingleContractMultipleData } from '../state/multicall/hooks'
 import { wrappedCurrency } from '../utils/wrappedCurrency'
 import { useMasterChefContract } from '../hooks/useContract'
+import { PairFarmablePool } from '../components/PositionCard'
+import { useSupportedLpTokenMap } from '../bao/lib/constants'
 
 const PAIR_INTERFACE = new Interface(IUniswapV2PairABI)
 
@@ -62,6 +64,19 @@ export function usePair(tokenA?: Currency, tokenB?: Currency): [PairState, Pair 
   return usePairs([[tokenA, tokenB]])[0]
 }
 
+export function useAllV2PairsWithLiquidity(v2Pairs: [PairState, Pair | null][]): PairFarmablePool[] {
+  const supportedLpTokenMap = useSupportedLpTokenMap()
+  return useMemo(() => {
+    return v2Pairs
+      .map(([, pair]) => pair as Pair)
+      .flatMap(v2Pair => {
+        const farmablePool = Boolean(v2Pair) && supportedLpTokenMap.get(v2Pair.liquidityToken.address)
+        return farmablePool && { pair: v2Pair, farmablePool: farmablePool }
+      })
+      .filter((pairFarmablePool): pairFarmablePool is PairFarmablePool => !!pairFarmablePool)
+  }, [v2Pairs, supportedLpTokenMap])
+}
+
 export function useAllStaked(currencies: [Currency | undefined, Currency | undefined][]): [PairState, Pair | null][] {
   const { chainId } = useActiveWeb3React()
   const masterChefContract = useMasterChefContract()
@@ -75,21 +90,15 @@ export function useAllStaked(currencies: [Currency | undefined, Currency | undef
     [chainId, currencies]
   )
 
-  const pairAddresses = useMemo(
-    () =>
-      tokens.map(([tokenA, tokenB]) => {
-        return tokenA && tokenB && !tokenA.equals(tokenB) ? Pair.getAddress(tokenA, tokenB) : undefined
-      }),
-    [tokens]
-  )
+  // const pairAddresses = useMemo(
+  //   () =>
+  //     tokens.map(([tokenA, tokenB]) => {
+  //       return tokenA && tokenB && !tokenA.equals(tokenB) ? Pair.getAddress(tokenA, tokenB) : undefined
+  //     }),
+  //   [tokens]
+  // )
 
-  // const results = useSingleContractMultipleData(masterChefContract, 'balanceOf', pairAddresses)
-  const results = useMultipleContractSingleData(
-    pairAddresses,
-    PAIR_INTERFACE,
-    'balanceOf',
-    masterChefContract ? [masterChefContract?.address] : []
-  )
+  const results = useSingleContractMultipleData(masterChefContract, 'userInfo', [])
 
   return useMemo(() => {
     return results.map((result, i) => {

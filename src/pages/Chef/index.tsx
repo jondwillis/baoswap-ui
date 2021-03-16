@@ -1,11 +1,10 @@
 import React, { useContext, useMemo } from 'react'
 import { ThemeContext } from 'styled-components'
-import { Pair } from 'uniswap-xdai-sdk'
 import { Link } from 'react-router-dom'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'
-import { ChefPositionCard, PairFarmablePool } from '../../components/PositionCard'
+import { ChefPositionCard } from '../../components/PositionCard'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
 import { ExternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
@@ -16,12 +15,11 @@ import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useWalletModalToggle } from '../../state/application/hooks'
-import { usePairs } from '../../data/Reserves'
+import { useAllV2PairsWithLiquidity, usePairs } from '../../data/Reserves'
 import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 
-import { useSupportedLpTokenMap } from '../../bao/lib/constants'
 import { useMasterChefContract } from '../../hooks/useContract'
 import { getEtherscanLink } from '../../utils'
 
@@ -47,22 +45,7 @@ export default function Chef() {
   const v2IsLoading =
     fetchingV2PairBalances || v2Pairs?.length < tokenPairsWithLiquidityTokens.length || v2Pairs?.some(V2Pair => !V2Pair)
 
-  // lookup bao contract for pair
-  // TODO: useMemo
-
-  const supportedLpTokenMap = useSupportedLpTokenMap()
-
-  const allV2PairsWithLiquidity = useMemo(() => {
-    return v2Pairs
-      .map(([, pair]) => pair as Pair)
-      .flatMap(v2Pair => {
-        const farmablePool = Boolean(v2Pair) && supportedLpTokenMap.get(v2Pair.liquidityToken.address)
-        return farmablePool && { pair: v2Pair, farmablePool: farmablePool }
-      })
-      .filter((pairFarmablePool): pairFarmablePool is PairFarmablePool => !!pairFarmablePool)
-  }, [v2Pairs, supportedLpTokenMap])
-
-  console.log(allV2PairsWithLiquidity, 'pairFarmablePool')
+  const allV2PairsWithLiquidity = useAllV2PairsWithLiquidity(v2Pairs)
 
   const masterChefContract = useMasterChefContract()
 
