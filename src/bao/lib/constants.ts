@@ -1746,6 +1746,22 @@ export const supportedPools = [
 		icon: '/unagi.png',
 		refUrl: 'https://ftx.com/trade/UNI/USD#a=createtrade',
 	},
+	{
+		pid: 107,
+		lpAddresses: {
+			100: '0xf2F9Ff5Cb8E2B21117715B2E3B5C6285349da498',
+		},
+		tokenAddresses: {
+			100: '0x2995D1317DcD4f0aB89f4AE60F3f020A4F17C7CE',
+		},
+		tokenDecimals: 18,
+		name: 'Sushi Eth',
+		symbol: 'SUSH-ETH SUSHILP',
+		tokenSymbol: 'SUSHI',
+		poolType: 'sushi',
+		icon: '/unagi.png',
+		refUrl: 'https://ftx.com/trade/SUSHI/USD#a=createtrade',
+	},
 ]
 
 export interface FarmablePool {
