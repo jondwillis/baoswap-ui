@@ -9,11 +9,9 @@ import ERC20_ABI from '../constants/abis/erc20.json'
 import MASTERCHEF_ABI from '../bao/lib/abi/masterchef.json'
 import UNI_ORACLE_ABI from '../bao/lib/abi/unioracle.json'
 import UNIV2LP from '../bao/lib/abi/uni_v2_lp.json'
-import { MIGRATOR_ABI, MIGRATOR_ADDRESS } from '../constants/abis/migrator'
 import UNISOCKS_ABI from '../constants/abis/unisocks.json'
 import WETH_ABI from '../constants/abis/weth.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
-import { V1_EXCHANGE_ABI, V1_FACTORY_ABI, V1_FACTORY_ADDRESSES } from '../constants/v1'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
 import { contractAddresses } from '../bao/lib/constants'
@@ -31,19 +29,6 @@ function useContract(address: string | undefined, ABI: any, withSignerIfPossible
       return null
     }
   }, [address, ABI, library, withSignerIfPossible, account])
-}
-
-export function useV1FactoryContract(): Contract | null {
-  const { chainId } = useActiveWeb3React()
-  return useContract(chainId && V1_FACTORY_ADDRESSES[chainId], V1_FACTORY_ABI, false)
-}
-
-export function useV2MigratorContract(): Contract | null {
-  return useContract(MIGRATOR_ADDRESS, MIGRATOR_ABI, true)
-}
-
-export function useV1ExchangeContract(address?: string, withSignerIfPossible?: boolean): Contract | null {
-  return useContract(address, V1_EXCHANGE_ABI, withSignerIfPossible)
 }
 
 export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Contract | null {
