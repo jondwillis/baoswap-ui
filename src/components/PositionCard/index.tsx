@@ -235,7 +235,7 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
             <AutoRow justify="center" marginTop={'10px'}>
               {chainId && (
                 <ExternalLink href={getEtherscanLink(chainId, pair.liquidityToken.address, 'address')}>
-                  View pool information ↗
+                  View Liquidity Pool Contract ↗
                 </ExternalLink>
               )}
             </AutoRow>
@@ -372,7 +372,7 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
             <AutoRow justify="center" marginTop={'10px'}>
               {chainId && (
                 <ExternalLink href={getEtherscanLink(chainId, pair.liquidityToken.address, 'address')}>
-                  View pool information ↗
+                  View Liquidity Pool Contract ↗
                 </ExternalLink>
               )}
             </AutoRow>
