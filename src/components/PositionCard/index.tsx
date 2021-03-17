@@ -22,8 +22,7 @@ import { AutoRow, RowBetween, RowFixed } from '../Row'
 import { Dots } from '../swap/styleds'
 import { getEtherscanLink } from '../../utils'
 import { FarmablePool } from '../../bao/lib/constants'
-import { useLPContract } from '../../hooks/useContract'
-import { useContractWETHBalance, usePoolWeight, useStakedAmount, useUserStakedBalance } from '../../data/Staked'
+import { UserInfoPairFarmablePool } from '../../data/Reserves'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -255,25 +254,23 @@ export interface PairFarmablePool {
 }
 
 interface ChefCardProps {
-  pairFarmablePool: PairFarmablePool
+  pairFarmablePool: UserInfoPairFarmablePool
   showUnwrapped?: boolean
   border?: string
 }
 
 export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
   const { account, chainId } = useActiveWeb3React()
-  const { pair, farmablePool } = pairFarmablePool
+  const { pair, stakedAmount } = pairFarmablePool
 
-  const lpTokenContract = useLPContract(farmablePool.address)
+  // const lpTokenContract = useLPContract(farmablePool.address)
 
-  const stakedAmount = useStakedAmount(pair.liquidityToken, lpTokenContract ?? undefined)
-  const poolWeight = usePoolWeight(farmablePool)
+  // const stakedAmount = useStakedAmount(pair.liquidityToken, lpTokenContract ?? undefined)
+  // const poolWeight = usePoolWeight(farmablePool)
   // currently shows amount of staked XDAI in pair
-  const contractWETHBalance = useContractWETHBalance(lpTokenContract ?? undefined)
-  console.log(poolWeight, 'poolWeight')
-  console.log(contractWETHBalance, 'contractWETHBalance')
-
-  // const portionLp = new BigNumber(stakedAmount?.raw)
+  // const contractWETHBalance = useContractWETHBalance(lpTokenContract ?? undefined)
+  // console.log(poolWeight, 'poolWeight')
+  // console.log(contractWETHBalance, 'contractWETHBalance')
 
   const currency0 = unwrappedToken(pair.token0)
   const currency1 = unwrappedToken(pair.token1)
@@ -281,9 +278,9 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
   const userPoolBalance = useTokenBalance(account ?? undefined, pair.liquidityToken)
   const totalPoolTokens = useTotalSupply(pair.liquidityToken)
 
-  const userStakedBalance = useUserStakedBalance(pair.liquidityToken, farmablePool)
+  // const userStakedBalance = useUserStakedBalance(pair.liquidityToken, farmablePool)
 
-  const showMore = userStakedBalance?.greaterThan(JSBI.BigInt(0)) ?? false
+  const showMore = stakedAmount?.greaterThan(JSBI.BigInt(0)) ?? false
 
   const lpStakedPercentage =
     !!stakedAmount && !!totalPoolTokens && JSBI.greaterThanOrEqual(totalPoolTokens.raw, stakedAmount.raw)
@@ -312,7 +309,7 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
               {!currency0 || !currency1 ? <Dots>Loading</Dots> : `${currency0.symbol}/${currency1.symbol}`}
             </Text>
           </RowFixed>
-          <RowFixed>{userStakedBalance?.toSignificant(8)}</RowFixed>
+          <RowFixed>{stakedAmount?.toSignificant(8)}</RowFixed>
           <RowFixed>
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '10px' }} />

@@ -15,7 +15,7 @@ import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useWalletModalToggle } from '../../state/application/hooks'
-import { useAllV2PairsWithLiquidity, usePairs } from '../../data/Reserves'
+import { useAllV2PairsWithLiquidity, usePairs, useUserInfoPairFarmablePools } from '../../data/Reserves'
 import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
@@ -46,6 +46,8 @@ export default function Chef() {
     fetchingV2PairBalances || v2Pairs?.length < tokenPairsWithLiquidityTokens.length || v2Pairs?.some(V2Pair => !V2Pair)
 
   const allV2PairsWithLiquidity = useAllV2PairsWithLiquidity(v2Pairs)
+
+  const userInfo = useUserInfoPairFarmablePools(allV2PairsWithLiquidity) || []
 
   const masterChefContract = useMasterChefContract()
 
@@ -88,9 +90,9 @@ export default function Chef() {
                   <Dots>Loading</Dots>
                 </TYPE.body>
               </LightCard>
-            ) : allV2PairsWithLiquidity?.length > 0 ? (
+            ) : userInfo?.length > 0 ? (
               <>
-                {allV2PairsWithLiquidity.map(v2Pair => (
+                {userInfo.map(v2Pair => (
                   <ChefPositionCard key={v2Pair.farmablePool.address} pairFarmablePool={v2Pair} />
                 ))}
               </>

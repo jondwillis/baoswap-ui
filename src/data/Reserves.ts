@@ -85,47 +85,52 @@ export interface UserInfoPairFarmablePool extends PairFarmablePool {
 export function useUserInfoPairFarmablePools(
   pairFarmablePools: PairFarmablePool[]
 ): UserInfoPairFarmablePool[] | undefined {
-  const { chainId } = useActiveWeb3React()
+  const { chainId, account } = useActiveWeb3React()
   const masterChefContract = useMasterChefContract()
 
   const chainIdNumber = chainId == ChainId.XDAI ? 100 : 4
   const baoRewardToken = (chainId && new Token(chainId, contractAddresses.bao[chainIdNumber], 18)) || WETH[100]
+  const accountAddress = account || '0x0'
 
   const poolIdsAndLpTokens = useMemo(() => {
     const matrix = pairFarmablePools.map(tuple => {
-      const { pair, farmablePool } = tuple
-      return [farmablePool.pid, pair.liquidityToken.address]
+      const { farmablePool } = tuple
+      return [farmablePool.pid, accountAddress]
     })
     return matrix
-  }, [pairFarmablePools])
+  }, [pairFarmablePools, accountAddress])
 
   const results = useSingleContractMultipleData(masterChefContract, 'userInfo', poolIdsAndLpTokens)
-
+  console.log(results, 'results')
   const userInfoPairFarmablePool = useMemo(() => {
-    return pairFarmablePools.map((tuple, i) => {
-      const { pair, farmablePool } = tuple
-      const stakedAmountResult = results?.[i]?.result?.[0]
-      const rewardDebtAmount = results?.[i]?.result?.[1]
+    return pairFarmablePools
+      .map((tuple, i) => {
+        const { pair, farmablePool } = tuple
+        const stakedAmountResult = results?.[i]?.result?.[0]
+        const rewardDebtAmount = results?.[i]?.result?.[1]
 
-      const mergeObject =
-        stakedAmountResult && rewardDebtAmount
-          ? {
-              stakedAmount: new TokenAmount(pair.liquidityToken, stakedAmountResult),
-              rewardDebt: new TokenAmount(baoRewardToken, rewardDebtAmount)
-            }
-          : {
-              stakedAmount: new TokenAmount(pair.liquidityToken, '0'),
-              rewardDebt: new TokenAmount(baoRewardToken, '0')
-            }
+        const mergeObject =
+          stakedAmountResult && rewardDebtAmount
+            ? {
+                stakedAmount: new TokenAmount(pair.liquidityToken, stakedAmountResult),
+                rewardDebt: new TokenAmount(baoRewardToken, rewardDebtAmount)
+              }
+            : {
+                stakedAmount: new TokenAmount(pair.liquidityToken, '0'),
+                rewardDebt: new TokenAmount(baoRewardToken, '0')
+              }
 
-      return {
-        pair,
-        farmablePool,
-        stakedAmount: mergeObject.stakedAmount,
-        rewardDebt: mergeObject.rewardDebt
-      }
-    })
+        return {
+          pair,
+          farmablePool,
+          stakedAmount: mergeObject.stakedAmount,
+          rewardDebt: mergeObject.rewardDebt
+        }
+      })
+      .filter(({ stakedAmount }) => stakedAmount.greaterThan('0'))
   }, [pairFarmablePools, results, baoRewardToken])
+
+  console.log(userInfoPairFarmablePool, 'userInfoPairFarmablePool')
 
   return userInfoPairFarmablePool
 }
