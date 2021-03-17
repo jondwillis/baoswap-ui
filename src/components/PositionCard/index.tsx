@@ -35,7 +35,7 @@ export const HoverCard = styled(Card)`
   }
 `
 
-const BalanceText = styled(Text)`
+export const BalanceText = styled(Text)`
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
     flex-shrink: 0;
   `};
@@ -228,7 +228,7 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
                 Your pool share:
               </Text>
               <Text fontSize={16} fontWeight={500}>
-                {poolTokenPercentage ? poolTokenPercentage.toFixed(2) + '%' : '-'}
+                {poolTokenPercentage ? poolTokenPercentage.toFixed(4) + '%' : '-'}
               </Text>
             </FixedHeightRow>
 

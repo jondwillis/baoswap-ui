@@ -82,17 +82,23 @@ export interface UserInfoPairFarmablePool extends PairFarmablePool {
   pendingReward: TokenAmount
 }
 
-export function useUserInfoPairFarmablePools(
-  pairFarmablePools: PairFarmablePool[]
-): [UserInfoPairFarmablePool[], boolean] {
-  const { chainId, account } = useActiveWeb3React()
-  const masterChefContract = useMasterChefContract()
-
+export function useRewardToken(): Token {
+  const { chainId } = useActiveWeb3React()
   const chainIdNumber = chainId == ChainId.XDAI ? 100 : 4
   const rewardSymbol = chainId == ChainId.XDAI ? 'BAO.cx' : 'BAO'
   const baoRewardToken =
     (chainId && new Token(chainId, contractAddresses.bao[chainIdNumber], 18, rewardSymbol)) || WETH[100]
-  console.log(baoRewardToken, 'baoRewardToken')
+
+  return baoRewardToken
+}
+
+export function useUserInfoPairFarmablePools(
+  pairFarmablePools: PairFarmablePool[]
+): [UserInfoPairFarmablePool[], boolean] {
+  const { account } = useActiveWeb3React()
+  const masterChefContract = useMasterChefContract()
+
+  const baoRewardToken = useRewardToken()
   const accountAddress = account || '0x0'
 
   const poolIdsAndLpTokens = useMemo(() => {

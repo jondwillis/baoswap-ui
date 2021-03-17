@@ -4,24 +4,24 @@ import { Link } from 'react-router-dom'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'
-import { ChefPositionCard } from '../../components/PositionCard'
-import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
+import { BalanceText, ChefPositionCard } from '../../components/PositionCard'
 import { ExternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
-import { RowBetween } from '../../components/Row'
+import { RowBetween, RowFixed } from '../../components/Row'
 import { ButtonLight, ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useWalletModalToggle } from '../../state/application/hooks'
-import { useAllV2PairsWithLiquidity, usePairs, useUserInfoPairFarmablePools } from '../../data/Reserves'
+import { useAllV2PairsWithLiquidity, usePairs, useRewardToken, useUserInfoPairFarmablePools } from '../../data/Reserves'
 import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 
 import { useMasterChefContract } from '../../hooks/useContract'
 import { getEtherscanLink, shortenAddress } from '../../utils'
+import { TokenAmount } from 'uniswap-xdai-sdk'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -36,10 +36,6 @@ export default function Chef() {
     () => trackedTokenPairs.map(tokens => ({ liquidityToken: toV2LiquidityToken(tokens), tokens })),
     [trackedTokenPairs]
   )
-  const liquidityTokens = useMemo(() => tokenPairsWithLiquidityTokens.map(tpwlt => tpwlt.liquidityToken), [
-    tokenPairsWithLiquidityTokens
-  ])
-  const [, fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(account ?? undefined, liquidityTokens)
 
   const v2Pairs = usePairs(tokenPairsWithLiquidityTokens.map(({ tokens }) => tokens))
 
@@ -47,19 +43,23 @@ export default function Chef() {
 
   const [userInfo, fetchingUserInfo] = useUserInfoPairFarmablePools(allV2PairsWithLiquidity) || []
 
+  const rewardToken = useRewardToken()
+  const allPendingRewards = useMemo(
+    () =>
+      userInfo
+        .map(userInfo => userInfo.pendingReward)
+        .reduce((sum, current) => sum.add(current), new TokenAmount(rewardToken, '0')),
+    [userInfo, rewardToken]
+  )
   const masterChefContract = useMasterChefContract()
   const v2IsLoading =
-    fetchingV2PairBalances ||
-    fetchingUserInfo ||
-    v2Pairs?.length < tokenPairsWithLiquidityTokens.length ||
-    v2Pairs?.some(V2Pair => !V2Pair)
+    fetchingUserInfo || v2Pairs?.length < tokenPairsWithLiquidityTokens.length || v2Pairs?.some(V2Pair => !V2Pair)
 
   return (
     <>
       <AppBody>
         <SwapPoolTabs active={'chef'} />
         <AutoColumn gap="lg" justify="center">
-
           <AutoColumn gap="12px" style={{ width: '100%' }}>
             {chainId && masterChefContract && (
               <RowBetween padding={'0 8px'}>
@@ -71,6 +71,28 @@ export default function Chef() {
                 </ExternalLink>
               </RowBetween>
             )}
+            <RowBetween padding={'0 8px'}>
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  Harvestable {rewardToken.symbol}:
+                </Text>
+              </RowFixed>
+              {account && !v2IsLoading ? (
+                <RowFixed>
+                  <ButtonPrimary padding="0.5rem">
+                    <span>
+                      Harvest All
+                      <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={800}>
+                        {allPendingRewards?.toSignificant(4) || '-'} {rewardToken.symbol}
+                      </BalanceText>
+                    </span>
+                  </ButtonPrimary>
+                </RowFixed>
+              ) : (
+                <b>-</b>
+              )}
+            </RowBetween>
+
             <RowBetween padding={'0 8px'}>
               <Text color={theme.text1} fontWeight={500}>
                 Your Staked Liquidity Pools:
@@ -97,7 +119,7 @@ export default function Chef() {
             ) : (
               <LightCard padding="40px">
                 <TYPE.body color={theme.text3} textAlign="center">
-                  No liquidity found.
+                  No staked liquidity found.
                 </TYPE.body>
                 <ButtonPrimary id="join-pool-button" as={Link} style={{ padding: 16 }} to="/add/ETH">
                   <Text fontWeight={500} fontSize={20}>
