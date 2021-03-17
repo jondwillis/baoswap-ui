@@ -21,7 +21,7 @@ import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 
 import { useMasterChefContract } from '../../hooks/useContract'
-import { getEtherscanLink } from '../../utils'
+import { getEtherscanLink, shortenAddress } from '../../utils'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -42,40 +42,38 @@ export default function Chef() {
   const [, fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(account ?? undefined, liquidityTokens)
 
   const v2Pairs = usePairs(tokenPairsWithLiquidityTokens.map(({ tokens }) => tokens))
-  const v2IsLoading =
-    fetchingV2PairBalances || v2Pairs?.length < tokenPairsWithLiquidityTokens.length || v2Pairs?.some(V2Pair => !V2Pair)
 
   const allV2PairsWithLiquidity = useAllV2PairsWithLiquidity(v2Pairs)
 
-  const userInfo = useUserInfoPairFarmablePools(allV2PairsWithLiquidity) || []
+  const [userInfo, fetchingUserInfo] = useUserInfoPairFarmablePools(allV2PairsWithLiquidity) || []
 
   const masterChefContract = useMasterChefContract()
+  const v2IsLoading =
+    fetchingV2PairBalances ||
+    fetchingUserInfo ||
+    v2Pairs?.length < tokenPairsWithLiquidityTokens.length ||
+    v2Pairs?.some(V2Pair => !V2Pair)
 
   return (
     <>
       <AppBody>
         <SwapPoolTabs active={'chef'} />
         <AutoColumn gap="lg" justify="center">
-          <ButtonPrimary id="join-pool-button" as={Link} style={{ padding: 16 }} to="/add/ETH">
-            <Text fontWeight={500} fontSize={20}>
-              Add Liquidity
-            </Text>
-          </ButtonPrimary>
 
           <AutoColumn gap="12px" style={{ width: '100%' }}>
             {chainId && masterChefContract && (
               <RowBetween padding={'0 8px'}>
                 <ExternalLink id="link" href={getEtherscanLink(chainId, masterChefContract.address, 'address')}>
                   BaoMasterFarmer
-                  <TYPE.body color={theme.text3} textAlign="center">
-                    {masterChefContract.address}
+                  <TYPE.body color={theme.text3}>
+                    <b title={masterChefContract.address}>{shortenAddress(masterChefContract.address)}</b>
                   </TYPE.body>
                 </ExternalLink>
               </RowBetween>
             )}
             <RowBetween padding={'0 8px'}>
               <Text color={theme.text1} fontWeight={500}>
-                Stake LP tokens, earn BAOcx!
+                Your Staked Liquidity Pools:
               </Text>
               <Question text="After you add liquidity to a pair, you are able to stake your position to earn BAOcx." />
             </RowBetween>
@@ -101,6 +99,11 @@ export default function Chef() {
                 <TYPE.body color={theme.text3} textAlign="center">
                   No liquidity found.
                 </TYPE.body>
+                <ButtonPrimary id="join-pool-button" as={Link} style={{ padding: 16 }} to="/add/ETH">
+                  <Text fontWeight={500} fontSize={20}>
+                    Add Liquidity
+                  </Text>
+                </ButtonPrimary>
               </LightCard>
             )}
           </AutoColumn>
