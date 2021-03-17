@@ -305,7 +305,7 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  Your LP Tokens:
+                  Your Staked LP Tokens:
                 </Text>
               </RowFixed>
               <RowFixed>
@@ -318,7 +318,7 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  Total LP Tokens:
+                  All Staked LP Tokens:
                 </Text>
               </RowFixed>
               <RowFixed>
