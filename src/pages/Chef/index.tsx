@@ -99,6 +99,11 @@ export default function Chef() {
               </Text>
               <Question text="After you add liquidity to a pair, you are able to stake your position to earn BAOcx." />
             </RowBetween>
+            <RowBetween padding={'0 8px'}>
+              <TYPE.body color={theme.text3}>
+                <i>Sushi LPs coming soon</i>
+              </TYPE.body>
+            </RowBetween>
 
             {!account ? (
               <LightCard padding="40px">
