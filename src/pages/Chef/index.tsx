@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import { ThemeContext } from 'styled-components'
 import { Link } from 'react-router-dom'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
@@ -22,6 +22,7 @@ import { Dots } from '../../components/swap/styleds'
 import { useMasterChefContract } from '../../hooks/useContract'
 import { getEtherscanLink, shortenAddress } from '../../utils'
 import { TokenAmount } from 'uniswap-xdai-sdk'
+import { useHarvestAll } from '../../hooks/Chef'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -55,6 +56,16 @@ export default function Chef() {
   const v2IsLoading =
     fetchingUserInfo || v2Pairs?.length < tokenPairsWithLiquidityTokens.length || v2Pairs?.some(V2Pair => !V2Pair)
 
+  const { callback } = useHarvestAll(useMemo(() => userInfo.map(({ farmablePool }) => farmablePool), [userInfo]))
+  const handleHarvestAll = useCallback(() => {
+    
+    // setSwapState({ attemptingTxn: true, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: undefined })
+    callback()
+      // .then(hash => {
+      //   setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
+      // })
+  }, [])
+
   return (
     <>
       <AppBody>
@@ -79,7 +90,7 @@ export default function Chef() {
               </RowFixed>
               {account && !v2IsLoading ? (
                 <RowFixed>
-                  <ButtonPrimary padding="0.5rem">
+                  <ButtonPrimary padding="0.5rem" onClick={() => handleHarvestAll()}>
                     <span>
                       Harvest All
                       <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={800}>

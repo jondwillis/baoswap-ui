@@ -7,6 +7,7 @@ import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_ABI from '../constants/abis/erc20.json'
 import MASTERCHEF_ABI from '../bao/lib/abi/masterchef.json'
+import BAO from '../bao/lib/abi/bao.json'
 import UNI_ORACLE_ABI from '../bao/lib/abi/unioracle.json'
 import UNIV2LP from '../bao/lib/abi/uni_v2_lp.json'
 import UNISOCKS_ABI from '../constants/abis/unisocks.json'
@@ -51,6 +52,16 @@ export function useMasterChefContract(withSignerIfPossible?: boolean): Contract 
   return useContract(
     chainId == ChainId.XDAI ? contractAddresses.masterChef[ChainId.XDAI] : undefined,
     MASTERCHEF_ABI,
+    withSignerIfPossible
+  )
+}
+
+export function useBaoContract(withSignerIfPossible?: boolean): Contract | null {
+  const { chainId } = useActiveWeb3React()
+
+  return useContract(
+    chainId == ChainId.XDAI ? contractAddresses.bao[ChainId.XDAI] : undefined,
+    BAO,
     withSignerIfPossible
   )
 }
