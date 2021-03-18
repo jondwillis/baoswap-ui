@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'
+import Lock from '../../components/LockHelper'
 import { BalanceText, ChefPositionCard } from '../../components/PositionCard'
 import { ExternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
@@ -13,7 +14,7 @@ import { ButtonLight, ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
-import { useWalletModalToggle } from '../../state/application/hooks'
+import { useBlockNumber, useWalletModalToggle } from '../../state/application/hooks'
 import { useAllV2PairsWithLiquidity, usePairs, useRewardToken, useUserInfoPairFarmablePools } from '../../data/Reserves'
 import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
 import AppBody from '../AppBody'
@@ -23,6 +24,7 @@ import { useMasterChefContract } from '../../hooks/useContract'
 import { getEtherscanLink, shortenAddress } from '../../utils'
 import { TokenAmount } from 'uniswap-xdai-sdk'
 import { useHarvestAll } from '../../hooks/Chef'
+import { useLockedEarned } from '../../data/Staked'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -53,9 +55,11 @@ export default function Chef() {
     [userInfo, rewardToken]
   )
   const masterChefContract = useMasterChefContract()
-  const v2IsLoading =
-    fetchingUserInfo || v2Pairs?.length < tokenPairsWithLiquidityTokens.length || v2Pairs?.some(V2Pair => !V2Pair)
-
+  
+  const lockedEarnedAmount = useLockedEarned()
+  const unlockBlock = 20038657
+  const latestBlockNumber = useBlockNumber() || unlockBlock
+  const remainingBlocks = Math.max(unlockBlock - latestBlockNumber, 0)
   const { callback } = useHarvestAll(useMemo(() => userInfo.map(({ farmablePool }) => farmablePool), [userInfo]))
   const handleHarvestAll = useCallback(() => {
     
@@ -65,6 +69,12 @@ export default function Chef() {
       //   setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
       // })
   }, [])
+  
+  const v2IsLoading =
+    !account ||
+    fetchingUserInfo ||
+    v2Pairs?.length < tokenPairsWithLiquidityTokens.length ||
+    v2Pairs?.some(V2Pair => !V2Pair)
 
   return (
     <>
@@ -102,6 +112,22 @@ export default function Chef() {
               ) : (
                 <b>-</b>
               )}
+            </RowBetween>
+            <RowBetween padding={'0 8px'}>
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  Locked {rewardToken.symbol}:
+                </Text>
+              </RowFixed>
+              <RowFixed>
+                <TYPE.body color={theme.text3}>
+                  <b>{lockedEarnedAmount.toFixed(2)}</b>
+                </TYPE.body>
+                <Question
+                  text={`Every time you Harvest or change your Stake, you instantly earn 5% of your pending rewards, and the remaining 95% will begin unlocking linearly at xDAI block ${unlockBlock}.`}
+                />
+                <Lock text={`Linear unlock begins in: ${(remainingBlocks / 12 / 60 / 24).toFixed(2)} days`} />
+              </RowFixed>
             </RowBetween>
 
             <RowBetween padding={'0 8px'}>

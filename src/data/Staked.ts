@@ -4,11 +4,12 @@ import { BigNumber } from '@ethersproject/bignumber'
 
 import { useMemo } from 'react'
 
-import { useMasterChefContract, useWETHContract } from '../hooks/useContract'
+import { useBaoContract, useMasterChefContract, useWETHContract } from '../hooks/useContract'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { FarmablePool } from '../bao/lib/constants'
 import { XDAI_WETH } from '../constants'
 import { useActiveWeb3React } from '../hooks'
+import { useRewardToken } from './Reserves'
 
 export function useTotalLiquidityAmount(token?: Token, contract?: Contract): TokenAmount | undefined {
   const balance = useSingleCallResult(contract, 'balanceOf', [contract?.address]).result?.[0]
@@ -102,4 +103,14 @@ export interface StakedValue {
   totalWethValue: BigNumber
   tokenPriceInWeth: BigNumber
   poolWeight: BigNumber
+}
+
+export function useLockedEarned(): TokenAmount {
+  const rewardToken = useRewardToken()
+  const { account } = useActiveWeb3React()
+  const baoContract = useBaoContract()
+
+  const result = useSingleCallResult(baoContract, 'lockOf', [account ?? undefined]).result?.[0]
+
+  return useMemo(() => new TokenAmount(rewardToken, result ?? '0'), [rewardToken, result])
 }
