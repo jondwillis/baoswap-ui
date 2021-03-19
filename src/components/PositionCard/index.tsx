@@ -23,6 +23,7 @@ import { Dots } from '../swap/styleds'
 import { getEtherscanLink } from '../../utils'
 import { FarmablePool } from '../../bao/lib/constants'
 import { UserInfoPairFarmablePool } from '../../data/Reserves'
+import { useStakedAmount } from '../../data/Staked'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -273,7 +274,7 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
   const currency1 = unwrappedToken(pair.token1)
   const rewardCurrency = unwrappedToken(pendingReward.token)
 
-  const totalPoolTokens = useTotalSupply(pair.liquidityToken)
+  const totalPoolTokens = useStakedAmount(pair.liquidityToken)
 
   const [showMore, setShowMore] = useState(true)
 
@@ -305,7 +306,7 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  Your Staked LP Tokens:
+                  Your Stake (LP):
                 </Text>
               </RowFixed>
               <RowFixed>
@@ -318,7 +319,7 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  All Staked LP Tokens:
+                  All Staked (LP):
                 </Text>
               </RowFixed>
               <RowFixed>

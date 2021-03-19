@@ -4,7 +4,7 @@ import { BigNumber } from '@ethersproject/bignumber'
 
 import { useMemo } from 'react'
 
-import { useBaoContract, useMasterChefContract, useWETHContract } from '../hooks/useContract'
+import { useBaoContract, useLPContract, useMasterChefContract, useWETHContract } from '../hooks/useContract'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { FarmablePool } from '../bao/lib/constants'
 import { XDAI_WETH } from '../constants'
@@ -21,8 +21,9 @@ export function useTotalLiquidityAmount(token?: Token, contract?: Contract): Tok
   ])
 }
 
-export function useStakedAmount(token?: Token, contract?: Contract): TokenAmount | undefined {
+export function useStakedAmount(token: Token): TokenAmount | undefined {
   const masterChefContract = useMasterChefContract()
+  const contract = useLPContract(token.address) || null
   const balance = useSingleCallResult(contract, 'balanceOf', [masterChefContract?.address]).result?.[0]
 
   return useMemo(() => (contract && token && balance ? new TokenAmount(token, balance?.toString()) : undefined), [
