@@ -1,5 +1,5 @@
-import React, { useCallback, useContext, useMemo } from 'react'
-import { ThemeContext } from 'styled-components'
+import React, { useCallback, useContext, useMemo, useState } from 'react'
+import styled, { ThemeContext } from 'styled-components'
 import { Link } from 'react-router-dom'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
@@ -22,9 +22,11 @@ import { Dots } from '../../components/swap/styleds'
 
 import { useMasterChefContract } from '../../hooks/useContract'
 import { getEtherscanLink, shortenAddress } from '../../utils'
-import { TokenAmount } from 'uniswap-xdai-sdk'
+import { Fraction, TokenAmount } from 'uniswap-xdai-sdk'
 import { useHarvestAll } from '../../hooks/Chef'
 import { useLockedEarned } from '../../data/Staked'
+import { ChefState, initialChefState } from '../../state/chef/reducer'
+import { Loader, Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -54,8 +56,11 @@ export default function Chef() {
         .reduce((sum, current) => sum.add(current), new TokenAmount(rewardToken, '0')),
     [userInfo, rewardToken]
   )
+
+  const unlockedPending = allPendingRewards?.multiply(new Fraction('1', '20'))
+  const lockedPending = allPendingRewards?.multiply(new Fraction('19', '20'))
   const masterChefContract = useMasterChefContract()
-  
+
   const lockedEarnedAmount = useLockedEarned()
   const unlockBlock = 20038657
   const latestBlockNumber = useBlockNumber() || unlockBlock
@@ -76,6 +81,9 @@ export default function Chef() {
     v2Pairs?.length < tokenPairsWithLiquidityTokens.length ||
     v2Pairs?.some(V2Pair => !V2Pair)
 
+  const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
+    color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
+  `
   return (
     <>
       <AppBody>
@@ -90,29 +98,38 @@ export default function Chef() {
                     <b title={masterChefContract.address}>{shortenAddress(masterChefContract.address)}</b>
                   </TYPE.body>
                 </ExternalLink>
-              </RowBetween>
-            )}
-            <RowBetween padding={'0 8px'}>
-              <RowFixed>
-                <Text fontSize={16} fontWeight={500}>
-                  Harvestable {rewardToken.symbol}:
-                </Text>
-              </RowFixed>
-              {account && !v2IsLoading ? (
                 <RowFixed>
-                  <ButtonPrimary padding="0.5rem" onClick={() => handleHarvestAll()}>
-                    <span>
-                      Harvest All
-                      <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={800}>
-                        {allPendingRewards?.toSignificant(4) || '-'} {rewardToken.symbol}
-                      </BalanceText>
-                    </span>
+                  <ButtonPrimary
+                    padding="0.5rem"
+                    onClick={() => handleHarvestAll()}
+                    disabled={attemptingHarvest || !account || v2IsLoading}
+                  >
+                    {attemptingHarvest ? (
+                      <span>
+                        <Dots>Harvesting</Dots>
+                        <IconWrapper pending={attemptingHarvest} success={!attemptingHarvest}>
+                          <Loader />
+                        </IconWrapper>
+                      </span>
+                    ) : (
+                      <span>
+                        <Text color={theme.text5} fontWeight={600}>
+                          Harvest All
+                        </Text>
+                        <BalanceText style={{ flexShrink: 0, textAlign: 'end' }} pr="0.5rem" fontWeight={800}>
+                          &nbsp;&nbsp;
+                          <UnlockIcon size="14px" /> {unlockedPending?.toFixed(0) || '-'}{' '}
+                          <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
+                          <br />
+                          + <LockIcon size="14px" /> {lockedPending?.toFixed(0) || '-'}{' '}
+                          <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
+                        </BalanceText>
+                      </span>
+                    )}
                   </ButtonPrimary>
                 </RowFixed>
-              ) : (
-                <b>-</b>
-              )}
-            </RowBetween>
+              </RowBetween>
+            )}
             <RowBetween padding={'0 8px'}>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
@@ -120,7 +137,7 @@ export default function Chef() {
                 </Text>
               </RowFixed>
               <RowFixed>
-                <TYPE.body color={theme.text3}>
+                <TYPE.body>
                   <b>{lockedEarnedAmount.toFixed(2)}</b>
                 </TYPE.body>
                 <Question
