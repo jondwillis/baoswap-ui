@@ -1,7 +1,7 @@
-import { FarmablePool } from "../bao/lib/constants"
-// import { useActiveWeb3React } from "."
-// import { useMasterChefContract } from "./useContract"
-// import { useSingleContractMultipleData } from "../state/multicall/hooks"
+import { useMemo } from 'react'
+import { FarmablePool } from '../bao/lib/constants'
+import { useTransactionAdder } from '../state/transactions/hooks'
+import { useMasterChefContract } from './useContract'
 
 export enum HarvestState {
   UNKNOWN,
@@ -9,18 +9,41 @@ export enum HarvestState {
   HARVESTED
 }
 
-export function useHarvestAll(farmablePools: FarmablePool[]): { state: HarvestState; callback: () => Promise<void> } {
-  // const { address } = useActiveWeb3React()
-  // const masterChef = useMasterChefContract()
-  // const results = useSingleContractMultipleData(masterChefContract, 'userInfo', poolIdsAndLpTokens)
-  // useMemo
+export function useHarvestAll(
+  farmablePools: FarmablePool[]
+): { state: HarvestState; callback?: null | (() => Promise<any[]>), error: string | null } {
+  const masterChefContract = useMasterChefContract()
+  const addTransaction = useTransactionAdder()
 
   console.log('farmablePools', farmablePools)
 
-  return {
-    state: HarvestState.PENDING,
-    callback: async function onHarvestAll(): Promise<void> {
-      Promise.resolve()
+  return useMemo(() => {
+    return {
+      state: HarvestState.PENDING,
+      callback:
+        masterChefContract &&
+        async function onHarvestAll(): Promise<any[]> {
+          const pids = farmablePools.map(farm => farm.pid)
+
+          return await Promise.all(
+            pids.map(async pid => {
+              const txReceipt = await masterChefContract?.claimReward(pid)
+              addTransaction(txReceipt, { summary: `Harvest Pool ID: ${pid}` })
+              const txHash = txReceipt.hash
+              return txHash
+            })
+          ).catch((error: any) => {
+            // if the user rejected the tx, pass this along
+            if (error?.code === 4001) {
+              throw new Error('Transaction rejected.')
+            } else {
+              // otherwise, the error was unexpected and we need to convey that
+              console.error(`Harvest failed`, error)
+              throw new Error(`Harvest failed: ${error.message}`)
+            }
+          })
+        },
+      error: null
     }
-  }
+  }, [addTransaction, masterChefContract, farmablePools])
 }

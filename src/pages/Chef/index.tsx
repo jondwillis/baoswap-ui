@@ -65,16 +65,30 @@ export default function Chef() {
   const unlockBlock = 20038657
   const latestBlockNumber = useBlockNumber() || unlockBlock
   const remainingBlocks = Math.max(unlockBlock - latestBlockNumber, 0)
+
+  // redux chef state
+
+  const [{ attemptingHarvest }, setChefState] = useState<ChefState>(initialChefState)
+
   const { callback } = useHarvestAll(useMemo(() => userInfo.map(({ farmablePool }) => farmablePool), [userInfo]))
   const handleHarvestAll = useCallback(() => {
-    
-    // setSwapState({ attemptingTxn: true, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: undefined })
+    if (!callback) {
+      return
+    }
+    setChefState({ attemptingHarvest: true, harvestErrorMessage: undefined, harvestTxnHash: undefined })
     callback()
-      // .then(hash => {
-      //   setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
-      // })
-  }, [])
-  
+      .then(hash => {
+        setChefState({ attemptingHarvest: false, harvestErrorMessage: undefined, harvestTxnHash: undefined })
+      })
+      .catch(error => {
+        setChefState({
+          attemptingHarvest: false,
+          harvestErrorMessage: error.message,
+          harvestTxnHash: undefined
+        })
+      })
+  }, [callback])
+
   const v2IsLoading =
     !account ||
     fetchingUserInfo ||
@@ -154,9 +168,7 @@ export default function Chef() {
               <Question text="After you add liquidity to a pair, you are able to stake your position to earn BAOcx." />
             </RowBetween>
             <RowBetween padding={'0 8px'}>
-              <TYPE.body color={theme.text3}>
-                <i>Sushi LPs coming soon</i>
-              </TYPE.body>
+              <TYPE.italic color={theme.text3}>Sushi LPs coming soon</TYPE.italic>
             </RowBetween>
 
             {!account ? (
