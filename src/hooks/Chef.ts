@@ -68,3 +68,29 @@ export function useStake(
     }
   }, [addTransaction, masterChefContract, farmablePool, amount, ref])
 }
+
+export function useUnstake(
+  farmablePool: FarmablePool,
+  amount: TokenAmount | null | undefined,
+  ref = '0x2CBb111028393710BFaFe51B2426D0AE496010B9' // TODO: allow users to disable this
+): { callback?: null | (() => Promise<any>) } {
+  const masterChefContract = useMasterChefContract()
+  const addTransaction = useTransactionAdder()
+
+  return useMemo(() => {
+    return {
+      callback:
+        masterChefContract &&
+        amount &&
+        async function onUnstake(): Promise<any> {
+          const pid = farmablePool.pid
+          const txReceipt = await masterChefContract.withdraw(pid, `0x${amount.raw.toString(16)}`, ref)
+          addTransaction(txReceipt, {
+            summary: `Unstake ${amount.toFixed(4)} from ${farmablePool.name} (Pool ID: ${pid})`
+          })
+          const txHash = txReceipt.hash
+          return txHash
+        }
+    }
+  }, [addTransaction, masterChefContract, farmablePool, amount, ref])
+}

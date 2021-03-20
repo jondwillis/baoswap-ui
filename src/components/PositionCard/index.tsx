@@ -24,8 +24,9 @@ import { getEtherscanLink } from '../../utils'
 import { FarmablePool } from '../../bao/lib/constants'
 import { UserInfoPairFarmablePool } from '../../data/Reserves'
 import { useStakedAmount } from '../../data/Staked'
-import { useHarvestAll, useStake } from '../../hooks/Chef'
+import { useHarvestAll, useStake, useUnstake } from '../../hooks/Chef'
 import { ChefState, initialChefState } from '../../state/chef/reducer'
+import QuestionHelper from '../QuestionHelper'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -174,6 +175,9 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
             </Text>
           </RowFixed>
           <RowFixed>
+            <ButtonSecondary onClick={() => setShowMore(!showMore)} style={{ paddingLeft: 10 }}>
+              Stake
+            </ButtonSecondary>
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '10px' }} />
             ) : (
@@ -287,13 +291,20 @@ export function ChefPositionCard({ pairFarmablePool, unstakedLPAmount, border }:
       ? new Percent(stakedAmount.raw, totalPoolTokens.raw)
       : undefined
 
-  const { callback } = useStake(farmablePool, unstakedLPAmount)
+  const { callback: stakeCallback } = useStake(farmablePool, unstakedLPAmount)
   const handleStake = useCallback(() => {
-    if (!callback) {
+    if (!stakeCallback) {
       return
     }
-    callback()
-  }, [callback])
+    stakeCallback()
+  }, [stakeCallback])
+  const { callback: unstakeCallback } = useUnstake(farmablePool, stakedAmount)
+  const handleUnstake = useCallback(() => {
+    if (!unstakeCallback) {
+      return
+    }
+    unstakeCallback()
+  }, [unstakeCallback])
 
   const [{ attemptingHarvest }, setChefState] = useState<ChefState>(initialChefState)
 
@@ -388,10 +399,17 @@ export function ChefPositionCard({ pairFarmablePool, unstakedLPAmount, border }:
                     style={{ fontWeight: 800, backgroundColor: theme.primary3, padding: '0.2rem', marginBottom: 10 }}
                   >
                     +Stake
+                    <QuestionHelper text={`Stakes ALL ${unstakedLPAmount?.toFixed(4)} remaining LP Tokens`} />
                   </ButtonSecondary>
                 </RowBetween>
                 <RowBetween>
-                  <ButtonSecondary disabled={true} style={{ backgroundColor: theme.red1, padding: '0.2rem' }}>-Stake</ButtonSecondary>
+                  <ButtonSecondary
+                    onClick={() => handleUnstake()}
+                    style={{ backgroundColor: theme.red2, padding: '0.2rem' }}
+                  >
+                    -Stake
+                    <QuestionHelper text={`🚨⚠️Unstakes ALL ${stakedAmount.toFixed(4)} staked LP Tokens`} />
+                  </ButtonSecondary>
                 </RowBetween>
               </AutoColumn>
               <AutoColumn>
