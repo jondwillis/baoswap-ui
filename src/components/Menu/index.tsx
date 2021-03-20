@@ -1,11 +1,15 @@
+import { useActiveWeb3React } from '../../hooks'
 import React, { useRef } from 'react'
 import { Info, BookOpen, Code, PieChart, MessageCircle } from 'react-feather'
 import styled from 'styled-components'
 import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg'
 import { useOnClickOutside } from '../../hooks/useOnClickOutside'
 import useToggle from '../../hooks/useToggle'
+import { getEtherscanLink } from '../../utils'
 
 import { ExternalLink } from '../../theme'
+import { useMasterChefContract } from '../../hooks/useContract'
+import { ChainId } from 'uniswap-xdai-sdk'
 
 const StyledMenuIcon = styled(MenuIcon)`
   path {
@@ -49,7 +53,7 @@ const StyledMenu = styled.div`
 `
 
 const MenuFlyout = styled.span`
-  min-width: 8.125rem;
+  min-width: 13.25rem;
   background-color: ${({ theme }) => theme.bg3};
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.01);
@@ -81,6 +85,9 @@ const MenuItem = styled(ExternalLink)`
 export default function Menu() {
   const node = useRef<HTMLDivElement>()
   const [open, toggle] = useToggle(false)
+  const { account, chainId } = useActiveWeb3React()
+
+  const masterChefContract = useMasterChefContract()
 
   useOnClickOutside(node, open ? toggle : undefined)
 
@@ -96,25 +103,47 @@ export default function Menu() {
             <Info size={14} />
             About
           </MenuItem>
-          <MenuItem id="link" href="https://www.bao.finance/">
+          <MenuItem id="link" href={chainId === ChainId.XDAI ? 'https://xdai.bao.finance/' : 'https://bao.finance'}>
             <Info size={14} />
-            Farm
+            Original Chef
           </MenuItem>
           <MenuItem id="link" href="https://docs.bao.finance">
             <BookOpen size={14} />
             Docs
           </MenuItem>
-          <MenuItem id="link" href="https://etherscan.io/address/0xBD530a1c060DC600b951f16dc656E4EA451d1A2D">
+          {chainId && masterChefContract && (
+            <MenuItem id="link" href={getEtherscanLink(chainId, masterChefContract.address, 'address')}>
+              <Code size={14} />
+              BaoMasterFarmer
+            </MenuItem>
+          )}
+          <MenuItem id="link" href="https://github.com/baofinance/baoswap-ui">
             <Code size={14} />
-            Code
+            Original Code
+          </MenuItem>
+          <MenuItem id="link" href="https://github.com/jondwillis/baoswap-ui">
+            <Code size={14} />
+            Fork Code
           </MenuItem>
           <MenuItem id="link" href="https://discord.gg/BW3P62vJXT">
             <MessageCircle size={14} />
             Discord
           </MenuItem>
-          <MenuItem id="link" href="#">
+          <MenuItem id="link" href="https://baoboard.com">
             <PieChart size={14} />
-            Analytics (Coming Soon)
+            TVL/APY (Baoboard)
+          </MenuItem>
+          <MenuItem id="link" href="https://baostats.pythonanywhere.com">
+            <PieChart size={14} />
+            TVL/APY (baostats)
+          </MenuItem>
+          <MenuItem id="link" href="https://dailydefi.org/tools/bao-finance-xdai-farms-tvl/">
+            <PieChart size={14} />
+            Bao TVL (dailydefi)
+          </MenuItem>
+          <MenuItem id="link" href={`https://stakedvalue.com/#/bao-finance-xdai/${account}`}>
+            <PieChart size={14} />
+            StakedValue
           </MenuItem>
         </MenuFlyout>
       )}

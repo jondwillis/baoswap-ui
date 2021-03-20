@@ -19,8 +19,7 @@ import { ArrowWrapper, BottomGrouping, Dots, SwapCallbackError, Wrapper } from '
 import TradePrice from '../../components/swap/TradePrice'
 import TokenWarningModal from '../../components/TokenWarningModal'
 
-import { BETTER_TRADE_LINK_THRESHOLD, INITIAL_ALLOWED_SLIPPAGE, HONEY } from '../../constants'
-import { isTradeBetter } from '../../data/V1'
+import { INITIAL_ALLOWED_SLIPPAGE, HONEY } from '../../constants'
 import { useActiveWeb3React } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
@@ -76,14 +75,7 @@ export default function Swap() {
 
   // swap state
   const { independentField, typedValue, recipient } = useSwapState()
-  const {
-    v1Trade,
-    v2Trade,
-    currencyBalances,
-    parsedAmount,
-    currencies,
-    inputError: swapInputError
-  } = useDerivedSwapInfo()
+  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useDerivedSwapInfo()
   const { wrapType, execute: onWrap, inputError: wrapInputError } = useWrapCallback(
     currencies[Field.INPUT],
     currencies[Field.OUTPUT],
@@ -94,16 +86,10 @@ export default function Swap() {
   const trade = showWrap
     ? undefined
     : {
-        [Version.v1]: v1Trade,
         [Version.v2]: v2Trade
       }[toggledVersion]
 
-  const betterTradeLinkVersion: Version | undefined =
-    toggledVersion === Version.v2 && isTradeBetter(v2Trade, v1Trade, BETTER_TRADE_LINK_THRESHOLD)
-      ? Version.v1
-      : toggledVersion === Version.v1 && isTradeBetter(v1Trade, v2Trade)
-      ? Version.v2
-      : undefined
+  const betterTradeLinkVersion: Version | undefined = undefined
 
   const parsedAmounts = showWrap
     ? {
@@ -174,6 +160,9 @@ export default function Swap() {
   }, [approval, approvalSubmitted])
 
   const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
+  const halfAmountInput: CurrencyAmount | undefined = CurrencyAmount.ether(
+    JSBI.divide(currencyBalances[Field.INPUT]?.raw || JSBI.BigInt(0), JSBI.BigInt(2)).toString()
+  )
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
 
   // the callback to execute the swap
@@ -248,12 +237,16 @@ export default function Swap() {
     maxAmountInput && onUserInput(Field.INPUT, maxAmountInput.toExact())
   }, [maxAmountInput, onUserInput])
 
+  const handleHalfInput = useCallback(() => {
+    halfAmountInput && onUserInput(Field.INPUT, halfAmountInput.toExact())
+  }, [halfAmountInput, onUserInput])
+
   const handleOutputSelect = useCallback(outputCurrency => onCurrencySelection(Field.OUTPUT, outputCurrency), [
     onCurrencySelection
   ])
 
   const { ethereum } = window
-  const handleAddHnyToMM = useCallback(() => addTokenToMetamask(ethereum, HONEY), [])
+  const handleAddHnyToMM = useCallback(() => addTokenToMetamask(ethereum, HONEY), [ethereum])
   const isHnySelected =
     currencies[Field.INPUT]?.symbol === HONEY.symbol || currencies[Field.OUTPUT]?.symbol === HONEY.symbol
 
@@ -303,6 +296,7 @@ export default function Swap() {
               currency={currencies[Field.INPUT]}
               onUserInput={handleTypeInput}
               onMax={handleMaxInput}
+              onHalf={handleHalfInput}
               onCurrencySelect={handleInputSelect}
               otherCurrency={currencies[Field.OUTPUT]}
               id="swap-currency-input"

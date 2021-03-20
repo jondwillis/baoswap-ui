@@ -6,13 +6,16 @@ import ENS_ABI from '../constants/abis/ens-registrar.json'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_ABI from '../constants/abis/erc20.json'
-import { MIGRATOR_ABI, MIGRATOR_ADDRESS } from '../constants/abis/migrator'
+import MASTERCHEF_ABI from '../bao/lib/abi/masterchef.json'
+import BAO from '../bao/lib/abi/bao.json'
+import UNI_ORACLE_ABI from '../bao/lib/abi/unioracle.json'
+import UNIV2LP from '../bao/lib/abi/uni_v2_lp.json'
 import UNISOCKS_ABI from '../constants/abis/unisocks.json'
 import WETH_ABI from '../constants/abis/weth.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
-import { V1_EXCHANGE_ABI, V1_FACTORY_ABI, V1_FACTORY_ADDRESSES } from '../constants/v1'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
+import { contractAddresses } from '../bao/lib/constants'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
@@ -29,26 +32,48 @@ function useContract(address: string | undefined, ABI: any, withSignerIfPossible
   }, [address, ABI, library, withSignerIfPossible, account])
 }
 
-export function useV1FactoryContract(): Contract | null {
-  const { chainId } = useActiveWeb3React()
-  return useContract(chainId && V1_FACTORY_ADDRESSES[chainId], V1_FACTORY_ABI, false)
-}
-
-export function useV2MigratorContract(): Contract | null {
-  return useContract(MIGRATOR_ADDRESS, MIGRATOR_ABI, true)
-}
-
-export function useV1ExchangeContract(address?: string, withSignerIfPossible?: boolean): Contract | null {
-  return useContract(address, V1_EXCHANGE_ABI, withSignerIfPossible)
-}
-
 export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Contract | null {
   return useContract(tokenAddress, ERC20_ABI, withSignerIfPossible)
 }
 
+// native wrapped chain currency
 export function useWETHContract(withSignerIfPossible?: boolean): Contract | null {
   const { chainId } = useActiveWeb3React()
   return useContract(chainId ? WETH[chainId].address : undefined, WETH_ABI, withSignerIfPossible)
+}
+
+export function useLPContract(address?: string, withSignerIfPossible?: boolean): Contract | null {
+  return useContract(address, UNIV2LP, withSignerIfPossible)
+}
+
+export function useMasterChefContract(withSignerIfPossible?: boolean): Contract | null {
+  const { chainId } = useActiveWeb3React()
+
+  return useContract(
+    chainId === ChainId.XDAI ? contractAddresses.masterChef[ChainId.XDAI] : undefined,
+    MASTERCHEF_ABI,
+    withSignerIfPossible
+  )
+}
+
+export function useBaoContract(withSignerIfPossible?: boolean): Contract | null {
+  const { chainId } = useActiveWeb3React()
+
+  return useContract(
+    chainId === ChainId.XDAI ? contractAddresses.bao[ChainId.XDAI] : undefined,
+    BAO,
+    withSignerIfPossible
+  )
+}
+
+export function useBaoPriceContract(withSignerIfPossible?: boolean): Contract | null {
+  const { chainId } = useActiveWeb3React()
+
+  return useContract(
+    chainId === ChainId.XDAI ? contractAddresses.baoPrice[ChainId.XDAI] : undefined,
+    UNI_ORACLE_ABI,
+    withSignerIfPossible
+  )
 }
 
 export function useENSRegistrarContract(withSignerIfPossible?: boolean): Contract | null {
