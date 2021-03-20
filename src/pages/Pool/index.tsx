@@ -87,7 +87,11 @@ export default function Pool() {
             ) : allV2PairsWithLiquidity?.length > 0 ? (
               <>
                 {allV2PairsWithLiquidity.map(v2Pair => (
-                  <FullPositionCard key={v2Pair.liquidityToken.address} pair={v2Pair} />
+                  <FullPositionCard
+                    key={v2Pair.liquidityToken.address}
+                    pair={v2Pair}
+                    unstakedLPAmount={v2PairsBalances[v2Pair.liquidityToken.address]}
+                  />
                 ))}
               </>
             ) : (

@@ -46,7 +46,7 @@ export function useHarvestAll(
 }
 
 export function useStake(
-  farmablePool: FarmablePool,
+  farmablePool: FarmablePool | undefined,
   amount: TokenAmount | null | undefined,
   ref = '0x2CBb111028393710BFaFe51B2426D0AE496010B9' // TODO: allow users to disable this
 ): { callback?: null | (() => Promise<any>) } {
@@ -57,6 +57,7 @@ export function useStake(
     return {
       callback:
         masterChefContract &&
+        farmablePool &&
         amount &&
         async function onStake(): Promise<any> {
           const pid = farmablePool.pid

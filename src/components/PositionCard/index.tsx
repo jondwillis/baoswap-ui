@@ -21,7 +21,7 @@ import DoubleCurrencyLogo from '../DoubleLogo'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
 import { Dots } from '../swap/styleds'
 import { getEtherscanLink } from '../../utils'
-import { FarmablePool } from '../../bao/lib/constants'
+import { FarmablePool, useSupportedLpTokenMap } from '../../bao/lib/constants'
 import { UserInfoPairFarmablePool } from '../../data/Reserves'
 import { useStakedAmount } from '../../data/Staked'
 import { useHarvestAll, useStake, useUnstake } from '../../hooks/Chef'
@@ -47,6 +47,7 @@ export const BalanceText = styled(Text)`
 
 interface PositionCardProps {
   pair: Pair
+  unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
 }
@@ -136,7 +137,8 @@ export function MinimalPositionCard({ pair, showUnwrapped = false, border }: Pos
   )
 }
 
-export default function FullPositionCard({ pair, border }: PositionCardProps) {
+export default function FullPositionCard({ pair, unstakedLPAmount, border }: PositionCardProps) {
+  const theme = useContext(ThemeContext)
   const { account, chainId } = useActiveWeb3React()
 
   const currency0 = unwrappedToken(pair.token0)
@@ -164,6 +166,17 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
         ]
       : [undefined, undefined]
 
+  const supportedLpTokenMap = useSupportedLpTokenMap()
+  const farmablePool = supportedLpTokenMap.get(pair.liquidityToken.address)
+
+  const { callback: stakeCallback } = useStake(farmablePool, unstakedLPAmount)
+  const handleStake = useCallback(() => {
+    if (!stakeCallback) {
+      return
+    }
+    stakeCallback()
+  }, [stakeCallback])
+
   return (
     <HoverCard border={border}>
       <AutoColumn gap="12px">
@@ -175,9 +188,19 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
             </Text>
           </RowFixed>
           <RowFixed>
-            <ButtonSecondary onClick={() => setShowMore(!showMore)} style={{ paddingLeft: 10 }}>
-              Stake
-            </ButtonSecondary>
+            {farmablePool ? (
+              <ButtonSecondary
+                onClick={() => handleStake()}
+                disabled={!(unstakedLPAmount && unstakedLPAmount.greaterThan('0'))}
+                padding="0.5rem"
+                style={{ fontWeight: 800, backgroundColor: theme.primary3, padding: '0.2rem' }}
+              >
+                +Stake
+                <QuestionHelper text={`Stakes ALL ${unstakedLPAmount?.toFixed(4)} remaining LP Tokens`} />
+              </ButtonSecondary>
+            ) : (
+              <></>
+            )}
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '10px' }} />
             ) : (
