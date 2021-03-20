@@ -1,6 +1,6 @@
 import { useActiveWeb3React } from '../../hooks'
 import React, { useRef } from 'react'
-import { Info, BookOpen, Code, PieChart, MessageCircle } from 'react-feather'
+import { Info, BookOpen, Code, PieChart, MessageCircle, Gift } from 'react-feather'
 import styled from 'styled-components'
 import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg'
 import { useOnClickOutside } from '../../hooks/useOnClickOutside'
@@ -99,9 +99,9 @@ export default function Menu() {
       </StyledMenuButton>
       {open && (
         <MenuFlyout>
-          <MenuItem id="link" href="">
-            <Info size={14} />
-            About
+          <MenuItem id="link" href="https://gitcoin.co/grants/2377/baoswapchef-quality-of-life-updates">
+            <Gift size={14} />
+            Gitcoin Grant
           </MenuItem>
           <MenuItem id="link" href={chainId === ChainId.XDAI ? 'https://xdai.bao.finance/' : 'https://bao.finance'}>
             <Info size={14} />

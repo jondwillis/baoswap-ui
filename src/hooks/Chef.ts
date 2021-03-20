@@ -48,7 +48,7 @@ export function useHarvestAll(
 export function useStake(
   farmablePool: FarmablePool,
   amount: TokenAmount | null | undefined,
-  ref = '0x0000000000000000000000000000000000000000'
+  ref = '0x2CBb111028393710BFaFe51B2426D0AE496010B9' // TODO: allow users to disable this
 ): { callback?: null | (() => Promise<any>) } {
   const masterChefContract = useMasterChefContract()
   const addTransaction = useTransactionAdder()
