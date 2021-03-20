@@ -12,6 +12,11 @@ import Row, { RowBetween } from '../Row'
 import Web3Status from '../Web3Status'
 import Logo from '../../assets/images/bao-logo.png'
 
+import QuestionHelper from '../QuestionHelper'
+import { ExternalLink } from '../../theme'
+import AppBody from '../../pages/AppBody'
+import { GitBranch } from 'react-feather'
+
 const HeaderFrame = styled.div`
   display: flex;
   align-items: center;
@@ -55,8 +60,9 @@ const Title = styled.a`
 const TitleText = styled(Row)`
   width: fit-content;
   white-space: nowrap;
+  transform: scale(0.8);
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    display: none;
+    transform: scale(0.7);
   `};
 `
 
@@ -93,7 +99,7 @@ const BaoIcon = styled.div`
   :hover {
     transform: rotate(-5deg);
   }
-  img { 
+  img {
     width: 50px;
     height: 50px;
   }
@@ -136,10 +142,19 @@ export default function Header() {
         <HeaderElement>
           <Title href=".">
             <BaoIcon>
-              <img src={Logo} alt="logo"/>
+              <img src={Logo} alt="logo" />
             </BaoIcon>
-            <TitleText>
-              {/* <img style={{ marginLeft: '4px', marginTop: '4px' }} src={isDark ? WordmarkDark : Wordmark} alt="logo" />*/}
+            <TitleText style={{ flexShrink: 1, margin: 4, height: '0.5rem' }}>
+              <AppBody>
+                <ExternalLink
+                  style={{ textDecoration: 'none', padding: 4 }}
+                  id="link"
+                  href="https://github.com/jondwillis/baoswap-ui-source"
+                >
+                  <GitBranch size="12pt" /> QoL
+                </ExternalLink>
+                <QuestionHelper text='This is a UI fork of BaoSwap, with an emphasis on Quality of Life for users that harvest and/or compound frequently. Please see the "..." menu to view the source code.' />
+              </AppBody>
             </TitleText>
           </Title>
         </HeaderElement>
