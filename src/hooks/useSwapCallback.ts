@@ -51,7 +51,6 @@ function useSwapCallArguments(
   const { address: recipientAddress } = useENS(recipientAddressOrName)
   const recipient = recipientAddressOrName === null ? account : recipientAddress
 
-
   return useMemo(() => {
     const tradeVersion = Version.v2
     if (!trade || !recipient || !library || !account || !tradeVersion || !chainId) return []

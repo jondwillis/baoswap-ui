@@ -88,7 +88,6 @@ export function useBaoPrice(): BigNumber {
 
 // export function useHttpPrices(ids: string[] | undefined = ['weth', 'bao-finance'], base: string | undefined = 'usd'): BigNumber {
 //   useCallback(async )
-  
 //   const commaSeparatedPrices = ids.join(',')
 //   const httpResponse = fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${commaSeparatedPrices}&vs_currencies=base`, {
 //     "headers": {

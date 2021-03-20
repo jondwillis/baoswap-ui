@@ -210,7 +210,15 @@ export default function Chef() {
             ) : (
               <LightCard padding="40px">
                 {noListSelected ? (
-                  <CurrencySearchModal isOpen={noListSelected} onCurrencySelect={() => {}} onDismiss={() => {}} />
+                  <CurrencySearchModal
+                    isOpen={noListSelected}
+                    onCurrencySelect={() => {
+                      /* no-op */
+                    }}
+                    onDismiss={() => {
+                      /* no-op */
+                    }}
+                  />
                 ) : (
                   <>
                     <TYPE.body color={theme.text3} textAlign="center">

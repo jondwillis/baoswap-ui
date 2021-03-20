@@ -194,7 +194,7 @@ export function useDerivedSwapInfo(): {
     currencyBalances,
     parsedAmount,
     v2Trade: v2Trade ?? undefined,
-    inputError,
+    inputError
   }
 }
 

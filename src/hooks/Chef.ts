@@ -12,7 +12,7 @@ export enum HarvestState {
 
 export function useHarvestAll(
   farmablePools: FarmablePool[]
-): { state: HarvestState; callback?: null | (() => Promise<any[]>), error: string | null } {
+): { state: HarvestState; callback?: null | (() => Promise<any[]>); error: string | null } {
   const masterChefContract = useMasterChefContract()
   const addTransaction = useTransactionAdder()
 
