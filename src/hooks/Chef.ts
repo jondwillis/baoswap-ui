@@ -61,7 +61,7 @@ export function useStake(
         async function onStake(): Promise<any> {
           const pid = farmablePool.pid
           const txReceipt = await masterChefContract.deposit(pid, `0x${amount.raw.toString(16)}`, ref)
-          addTransaction(txReceipt, { summary: `Add ${amount.toFixed(4)} to Stake (Pool ID: ${pid})` })
+          addTransaction(txReceipt, { summary: `Stake ${amount.toFixed(4)} in ${farmablePool.name} (Pool ID: ${pid})` })
           const txHash = txReceipt.hash
           return txHash
         }
