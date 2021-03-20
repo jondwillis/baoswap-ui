@@ -246,7 +246,7 @@ export default function Swap() {
   ])
 
   const { ethereum } = window
-  const handleAddHnyToMM = useCallback(() => addTokenToMetamask(ethereum, HONEY), [])
+  const handleAddHnyToMM = useCallback(() => addTokenToMetamask(ethereum, HONEY), [ethereum])
   const isHnySelected =
     currencies[Field.INPUT]?.symbol === HONEY.symbol || currencies[Field.OUTPUT]?.symbol === HONEY.symbol
 

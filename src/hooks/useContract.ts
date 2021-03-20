@@ -50,7 +50,7 @@ export function useMasterChefContract(withSignerIfPossible?: boolean): Contract 
   const { chainId } = useActiveWeb3React()
 
   return useContract(
-    chainId == ChainId.XDAI ? contractAddresses.masterChef[ChainId.XDAI] : undefined,
+    chainId === ChainId.XDAI ? contractAddresses.masterChef[ChainId.XDAI] : undefined,
     MASTERCHEF_ABI,
     withSignerIfPossible
   )
@@ -60,7 +60,7 @@ export function useBaoContract(withSignerIfPossible?: boolean): Contract | null 
   const { chainId } = useActiveWeb3React()
 
   return useContract(
-    chainId == ChainId.XDAI ? contractAddresses.bao[ChainId.XDAI] : undefined,
+    chainId === ChainId.XDAI ? contractAddresses.bao[ChainId.XDAI] : undefined,
     BAO,
     withSignerIfPossible
   )
@@ -70,7 +70,7 @@ export function useBaoPriceContract(withSignerIfPossible?: boolean): Contract | 
   const { chainId } = useActiveWeb3React()
 
   return useContract(
-    chainId == ChainId.XDAI ? contractAddresses.baoPrice[ChainId.XDAI] : undefined,
+    chainId === ChainId.XDAI ? contractAddresses.baoPrice[ChainId.XDAI] : undefined,
     UNI_ORACLE_ABI,
     withSignerIfPossible
   )

@@ -84,8 +84,8 @@ export interface UserInfoPairFarmablePool extends PairFarmablePool {
 
 export function useRewardToken(): Token {
   const { chainId } = useActiveWeb3React()
-  const chainIdNumber = chainId == ChainId.XDAI ? 100 : 4
-  const rewardSymbol = chainId == ChainId.XDAI ? 'BAO.cx' : 'BAO'
+  const chainIdNumber = chainId === ChainId.XDAI ? 100 : 4
+  const rewardSymbol = chainId === ChainId.XDAI ? 'BAO.cx' : 'BAO'
   const baoRewardToken =
     (chainId && new Token(chainId, contractAddresses.bao[chainIdNumber], 18, rewardSymbol)) || WETH[100]
 

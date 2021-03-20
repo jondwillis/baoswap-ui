@@ -12,15 +12,6 @@ import Row, { RowBetween } from '../Row'
 import Web3Status from '../Web3Status'
 import Logo from '../../assets/images/bao-logo.png'
 
-{
-  /*import Logo from '../../assets/svg/logo.svg'
-import LogoDark from '../../assets/svg/logo_white.svg'
-import Wordmark from '../../assets/svg/wordmark.svg'
-import WordmarkDark from '../../assets/svg/wordmark_white.svg'
-import VersionSwitch from './VersionSwitch'
-import { useDarkModeManager } from '../../state/user/hooks'*/
-}
-
 const HeaderFrame = styled.div`
   display: flex;
   align-items: center;
@@ -138,9 +129,6 @@ export default function Header() {
   const { account, chainId } = useActiveWeb3React()
 
   const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
-  {
-    /*const [isDark] = useDarkModeManager()*/
-  }
 
   return (
     <HeaderFrame>

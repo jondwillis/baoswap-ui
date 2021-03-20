@@ -103,7 +103,7 @@ export default function Menu() {
             <Info size={14} />
             About
           </MenuItem>
-          <MenuItem id="link" href={chainId == ChainId.XDAI ? 'https://xdai.bao.finance/' : 'https://bao.finance'}>
+          <MenuItem id="link" href={chainId === ChainId.XDAI ? 'https://xdai.bao.finance/' : 'https://bao.finance'}>
             <Info size={14} />
             Original Chef
           </MenuItem>
