@@ -27,6 +27,7 @@ import { useHarvestAll } from '../../hooks/Chef'
 import { useLockedEarned } from '../../data/Staked'
 import { ChefState, initialChefState } from '../../state/chef/reducer'
 import { Loader, Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
+import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -40,6 +41,14 @@ export default function Chef() {
   const tokenPairsWithLiquidityTokens = useMemo(
     () => trackedTokenPairs.map(tokens => ({ liquidityToken: toV2LiquidityToken(tokens), tokens })),
     [trackedTokenPairs]
+  )
+
+  const liquidityTokens = useMemo(() => tokenPairsWithLiquidityTokens.map(tpwlt => tpwlt.liquidityToken), [
+    tokenPairsWithLiquidityTokens
+  ])
+  const [tokenBalanceMap, fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(
+    account ?? undefined,
+    liquidityTokens
   )
 
   const v2Pairs = usePairs(tokenPairsWithLiquidityTokens.map(({ tokens }) => tokens))
@@ -90,6 +99,7 @@ export default function Chef() {
   }, [callback])
 
   const v2IsLoading =
+    fetchingV2PairBalances ||
     !account ||
     fetchingUserInfo ||
     v2Pairs?.length < tokenPairsWithLiquidityTokens.length ||
@@ -184,7 +194,11 @@ export default function Chef() {
             ) : userInfo?.length > 0 ? (
               <>
                 {userInfo.map(v2Pair => (
-                  <ChefPositionCard key={v2Pair.farmablePool.address} pairFarmablePool={v2Pair} />
+                  <ChefPositionCard
+                    key={v2Pair.farmablePool.address}
+                    pairFarmablePool={v2Pair}
+                    unstakedLPAmount={tokenBalanceMap[v2Pair.farmablePool.address]}
+                  />
                 ))}
               </>
             ) : (

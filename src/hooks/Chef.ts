@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { TokenAmount } from 'uniswap-xdai-sdk'
 import { FarmablePool } from '../bao/lib/constants'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { useMasterChefContract } from './useContract'
@@ -15,20 +16,16 @@ export function useHarvestAll(
   const masterChefContract = useMasterChefContract()
   const addTransaction = useTransactionAdder()
 
-  console.log('farmablePools', farmablePools)
-
   return useMemo(() => {
     return {
       state: HarvestState.PENDING,
       callback:
         masterChefContract &&
         async function onHarvestAll(): Promise<any[]> {
-          const pids = farmablePools.map(farm => farm.pid)
-
           return await Promise.all(
-            pids.map(async pid => {
-              const txReceipt = await masterChefContract?.claimReward(pid)
-              addTransaction(txReceipt, { summary: `Harvest Pool ID: ${pid}` })
+            farmablePools.map(async farm => {
+              const txReceipt = await masterChefContract.claimReward(farm.pid)
+              addTransaction(txReceipt, { summary: `Harvest ${farm.name} (Pool ID: ${farm.pid})` })
               const txHash = txReceipt.hash
               return txHash
             })
@@ -46,4 +43,28 @@ export function useHarvestAll(
       error: null
     }
   }, [addTransaction, masterChefContract, farmablePools])
+}
+
+export function useStake(
+  farmablePool: FarmablePool,
+  amount: TokenAmount | null | undefined,
+  ref = '0x0000000000000000000000000000000000000000'
+): { callback?: null | (() => Promise<any>) } {
+  const masterChefContract = useMasterChefContract()
+  const addTransaction = useTransactionAdder()
+
+  return useMemo(() => {
+    return {
+      callback:
+        masterChefContract &&
+        amount &&
+        async function onStake(): Promise<any> {
+          const pid = farmablePool.pid
+          const txReceipt = await masterChefContract.deposit(pid, `0x${amount.raw.toString(16)}`, ref)
+          addTransaction(txReceipt, { summary: `Add ${amount.toFixed(4)} to Stake (Pool ID: ${pid})` })
+          const txHash = txReceipt.hash
+          return txHash
+        }
+    }
+  }, [addTransaction, masterChefContract, farmablePool, amount, ref])
 }

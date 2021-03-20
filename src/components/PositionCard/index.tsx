@@ -1,6 +1,6 @@
-import { JSBI, Pair, Percent } from 'uniswap-xdai-sdk'
+import { JSBI, Pair, Percent, TokenAmount } from 'uniswap-xdai-sdk'
 import { darken } from 'polished'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import { Link } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -24,6 +24,7 @@ import { getEtherscanLink } from '../../utils'
 import { FarmablePool } from '../../bao/lib/constants'
 import { UserInfoPairFarmablePool } from '../../data/Reserves'
 import { useStakedAmount } from '../../data/Staked'
+import { useStake } from '../../hooks/Chef'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -262,13 +263,14 @@ export interface PairFarmablePool {
 
 interface ChefCardProps {
   pairFarmablePool: UserInfoPairFarmablePool
+  unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
 }
 
-export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
+export function ChefPositionCard({ pairFarmablePool, unstakedLPAmount, border }: ChefCardProps) {
   const { chainId } = useActiveWeb3React()
-  const { pair, stakedAmount, pendingReward } = pairFarmablePool
+  const { pair, stakedAmount, pendingReward, farmablePool } = pairFarmablePool
 
   const currency0 = unwrappedToken(pair.token0)
   const currency1 = unwrappedToken(pair.token1)
@@ -282,6 +284,14 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
     !!stakedAmount && !!totalPoolTokens && JSBI.greaterThanOrEqual(totalPoolTokens.raw, stakedAmount.raw)
       ? new Percent(stakedAmount.raw, totalPoolTokens.raw)
       : undefined
+
+  const { callback } = useStake(farmablePool, unstakedLPAmount)
+  const handleStake = useCallback(() => {
+    if (!callback) {
+      return
+    }
+    callback()
+  }, [callback])
 
   return (
     <HoverCard border={border}>
@@ -357,17 +367,15 @@ export function ChefPositionCard({ pairFarmablePool, border }: ChefCardProps) {
                 width="25%"
                 to={`/chef/remove/${currencyId(currency0)}/${currencyId(currency1)}`}
               >
-                Unstake
+                -Stake
               </ButtonSecondary>
-              <ButtonLight
-                as={Link}
-                width="8%"
-                to={`/chef/add/${currencyId(currency0)}/${currencyId(currency1)}`}
-                padding="0.5rem"
-                style={{ fontWeight: 800 }}
-              >
-                {'  '}+{'  '}
-              </ButtonLight>
+              <>
+                {unstakedLPAmount && unstakedLPAmount.greaterThan('0') && (
+                  <ButtonLight onClick={() => handleStake()} width="8%" padding="0.5rem" style={{ fontWeight: 800 }}>
+                    +Stake
+                  </ButtonLight>
+                )}
+              </>
             </FixedHeightRow>
 
             <AutoRow justify="center" marginTop={'10px'}>
