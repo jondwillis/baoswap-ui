@@ -28,6 +28,8 @@ import { useLockedEarned } from '../../data/Staked'
 import { ChefState, initialChefState } from '../../state/chef/reducer'
 import { Loader, Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
+import CurrencySearchModal from '../../components/SearchModal/CurrencySearchModal'
+import { useSelectedListUrl } from '../../state/lists/hooks'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -108,6 +110,10 @@ export default function Chef() {
   const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
   `
+
+  const selectedListUrl = useSelectedListUrl()
+  const noListSelected = !selectedListUrl
+
   return (
     <>
       <AppBody>
@@ -203,14 +209,20 @@ export default function Chef() {
               </>
             ) : (
               <LightCard padding="40px">
-                <TYPE.body color={theme.text3} textAlign="center">
-                  No staked liquidity found.
-                </TYPE.body>
-                <ButtonPrimary id="join-pool-button" as={Link} style={{ padding: 16 }} to="/add/ETH">
-                  <Text fontWeight={500} fontSize={20}>
-                    Add Liquidity
-                  </Text>
-                </ButtonPrimary>
+                {noListSelected ? (
+                  <CurrencySearchModal isOpen={noListSelected} onCurrencySelect={() => {}} onDismiss={() => {}} />
+                ) : (
+                  <>
+                    <TYPE.body color={theme.text3} textAlign="center">
+                      No staked liquidity found.
+                    </TYPE.body>
+                    <ButtonPrimary id="join-pool-button" as={Link} style={{ marginTop: 16 }} to="/add/ETH">
+                      <Text fontWeight={500} fontSize={20}>
+                        Add Liquidity
+                      </Text>
+                    </ButtonPrimary>
+                  </>
+                )}
               </LightCard>
             )}
           </AutoColumn>
