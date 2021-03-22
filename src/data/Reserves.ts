@@ -7,8 +7,7 @@ import { useActiveWeb3React } from '../hooks'
 import { useMultipleContractSingleData, useSingleContractMultipleData } from '../state/multicall/hooks'
 import { wrappedCurrency } from '../utils/wrappedCurrency'
 import { useMasterChefContract } from '../hooks/useContract'
-import { PairFarmablePool } from '../components/PositionCard'
-import { contractAddresses, useSupportedLpTokenMap } from '../bao/lib/constants'
+import { contractAddresses, FarmablePool, useSupportedLpTokenMap } from '../bao/lib/constants'
 
 const PAIR_INTERFACE = new Interface(IUniswapV2PairABI)
 
@@ -75,6 +74,11 @@ export function useAllV2PairsWithLiquidity(v2Pairs: [PairState, Pair | null][]):
       })
       .filter((pairFarmablePool): pairFarmablePool is PairFarmablePool => !!pairFarmablePool)
   }, [v2Pairs, supportedLpTokenMap])
+}
+
+export interface PairFarmablePool {
+  pair: Pair
+  farmablePool: FarmablePool
 }
 
 export interface UserInfoPairFarmablePool extends PairFarmablePool {
