@@ -91,10 +91,7 @@ export default function Chef() {
       })
   }, [callback])
 
-  const v2IsLoading =
-    fetchingV2PairBalances ||
-    !account ||
-    fetchingUserInfo
+  const v2IsLoading = fetchingV2PairBalances || !account || fetchingUserInfo
 
   const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
