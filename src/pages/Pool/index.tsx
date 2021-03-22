@@ -7,7 +7,7 @@ import { SwapPoolTabs } from '../../components/NavigationTabs'
 import Question from '../../components/QuestionHelper'
 import FullPositionCard from '../../components/PositionCard'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
-import { TYPE } from '../../theme'
+import { StyledInternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
 import { RowBetween } from '../../components/Row'
@@ -101,6 +101,15 @@ export default function Pool() {
                 </TYPE.body>
               </LightCard>
             )}
+
+            <div>
+              <Text textAlign="center" fontSize={14} style={{ padding: '.5rem 0 .5rem 0' }}>
+                {"Don't see a pool you joined?"}{' '}
+                <StyledInternalLink id="import-pool-link" to={'/find'}>
+                  {'Import it.'}
+                </StyledInternalLink>
+              </Text>
+            </div>
           </AutoColumn>
         </AutoColumn>
       </AppBody>

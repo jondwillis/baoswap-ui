@@ -268,7 +268,7 @@ export default function Swap() {
             whiteSpace: 'nowrap'
           }}
         >
-          Add HNY to MetaMask
+          Add {HONEY.symbol} to MetaMask
         </ButtonImagePlus>
       )}
       <AppBody>
