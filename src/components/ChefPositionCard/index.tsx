@@ -98,6 +98,9 @@ export function ChefPositionCard({ farmablePool, unstakedLPAmount, border }: Che
               {farmablePool.name}
               {/* {!currency0 || !currency1 ? <Dots>Loading</Dots> : `${currency0.symbol}/${currency1.symbol}`} */}
             </Text>
+            <Text fontWeight={300} fontSize={15}>
+              {farmablePool.symbol}
+            </Text>
           </RowFixed>
           <RowFixed>
             {showMore ? (
