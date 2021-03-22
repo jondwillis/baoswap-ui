@@ -21,9 +21,9 @@ import DoubleCurrencyLogo from '../DoubleLogo'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
 import { Dots } from '../swap/styleds'
 import { getEtherscanLink } from '../../utils'
-import { useSupportedLpTokenMap } from '../../bao/lib/constants'
 import { useStake } from '../../hooks/Chef'
 import QuestionHelper from '../QuestionHelper'
+import { useSupportedLpTokenMap } from '../../bao/lib/constants'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;

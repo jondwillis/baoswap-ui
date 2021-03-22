@@ -2,7 +2,7 @@ import React, { useContext, useState, useCallback } from 'react'
 import { ChevronUp, ChevronDown, Loader } from 'react-feather'
 import styled, { ThemeContext } from 'styled-components'
 import { TokenAmount, JSBI, Percent, Fraction } from 'uniswap-xdai-sdk'
-import { UserInfoPairFarmablePool } from '../../data/Reserves'
+import { UserInfoFarmablePool } from '../../data/Reserves'
 import { useStakedAmount } from '../../data/Staked'
 import { useActiveWeb3React } from '../../hooks'
 import { useStake, useUnstake, useHarvestAll } from '../../hooks/Chef'
@@ -11,7 +11,7 @@ import { getEtherscanLink } from '../../utils'
 import { unwrappedToken } from '../../utils/wrappedCurrency'
 import { ButtonSecondary, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
-import DoubleCurrencyLogo from '../DoubleLogo'
+// import DoubleCurrencyLogo from '../DoubleLogo'
 import { HoverCard, FixedHeightRow, BalanceText } from '../PositionCard'
 import QuestionHelper from '../QuestionHelper'
 import { RowFixed, RowBetween, AutoRow } from '../Row'
@@ -21,22 +21,22 @@ import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { ExternalLink } from '../../theme'
 
 interface ChefCardProps {
-  pairFarmablePool: UserInfoPairFarmablePool
+  farmablePool: UserInfoFarmablePool
   unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
 }
 
-export function ChefPositionCard({ pairFarmablePool, unstakedLPAmount, border }: ChefCardProps) {
+export function ChefPositionCard({ farmablePool, unstakedLPAmount, border }: ChefCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
-  const { pair, stakedAmount, pendingReward, farmablePool } = pairFarmablePool
+  const { stakedAmount, pendingReward } = farmablePool
 
-  const currency0 = unwrappedToken(pair.token0)
-  const currency1 = unwrappedToken(pair.token1)
+  // const currency0 = unwrappedToken(pair.token0)
+  // const currency1 = unwrappedToken(pair.token1)
   const rewardCurrency = unwrappedToken(pendingReward.token)
 
-  const totalPoolTokens = useStakedAmount(pair.liquidityToken)
+  const totalPoolTokens = useStakedAmount(farmablePool.token)
 
   const [showMore, setShowMore] = useState(true)
 
@@ -93,9 +93,10 @@ export function ChefPositionCard({ pairFarmablePool, unstakedLPAmount, border }:
       <AutoColumn gap="12px">
         <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer' }}>
           <RowFixed>
-            <DoubleCurrencyLogo currency0={currency0} currency1={currency1} margin={true} size={20} />
+            {/* <DoubleCurrencyLogo currency0={currency0} currency1={currency1} margin={true} size={20} /> */}
             <Text fontWeight={500} fontSize={20}>
-              {!currency0 || !currency1 ? <Dots>Loading</Dots> : `${currency0.symbol}/${currency1.symbol}`}
+              {farmablePool.name}
+              {/* {!currency0 || !currency1 ? <Dots>Loading</Dots> : `${currency0.symbol}/${currency1.symbol}`} */}
             </Text>
           </RowFixed>
           <RowFixed>
@@ -196,7 +197,7 @@ export function ChefPositionCard({ pairFarmablePool, unstakedLPAmount, border }:
 
             <AutoRow justify="center" marginTop={'10px'}>
               {chainId && (
-                <ExternalLink href={getEtherscanLink(chainId, pair.liquidityToken.address, 'address')}>
+                <ExternalLink href={getEtherscanLink(chainId, farmablePool.address, 'address')}>
                   View Liquidity Pool Contract ↗
                 </ExternalLink>
               )}

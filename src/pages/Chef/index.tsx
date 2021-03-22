@@ -16,8 +16,7 @@ import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useBlockNumber, useWalletModalToggle } from '../../state/application/hooks'
-import { useAllV2PairsWithLiquidity, usePairs, useRewardToken, useUserInfoPairFarmablePools } from '../../data/Reserves'
-import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
+import { useRewardToken, useUserInfoFarmablePools } from '../../data/Reserves'
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 
@@ -31,6 +30,7 @@ import { Loader, Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
 import CurrencySearchModal from '../../components/SearchModal/CurrencySearchModal'
 import { useSelectedListUrl } from '../../state/lists/hooks'
+import { useAllFarmablePools } from '../../bao/lib/constants'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -39,26 +39,16 @@ export default function Chef() {
   // toggle wallet when disconnected
   const toggleWalletModal = useWalletModalToggle()
 
-  // fetch the user's balances of all tracked V2 LP tokens
-  const trackedTokenPairs = useTrackedTokenPairs()
-  const tokenPairsWithLiquidityTokens = useMemo(
-    () => trackedTokenPairs.map(tokens => ({ liquidityToken: toV2LiquidityToken(tokens), tokens })),
-    [trackedTokenPairs]
-  )
+  const allFarmablePools = useAllFarmablePools()
 
-  const liquidityTokens = useMemo(() => tokenPairsWithLiquidityTokens.map(tpwlt => tpwlt.liquidityToken), [
-    tokenPairsWithLiquidityTokens
-  ])
+  const liquidityTokens = useMemo(() => allFarmablePools.map(farm => farm.token), [allFarmablePools])
+
   const [tokenBalanceMap, fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(
     account ?? undefined,
     liquidityTokens
   )
 
-  const v2Pairs = usePairs(tokenPairsWithLiquidityTokens.map(({ tokens }) => tokens))
-
-  const allV2PairsWithLiquidity = useAllV2PairsWithLiquidity(v2Pairs)
-
-  const [userInfo, fetchingUserInfo] = useUserInfoPairFarmablePools(allV2PairsWithLiquidity) || []
+  const [userInfo, fetchingUserInfo] = useUserInfoFarmablePools(allFarmablePools) || []
 
   const rewardToken = useRewardToken()
   const allPendingRewards = useMemo(
@@ -82,14 +72,14 @@ export default function Chef() {
 
   const [{ attemptingHarvest }, setChefState] = useState<ChefState>(initialChefState)
 
-  const { callback } = useHarvestAll(useMemo(() => userInfo.map(({ farmablePool }) => farmablePool), [userInfo]))
+  const { callback } = useHarvestAll(useMemo(() => userInfo, [userInfo]))
   const handleHarvestAll = useCallback(() => {
     if (!callback) {
       return
     }
     setChefState({ attemptingHarvest: true, harvestErrorMessage: undefined, harvestTxnHash: undefined })
     callback()
-      .then(hash => {
+      .then(() => {
         setChefState({ attemptingHarvest: false, harvestErrorMessage: undefined, harvestTxnHash: undefined })
       })
       .catch(error => {
@@ -104,9 +94,7 @@ export default function Chef() {
   const v2IsLoading =
     fetchingV2PairBalances ||
     !account ||
-    fetchingUserInfo ||
-    v2Pairs?.length < tokenPairsWithLiquidityTokens.length ||
-    v2Pairs?.some(V2Pair => !V2Pair)
+    fetchingUserInfo
 
   const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
@@ -200,11 +188,11 @@ export default function Chef() {
               </LightCard>
             ) : userInfo?.length > 0 ? (
               <>
-                {userInfo.map(v2Pair => (
+                {userInfo.map(farmablePool => (
                   <ChefPositionCard
-                    key={v2Pair.farmablePool.address}
-                    pairFarmablePool={v2Pair}
-                    unstakedLPAmount={tokenBalanceMap[v2Pair.farmablePool.address]}
+                    key={farmablePool.address}
+                    farmablePool={farmablePool}
+                    unstakedLPAmount={tokenBalanceMap[farmablePool.address]}
                   />
                 ))}
               </>

@@ -7,7 +7,7 @@ import { useActiveWeb3React } from '../hooks'
 import { useMultipleContractSingleData, useSingleContractMultipleData } from '../state/multicall/hooks'
 import { wrappedCurrency } from '../utils/wrappedCurrency'
 import { useMasterChefContract } from '../hooks/useContract'
-import { contractAddresses, FarmablePool, useSupportedLpTokenMap } from '../bao/lib/constants'
+import { contractAddresses, FarmablePool } from '../bao/lib/constants'
 
 const PAIR_INTERFACE = new Interface(IUniswapV2PairABI)
 
@@ -63,25 +63,7 @@ export function usePair(tokenA?: Currency, tokenB?: Currency): [PairState, Pair 
   return usePairs([[tokenA, tokenB]])[0]
 }
 
-export function useAllV2PairsWithLiquidity(v2Pairs: [PairState, Pair | null][]): PairFarmablePool[] {
-  const supportedLpTokenMap = useSupportedLpTokenMap()
-  return useMemo(() => {
-    return v2Pairs
-      .map(([, pair]) => pair as Pair)
-      .flatMap(v2Pair => {
-        const farmablePool = Boolean(v2Pair) && supportedLpTokenMap.get(v2Pair.liquidityToken.address)
-        return farmablePool && { pair: v2Pair, farmablePool: farmablePool }
-      })
-      .filter((pairFarmablePool): pairFarmablePool is PairFarmablePool => !!pairFarmablePool)
-  }, [v2Pairs, supportedLpTokenMap])
-}
-
-export interface PairFarmablePool {
-  pair: Pair
-  farmablePool: FarmablePool
-}
-
-export interface UserInfoPairFarmablePool extends PairFarmablePool {
+export interface UserInfoFarmablePool extends FarmablePool {
   stakedAmount: TokenAmount
   pendingReward: TokenAmount
 }
@@ -96,9 +78,7 @@ export function useRewardToken(): Token {
   return baoRewardToken
 }
 
-export function useUserInfoPairFarmablePools(
-  pairFarmablePools: PairFarmablePool[]
-): [UserInfoPairFarmablePool[], boolean] {
+export function useUserInfoFarmablePools(pairFarmablePools: FarmablePool[]): [UserInfoFarmablePool[], boolean] {
   const { account } = useActiveWeb3React()
   const masterChefContract = useMasterChefContract()
 
@@ -106,8 +86,7 @@ export function useUserInfoPairFarmablePools(
   const accountAddress = account || '0x0'
 
   const poolIdsAndLpTokens = useMemo(() => {
-    const matrix = pairFarmablePools.map(tuple => {
-      const { farmablePool } = tuple
+    const matrix = pairFarmablePools.map(farmablePool => {
       return [farmablePool.pid, accountAddress]
     })
     return matrix
@@ -120,27 +99,25 @@ export function useUserInfoPairFarmablePools(
     [results, pendingRewardResults]
   )
 
-  const userInfoPairFarmablePool = useMemo(() => {
+  const userInfoFarmablePool = useMemo(() => {
     return pairFarmablePools
-      .map((tuple, i) => {
-        const { pair, farmablePool } = tuple
+      .map((farmablePool, i) => {
         const stakedAmountResult = results?.[i]?.result?.[0]
         const pendingReward = pendingRewardResults?.[i]?.result?.[0]
 
         const mergeObject =
           stakedAmountResult && pendingReward
             ? {
-                stakedAmount: new TokenAmount(pair.liquidityToken, stakedAmountResult),
+                stakedAmount: new TokenAmount(farmablePool.token, stakedAmountResult),
                 pendingReward: new TokenAmount(baoRewardToken, pendingReward)
               }
             : {
-                stakedAmount: new TokenAmount(pair.liquidityToken, '0'),
+                stakedAmount: new TokenAmount(farmablePool.token, '0'),
                 pendingReward: new TokenAmount(baoRewardToken, '0')
               }
 
         return {
-          pair,
-          farmablePool,
+          ...farmablePool,
           stakedAmount: mergeObject.stakedAmount,
           pendingReward: mergeObject.pendingReward
         }
@@ -148,7 +125,7 @@ export function useUserInfoPairFarmablePools(
       .filter(({ stakedAmount }) => stakedAmount.greaterThan('0'))
   }, [pairFarmablePools, results, pendingRewardResults, baoRewardToken])
 
-  console.log(userInfoPairFarmablePool, 'userInfoPairFarmablePool')
+  console.log(userInfoFarmablePool, 'userInfoFarmablePool')
 
-  return [userInfoPairFarmablePool, anyLoading]
+  return [userInfoFarmablePool, anyLoading]
 }
