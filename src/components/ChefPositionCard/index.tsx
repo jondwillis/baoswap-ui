@@ -69,7 +69,7 @@ export function ChefPositionCard({ farmablePool, unstakedLPAmount, border }: Che
     }
     setChefState({ attemptingHarvest: true, harvestErrorMessage: undefined, harvestTxnHash: undefined })
     harvestCallback()
-      .then(hash => {
+      .then(() => {
         setChefState({ attemptingHarvest: false, harvestErrorMessage: undefined, harvestTxnHash: undefined })
       })
       .catch(error => {

@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { ChainId, Token } from 'uniswap-xdai-sdk'
 
 export interface PoolInfo {
@@ -2320,25 +2319,21 @@ export interface FarmablePool {
 }
 
 export function useAllFarmablePools(): FarmablePool[] {
-  return useMemo(
-    () =>
-      supportedPools.map(poolInfo => {
-        const address = poolInfo.lpAddresses[ChainId.XDAI]
-        const tokenAddress = poolInfo.tokenAddresses[ChainId.XDAI]
-        const farmablePool: FarmablePool = {
-          pid: poolInfo.pid,
-          address,
-          tokenAddress: tokenAddress,
-          token: new Token(ChainId.XDAI, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
-          symbol: poolInfo.symbol,
-          name: poolInfo.name,
-          icon: poolInfo.icon,
-          refUrl: poolInfo.refUrl
-        }
-        return farmablePool
-      }),
-    [supportedPools]
-  )
+  return supportedPools.map(poolInfo => {
+    const address = poolInfo.lpAddresses[ChainId.XDAI]
+    const tokenAddress = poolInfo.tokenAddresses[ChainId.XDAI]
+    const farmablePool: FarmablePool = {
+      pid: poolInfo.pid,
+      address,
+      tokenAddress: tokenAddress,
+      token: new Token(ChainId.XDAI, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
+      symbol: poolInfo.symbol,
+      name: poolInfo.name,
+      icon: poolInfo.icon,
+      refUrl: poolInfo.refUrl
+    }
+    return farmablePool
+  })
 }
 
 const supportedLpTokenEntries = supportedPools.map(poolInfo => {
