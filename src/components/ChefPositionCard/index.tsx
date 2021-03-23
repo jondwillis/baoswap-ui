@@ -25,9 +25,10 @@ interface ChefCardProps {
   unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
+  defaultShowMore: boolean
 }
 
-export function ChefPositionCard({ farmablePool, unstakedLPAmount, border }: ChefCardProps) {
+export function ChefPositionCard({ farmablePool, unstakedLPAmount, border, defaultShowMore }: ChefCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
   const { stakedAmount, pendingReward } = farmablePool
@@ -38,7 +39,7 @@ export function ChefPositionCard({ farmablePool, unstakedLPAmount, border }: Che
 
   const totalPoolTokens = useStakedAmount(farmablePool.token)
 
-  const [showMore, setShowMore] = useState(true)
+  const [showMore, setShowMore] = useState(defaultShowMore)
 
   const lpStakedPercentage =
     !!stakedAmount && !!totalPoolTokens && JSBI.greaterThanOrEqual(totalPoolTokens.raw, stakedAmount.raw)
