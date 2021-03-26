@@ -15,10 +15,12 @@ import { ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
-import { usePairs } from '../../data/Reserves'
+import { usePairs, usePoolInfoFarmablePools } from '../../data/Reserves'
 import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
+import { useAllFarmablePools } from '../../bao/lib/constants'
+import { FarmCard } from '../../components/FarmCard'
 
 export default function Pool() {
   const theme = useContext(ThemeContext)
@@ -47,9 +49,29 @@ export default function Pool() {
     [tokenPairsWithLiquidityTokens, v2PairsBalances]
   )
 
+  const allFarmablePools = useAllFarmablePools()
+
+  // const farmableLiquidityTokens = useMemo(() => allFarmablePools.map(farm => farm.token), [allFarmablePools])
+
+  // const baoRewardToken = useRewardToken()
+
+  // const userInfo = useMemo(() => allFarmablePools.map((farm) => {
+  //   return {
+  //     ...farm,
+  //     stakedAmount: new TokenAmount(farm.token, '0'),
+  //     pendingReward: new TokenAmount(baoRewardToken, '0')
+  //   }
+  // }), [allFarmablePools, baoRewardToken])
+
+  const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools)
+
   const v2Pairs = usePairs(liquidityTokensWithBalances.map(({ tokens }) => tokens))
+
   const v2IsLoading =
-    fetchingV2PairBalances || v2Pairs?.length < liquidityTokensWithBalances.length || v2Pairs?.some(V2Pair => !V2Pair)
+    fetchingPoolInfo ||
+    fetchingV2PairBalances ||
+    v2Pairs?.length < liquidityTokensWithBalances.length ||
+    v2Pairs?.some(V2Pair => !V2Pair)
 
   const allV2PairsWithLiquidity = v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair))
 
@@ -110,6 +132,32 @@ export default function Pool() {
                 </StyledInternalLink>
               </Text>
             </div>
+
+            <RowBetween padding={'0 8px'}>
+              <Text color={theme.text1} fontWeight={500}>
+                All Farmable Liquidity Pools
+              </Text>
+            </RowBetween>
+
+            {v2IsLoading ? (
+              <LightCard padding="40px">
+                <TYPE.body color={theme.text3} textAlign="center">
+                  <Dots>Loading</Dots>
+                </TYPE.body>
+              </LightCard>
+            ) : poolInfo?.length > 0 ? (
+              <>
+                {poolInfo.map(farmablePool => (
+                  <FarmCard key={`farm-${farmablePool.address}`} farmablePool={farmablePool} defaultShowMore={false} />
+                ))}
+              </>
+            ) : (
+              <LightCard padding="40px">
+                <TYPE.body color={theme.text3} textAlign="center">
+                  No farmable liquidity pools found.
+                </TYPE.body>
+              </LightCard>
+            )}
           </AutoColumn>
         </AutoColumn>
       </AppBody>

@@ -42,7 +42,10 @@ export function ChefPositionCard({ farmablePool, unstakedLPAmount, border, defau
   const [showMore, setShowMore] = useState(defaultShowMore)
 
   const lpStakedPercentage =
-    !!stakedAmount && !!totalPoolTokens && JSBI.greaterThanOrEqual(totalPoolTokens.raw, stakedAmount.raw)
+    !!stakedAmount &&
+    !!totalPoolTokens &&
+    stakedAmount.greaterThan('0') &&
+    JSBI.greaterThanOrEqual(totalPoolTokens.raw, stakedAmount.raw)
       ? new Percent(stakedAmount.raw, totalPoolTokens.raw)
       : undefined
 

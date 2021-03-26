@@ -63,11 +63,6 @@ export function usePair(tokenA?: Currency, tokenB?: Currency): [PairState, Pair 
   return usePairs([[tokenA, tokenB]])[0]
 }
 
-export interface UserInfoFarmablePool extends FarmablePool {
-  stakedAmount: TokenAmount
-  pendingReward: TokenAmount
-}
-
 export function useRewardToken(): Token {
   const { chainId } = useActiveWeb3React()
   const chainIdNumber = chainId === ChainId.XDAI ? 100 : 4
@@ -76,6 +71,11 @@ export function useRewardToken(): Token {
     (chainId && new Token(chainId, contractAddresses.bao[chainIdNumber], 18, rewardSymbol)) || WETH[100]
 
   return baoRewardToken
+}
+
+export interface UserInfoFarmablePool extends FarmablePool {
+  stakedAmount: TokenAmount
+  pendingReward: TokenAmount
 }
 
 export function useUserInfoFarmablePools(pairFarmablePools: FarmablePool[]): [UserInfoFarmablePool[], boolean] {
@@ -126,6 +126,47 @@ export function useUserInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Us
   }, [pairFarmablePools, results, pendingRewardResults, baoRewardToken])
 
   console.log(userInfoFarmablePool, 'userInfoFarmablePool')
+
+  return [userInfoFarmablePool, anyLoading]
+}
+
+export interface PoolInfoFarmablePool extends FarmablePool {
+  accBaoPerShare: TokenAmount
+}
+
+export function usePoolInfoFarmablePools(pairFarmablePools: FarmablePool[]): [PoolInfoFarmablePool[], boolean] {
+  const masterChefContract = useMasterChefContract()
+
+  const baoRewardToken = useRewardToken()
+
+  const poolIds = useMemo(() => {
+    return pairFarmablePools.map(farmablePool => [farmablePool.pid])
+  }, [pairFarmablePools])
+
+  const results = useSingleContractMultipleData(masterChefContract, 'poolInfo', poolIds)
+  const anyLoading: boolean = useMemo(() => results.some(callState => callState.loading), [results])
+
+  const userInfoFarmablePool = useMemo(() => {
+    return pairFarmablePools
+      .map((farmablePool, i) => {
+        const accBaoPerShare = results?.[i]?.result?.[3] // [1] is pool weight
+
+        const mergeObject = accBaoPerShare
+          ? {
+              accBaoPerShare: new TokenAmount(baoRewardToken, accBaoPerShare)
+            }
+          : {
+              accBaoPerShare: new TokenAmount(baoRewardToken, '0')
+            }
+
+        return {
+          ...farmablePool,
+          accBaoPerShare: mergeObject.accBaoPerShare
+        }
+      })
+      .filter(({ accBaoPerShare }) => accBaoPerShare.greaterThan('0'))
+      .sort((a, b) => a.accBaoPerShare.greaterThan(b.accBaoPerShare) ? -1 : 1)
+  }, [pairFarmablePools, results, baoRewardToken])
 
   return [userInfoFarmablePool, anyLoading]
 }
