@@ -13,6 +13,7 @@ import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useTranslation } from 'react-i18next'
+import { AutoColumn } from '../Column'
 
 const InputRow = styled.div<{ selected: boolean }>`
   ${({ theme }) => theme.flexRowNoWrap}
@@ -196,10 +197,10 @@ export default function CurrencyInputPanel({
                 }}
               />
               {account && currency && showMaxButton && label !== 'To' && (
-                <>
+                <AutoColumn gap="4pt">
                   <StyledBalanceMax onClick={onHalf}>1/2</StyledBalanceMax>
                   <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>
-                </>
+                </AutoColumn>
               )}
             </>
           )}
