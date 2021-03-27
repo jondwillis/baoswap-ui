@@ -6,7 +6,7 @@ import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'
 import FullPositionCard from '../../components/PositionCard'
-import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
+import { TokenPairWithLiquidityToken, useTokenBalancesWithLoadingIndicator, useTokenPairCandidates } from '../../state/wallet/hooks'
 import { StyledInternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
@@ -28,7 +28,7 @@ export default function Pool() {
 
   // fetch the user's balances of all tracked V2 LP tokens
   const trackedTokenPairs = useTrackedTokenPairs()
-  const tokenPairsWithLiquidityTokens = useMemo(
+  const tokenPairsWithLiquidityTokens: TokenPairWithLiquidityToken[] = useMemo(
     () => trackedTokenPairs.map(tokens => ({ liquidityToken: toV2LiquidityToken(tokens), tokens })),
     [trackedTokenPairs]
   )
@@ -40,6 +40,9 @@ export default function Pool() {
     liquidityTokens
   )
 
+  const [tokenPairCandidates, fetchingTokenPairCandidates] = useTokenPairCandidates(tokenPairsWithLiquidityTokens)
+  const farmableTokenPairCandidates = tokenPairCandidates.filter(tokenPair => allFarmablePools.map(farm => farm.address).includes(tokenPair.liquidityToken.address))
+
   // fetch the reserves for all V2 pools in which the user has a balance
   const liquidityTokensWithBalances = useMemo(
     () =>
@@ -49,6 +52,18 @@ export default function Pool() {
     [tokenPairsWithLiquidityTokens, v2PairsBalances]
   )
 
+  // const liquidityTokenCandidates = useMemo(() => tokenPairsWithLiquidityTokens.filter(({ tokens }) => useTokenBalancesWithLoadingIndicator(account ?? undefined, tokens)), [tokenPairsWithLiquidityTokens, account])
+
+  // var liquidityTokenCandidates: { [tokenAddress: string]: TokenAmount | undefined }[] = []
+  // var tokenPair//
+  // for (tokenPair in tokenPairsWithLiquidityTokens) {
+  //   const { liquidityToken, tokens } = tokenPair as unknown as { liquidityToken: Token; tokens: [Token, Token] }
+  //   const thing = useTokenBalancesWithLoadingIndicator(account ?? undefined, tokens)
+  //   const [balanceMap] = thing
+  //   if (balanceMap[liquidityToken.address]?.greaterThan('0')) {
+  //     liquidityTokenCandidates.push(balanceMap)
+  //   }
+  // }
   const allFarmablePools = useAllFarmablePools()
 
   // const farmableLiquidityTokens = useMemo(() => allFarmablePools.map(farm => farm.token), [allFarmablePools])
@@ -66,15 +81,18 @@ export default function Pool() {
   const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools)
 
   const v2Pairs = usePairs(liquidityTokensWithBalances.map(({ tokens }) => tokens))
+  const pairCandidates = usePairs(farmableTokenPairCandidates.map(({ tokens }) => tokens))
 
   const v2IsLoading =
     fetchingPoolInfo ||
     fetchingV2PairBalances ||
+    fetchingTokenPairCandidates ||
     v2Pairs?.length < liquidityTokensWithBalances.length ||
     v2Pairs?.some(V2Pair => !V2Pair)
 
-  const allV2PairsWithLiquidity = v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair))
-
+  const allV2PairsWithLiquidity = useMemo(() => v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)), [v2Pairs])
+  const allPairCandidatesWithLiquidity = useMemo(() => pairCandidates.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)), [pairCandidates])
+  
   return (
     <>
       <AppBody>
@@ -132,6 +150,36 @@ export default function Pool() {
                 </StyledInternalLink>
               </Text>
             </div>
+            <RowBetween padding={'0 8px'}>
+              <Text color={theme.text1} fontWeight={500}>
+                Farmable Liquidity Suggestions:
+              </Text>
+              <Question text="These liquidity pools are shown because you have a balance in both tokens in the pair, and the LP can be staked." />
+            </RowBetween>
+
+            {v2IsLoading ? (
+              <LightCard padding="40px">
+                <TYPE.body color={theme.text3} textAlign="center">
+                  <Dots>Loading</Dots>
+                </TYPE.body>
+              </LightCard>
+            ) : allPairCandidatesWithLiquidity?.length > 0 ? (
+              <>
+                {allPairCandidatesWithLiquidity.map(v2Pair => (
+                  <FullPositionCard
+                    key={`suggest- ${v2Pair.liquidityToken.address}`}
+                    pair={v2Pair}
+                    unstakedLPAmount={v2PairsBalances[v2Pair.liquidityToken.address]}
+                  />
+                ))}
+              </>
+            ) : (
+              <LightCard padding="40px">
+                <TYPE.body color={theme.text3} textAlign="center">
+                  No significant individual token balances found in farmable liquidity pools.
+                </TYPE.body>
+              </LightCard>
+            )}
 
             <RowBetween padding={'0 8px'}>
               <Text color={theme.text1} fontWeight={500}>
