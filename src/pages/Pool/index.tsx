@@ -15,12 +15,11 @@ import { ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
-import { usePairs, usePoolInfoFarmablePools } from '../../data/Reserves'
+import { usePairs } from '../../data/Reserves'
 import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 import { useAllFarmablePools } from '../../bao/lib/constants'
-import { FarmCard } from '../../components/FarmCard'
 
 export default function Pool() {
   const theme = useContext(ThemeContext)
@@ -40,8 +39,11 @@ export default function Pool() {
     liquidityTokens
   )
 
+  const allFarmablePools = useAllFarmablePools()
+
   const [tokenPairCandidates, fetchingTokenPairCandidates] = useTokenPairCandidates(tokenPairsWithLiquidityTokens)
-  const farmableTokenPairCandidates = tokenPairCandidates.filter(tokenPair => allFarmablePools.map(farm => farm.address).includes(tokenPair.liquidityToken.address))
+  const farmableAddresses = useMemo(() => allFarmablePools.map(farm => farm.address), [allFarmablePools])
+  const farmableTokenPairCandidates = useMemo(() => tokenPairCandidates.filter(tokenPair => farmableAddresses.includes(tokenPair.liquidityToken.address)), [allFarmablePools, tokenPairCandidates])
 
   // fetch the reserves for all V2 pools in which the user has a balance
   const liquidityTokensWithBalances = useMemo(
@@ -52,39 +54,10 @@ export default function Pool() {
     [tokenPairsWithLiquidityTokens, v2PairsBalances]
   )
 
-  // const liquidityTokenCandidates = useMemo(() => tokenPairsWithLiquidityTokens.filter(({ tokens }) => useTokenBalancesWithLoadingIndicator(account ?? undefined, tokens)), [tokenPairsWithLiquidityTokens, account])
-
-  // var liquidityTokenCandidates: { [tokenAddress: string]: TokenAmount | undefined }[] = []
-  // var tokenPair//
-  // for (tokenPair in tokenPairsWithLiquidityTokens) {
-  //   const { liquidityToken, tokens } = tokenPair as unknown as { liquidityToken: Token; tokens: [Token, Token] }
-  //   const thing = useTokenBalancesWithLoadingIndicator(account ?? undefined, tokens)
-  //   const [balanceMap] = thing
-  //   if (balanceMap[liquidityToken.address]?.greaterThan('0')) {
-  //     liquidityTokenCandidates.push(balanceMap)
-  //   }
-  // }
-  const allFarmablePools = useAllFarmablePools()
-
-  // const farmableLiquidityTokens = useMemo(() => allFarmablePools.map(farm => farm.token), [allFarmablePools])
-
-  // const baoRewardToken = useRewardToken()
-
-  // const userInfo = useMemo(() => allFarmablePools.map((farm) => {
-  //   return {
-  //     ...farm,
-  //     stakedAmount: new TokenAmount(farm.token, '0'),
-  //     pendingReward: new TokenAmount(baoRewardToken, '0')
-  //   }
-  // }), [allFarmablePools, baoRewardToken])
-
-  const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools)
-
   const v2Pairs = usePairs(liquidityTokensWithBalances.map(({ tokens }) => tokens))
   const pairCandidates = usePairs(farmableTokenPairCandidates.map(({ tokens }) => tokens))
 
   const v2IsLoading =
-    fetchingPoolInfo ||
     fetchingV2PairBalances ||
     fetchingTokenPairCandidates ||
     v2Pairs?.length < liquidityTokensWithBalances.length ||
@@ -177,32 +150,6 @@ export default function Pool() {
               <LightCard padding="40px">
                 <TYPE.body color={theme.text3} textAlign="center">
                   No significant individual token balances found in farmable liquidity pools.
-                </TYPE.body>
-              </LightCard>
-            )}
-
-            <RowBetween padding={'0 8px'}>
-              <Text color={theme.text1} fontWeight={500}>
-                All Farmable Liquidity Pools
-              </Text>
-            </RowBetween>
-
-            {v2IsLoading ? (
-              <LightCard padding="40px">
-                <TYPE.body color={theme.text3} textAlign="center">
-                  <Dots>Loading</Dots>
-                </TYPE.body>
-              </LightCard>
-            ) : poolInfo?.length > 0 ? (
-              <>
-                {poolInfo.map(farmablePool => (
-                  <FarmCard key={`farm-${farmablePool.address}`} farmablePool={farmablePool} defaultShowMore={false} />
-                ))}
-              </>
-            ) : (
-              <LightCard padding="40px">
-                <TYPE.body color={theme.text3} textAlign="center">
-                  No farmable liquidity pools found.
                 </TYPE.body>
               </LightCard>
             )}
