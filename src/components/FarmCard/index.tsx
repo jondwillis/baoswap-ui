@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { ChevronUp, ChevronDown } from 'react-feather'
 import { ThemeContext } from 'styled-components'
-import { useStakedAmount } from '../../data/Staked'
 import { useActiveWeb3React } from '../../hooks'
 import { getEtherscanLink } from '../../utils'
 import { AutoColumn } from '../Column'
@@ -10,6 +9,7 @@ import { RowFixed, AutoRow } from '../Row'
 import { Text } from 'rebass'
 import { ExternalLink } from '../../theme'
 import { PoolInfoFarmablePool } from '../../data/Reserves'
+import { JSBI, TokenAmount } from 'uniswap-xdai-sdk'
 
 interface FarmCardProps {
   farmablePool: PoolInfoFarmablePool
@@ -20,13 +20,16 @@ interface FarmCardProps {
 export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
-  // const { stakedAmount, pendingReward } = farmablePool
+  const { accBaoPerShare, totalSupply } = farmablePool
 
-  // const currency0 = unwrappedToken(pair.token0)
-  // const currency1 = unwrappedToken(pair.token1)
-  // const rewardCurrency = unwrappedToken(pendingReward.token)
+  // const stakedPoolTokens = useStakedAmount(farmablePool.token)
 
-  const totalPoolTokens = useStakedAmount(farmablePool.token)
+  const score =
+    totalSupply &&
+    new TokenAmount(
+      totalSupply.token,
+      JSBI.subtract(JSBI.multiply(accBaoPerShare.raw, totalSupply.raw), JSBI.BigInt(1e12))
+    )
 
   const [showMore, setShowMore] = useState(defaultShowMore)
 
@@ -35,16 +38,15 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
       <AutoColumn gap="12px">
         <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer' }}>
           <RowFixed>
-            {/* <DoubleCurrencyLogo currency0={currency0} currency1={currency1} margin={true} size={20} /> */}
             <Text fontWeight={500} fontSize={20}>
               {farmablePool.name}
-              {/* {!currency0 || !currency1 ? <Dots>Loading</Dots> : `${currency0.symbol}/${currency1.symbol}`} */}
             </Text>
             <Text fontWeight={300} fontSize={12}>
               {'  - '}
               {farmablePool.symbol}
             </Text>
           </RowFixed>
+          <RowFixed>{score?.toSignificant(8) ?? '-'}</RowFixed>
           <RowFixed>
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '10px' }} />
@@ -63,7 +65,20 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
               </RowFixed>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  {totalPoolTokens ? totalPoolTokens.toFixed(3) : '-'}
+                  {totalSupply ? totalSupply.toSignificant(8) : '-'}
+                </Text>
+              </RowFixed>
+            </FixedHeightRow>
+
+            <FixedHeightRow>
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  Acc Bao/Share:
+                </Text>
+              </RowFixed>
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  {accBaoPerShare ? accBaoPerShare.toSignificant(8) : '-'}
                 </Text>
               </RowFixed>
             </FixedHeightRow>

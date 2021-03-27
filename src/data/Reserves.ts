@@ -1,4 +1,4 @@
-import { TokenAmount, Pair, Currency, Token, ChainId, WETH } from 'uniswap-xdai-sdk'
+import { TokenAmount, Pair, Currency, Token, ChainId, WETH, JSBI } from 'uniswap-xdai-sdk'
 import { useMemo } from 'react'
 import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 import { Interface } from '@ethersproject/abi'
@@ -131,7 +131,9 @@ export function useUserInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Us
 }
 
 export interface PoolInfoFarmablePool extends FarmablePool {
+  totalSupply: TokenAmount
   accBaoPerShare: TokenAmount
+  poolWeight: JSBI
 }
 
 export function usePoolInfoFarmablePools(pairFarmablePools: FarmablePool[]): [PoolInfoFarmablePool[], boolean] {
@@ -142,31 +144,48 @@ export function usePoolInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Po
   const poolIds = useMemo(() => {
     return pairFarmablePools.map(farmablePool => [farmablePool.pid])
   }, [pairFarmablePools])
+  const pairAddresses = useMemo(() => {
+    return pairFarmablePools.map(farmablePool => farmablePool.address)
+  }, [pairFarmablePools])
 
   const results = useSingleContractMultipleData(masterChefContract, 'poolInfo', poolIds)
-  const anyLoading: boolean = useMemo(() => results.some(callState => callState.loading), [results])
+  const pairResults = useMultipleContractSingleData(pairAddresses, PAIR_INTERFACE, 'totalSupply')
+  const anyLoading: boolean = useMemo(
+    () => results.some(callState => callState.loading) || pairResults.some(callState => callState.loading),
+    [results, pairResults]
+  )
 
   const userInfoFarmablePool = useMemo(() => {
     return pairFarmablePools
       .map((farmablePool, i) => {
         const accBaoPerShare = results?.[i]?.result?.[3] // [1] is pool weight
+        const totalSupply = pairResults?.[i].result?.[0]
+        const poolWeight = results?.[i]?.result?.[1]
 
-        const mergeObject = accBaoPerShare
-          ? {
-              accBaoPerShare: new TokenAmount(baoRewardToken, accBaoPerShare)
-            }
-          : {
-              accBaoPerShare: new TokenAmount(baoRewardToken, '0')
-            }
+        const mergeObject =
+          accBaoPerShare && totalSupply
+            ? {
+                totalSupply: new TokenAmount(farmablePool.token, totalSupply),
+                accBaoPerShare: new TokenAmount(baoRewardToken, accBaoPerShare),
+                poolWeight: JSBI.BigInt(poolWeight)
+              }
+            : {
+                totalSupply: new TokenAmount(farmablePool.token, '1'),
+                accBaoPerShare: new TokenAmount(baoRewardToken, '0'),
+                poolWeight: JSBI.BigInt(0)
+              }
 
         return {
           ...farmablePool,
-          accBaoPerShare: mergeObject.accBaoPerShare
+          ...mergeObject
         }
       })
-      .filter(({ accBaoPerShare }) => accBaoPerShare.greaterThan('0'))
-      .sort((a, b) => a.accBaoPerShare.greaterThan(b.accBaoPerShare) ? -1 : 1)
-  }, [pairFarmablePools, results, baoRewardToken])
+      .sort((a, b) => {
+        const aProd = JSBI.multiply(JSBI.divide(a.accBaoPerShare.raw, a.totalSupply.raw), a.poolWeight)
+        const bProd = JSBI.multiply(JSBI.divide(b.accBaoPerShare.raw, b.totalSupply.raw), b.poolWeight)
+        return JSBI.greaterThan(aProd, bProd) ? -1 : 1
+      })
+  }, [pairFarmablePools, results, pairResults, baoRewardToken])
 
   return [userInfoFarmablePool, anyLoading]
 }
