@@ -44,7 +44,7 @@ export default function Pool() {
 
   const [tokenPairCandidates, fetchingTokenPairCandidates] = useTokenPairCandidates(tokenPairsWithLiquidityTokens)
   const farmableAddresses = useMemo(() => allFarmablePools.map(farm => farm.address), [allFarmablePools])
-  const farmableTokenPairCandidates = useMemo(() => tokenPairCandidates.filter(tokenPair => farmableAddresses.includes(tokenPair.liquidityToken.address)), [allFarmablePools, tokenPairCandidates])
+  const farmableTokenPairCandidates = useMemo(() => tokenPairCandidates.filter(tokenPair => farmableAddresses.includes(tokenPair.liquidityToken.address)), [farmableAddresses, tokenPairCandidates])
 
   // fetch the reserves for all V2 pools in which the user has a balance
   const liquidityTokensWithBalances = useMemo(
