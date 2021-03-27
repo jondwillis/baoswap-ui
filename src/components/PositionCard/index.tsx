@@ -255,7 +255,7 @@ export default function FullPositionCard({ pair, unstakedLPAmount, border }: Pos
                 Your pool share:
               </Text>
               <Text fontSize={16} fontWeight={500}>
-                {poolTokenPercentage ? poolTokenPercentage.toFixed(4) + '%' : '-'}
+                {poolTokenPercentage ? poolTokenPercentage.toFixed(8) + '%' : '-'}
               </Text>
             </FixedHeightRow>
 

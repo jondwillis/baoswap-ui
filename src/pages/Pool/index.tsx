@@ -20,6 +20,7 @@ import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 import { useAllFarmablePools } from '../../bao/lib/constants'
+import { FarmSuggestionCard } from '../../components/FarmSuggestionCard'
 
 export default function Pool() {
   const theme = useContext(ThemeContext)
@@ -139,7 +140,7 @@ export default function Pool() {
             ) : allPairCandidatesWithLiquidity?.length > 0 ? (
               <>
                 {allPairCandidatesWithLiquidity.map(v2Pair => (
-                  <FullPositionCard
+                  <FarmSuggestionCard
                     key={`suggest- ${v2Pair.liquidityToken.address}`}
                     pair={v2Pair}
                     unstakedLPAmount={v2PairsBalances[v2Pair.liquidityToken.address]}
