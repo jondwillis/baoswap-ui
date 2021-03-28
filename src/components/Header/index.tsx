@@ -5,7 +5,7 @@ import { Text } from 'rebass'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
 import { useETHBalances } from '../../state/wallet/hooks'
-import { YellowCard } from '../Card'
+import { LightCard } from '../Card'
 import Settings from '../Settings'
 import Menu from '../Menu'
 import Row, { RowBetween } from '../Row'
@@ -14,8 +14,8 @@ import Logo from '../../assets/images/bao-logo.png'
 
 import QuestionHelper from '../QuestionHelper'
 import { ExternalLink } from '../../theme'
-import AppBody from '../../pages/AppBody'
 import { GitBranch } from 'react-feather'
+import { ColumnCenter as Column } from '../Column'
 
 const HeaderFrame = styled.div`
   display: flex;
@@ -87,7 +87,7 @@ const TestnetWrapper = styled.div`
   pointer-events: auto;
 `
 
-const NetworkCard = styled(YellowCard)`
+const NetworkCard = styled(LightCard)`
   width: fit-content;
   margin-right: 10px;
   border-radius: 12px;
@@ -145,23 +145,30 @@ export default function Header() {
               <img src={Logo} alt="logo" />
             </BaoIcon>
             <TitleText style={{ flexShrink: 1, margin: 4, height: '0.5rem' }}>
-              <AppBody>
+              <NetworkCard>
                 <ExternalLink
                   style={{ textDecoration: 'none', padding: 4 }}
                   id="link"
                   href="https://github.com/jondwillis/baoswap-ui-source"
                 >
-                  <GitBranch size="12pt" /> QoL
+                  <GitBranch size="20pt" />
                 </ExternalLink>
                 <QuestionHelper text='This is a UI fork of BaoSwap, with an emphasis on Quality of Life for users that harvest and/or compound frequently. Please see the "..." menu to view the source code.' />
-              </AppBody>
+              </NetworkCard>
             </TitleText>
           </Title>
         </HeaderElement>
         <HeaderControls>
           <HeaderElement>
             <TestnetWrapper>
-              {!isMobile && chainId && NETWORK_LABELS[chainId] && <NetworkCard>{NETWORK_LABELS[chainId]}</NetworkCard>}
+              {!isMobile && chainId && NETWORK_LABELS[chainId] && (
+                <NetworkCard>
+                  <Column style={{ padding: 0, margin: 0 }}>
+                    <RowBetween>{NETWORK_LABELS[chainId]}</RowBetween>
+                    <RowBetween><Text fontWeight={300} fontSize={12}>CHAIN</Text></RowBetween>
+                  </Column>
+                </NetworkCard>
+              )}
             </TestnetWrapper>
             <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
               {account && userEthBalance ? (
