@@ -159,7 +159,7 @@ export function ChefPositionCard({ farmablePool, unstakedLPAmount, border, defau
                     onClick={() => handleStake()}
                     disabled={!(unstakedLPAmount && unstakedLPAmount.greaterThan('0'))}
                     padding="0.5rem"
-                    style={{ fontWeight: 800, backgroundColor: theme.primary3, padding: '0.2rem', marginBottom: 10 }}
+                    style={{ fontWeight: 900, backgroundColor: theme.primary3, padding: '0.2rem', marginBottom: 10 }}
                   >
                     +Stake
                     <QuestionHelper text={`Stakes ALL ${unstakedLPAmount?.toFixed(4)} remaining LP Tokens`} />
