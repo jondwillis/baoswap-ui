@@ -86,7 +86,6 @@ export const useTokenPairCandidates = (tpwlts: TokenPairWithLiquidityToken[]): [
   const tokens = useMemo(() => tpwlts.map(tpwlt => tpwlt.tokens.flat()).flat(), [tpwlts])
   const { validatedTokenAddresses }: { validatedTokenAddresses: string[]; validatedTokens: Token[] } = useValidatedTokens(tokens)
 
-  debugger
   const balances = useMultipleContractSingleData(validatedTokenAddresses, ERC20_INTERFACE, 'balanceOf', [account || undefined])
   const anyLoading: boolean = useMemo(() => balances.some(callState => callState.loading), [balances])
 
