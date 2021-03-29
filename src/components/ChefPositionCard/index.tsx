@@ -28,7 +28,7 @@ interface ChefCardProps {
   defaultShowMore: boolean
 }
 
-export function ChefPositionCard({ farmablePool, unstakedLPAmount, border, defaultShowMore }: ChefCardProps) {
+export function ChefPositionCard({ farmablePool, unstakedLPAmount, border, defaultShowMore }: ChefCardProps): JSX.Element {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
   const { stakedAmount, pendingReward, icon, name } = farmablePool
@@ -109,11 +109,35 @@ export function ChefPositionCard({ farmablePool, unstakedLPAmount, border, defau
               </RowFixed>
             </AutoColumn>
           </RowFixed>
+          {!showMore ? (
+            <RowBetween style={{width: '6rem', alignContent: 'end' }} fontWeight={800}>
+              <ButtonPrimary padding="0.5rem" margin="0" onClick={() => handleHarvestAll()} disabled={attemptingHarvest}>
+              {attemptingHarvest ? (
+                <span>
+                  <Dots>Harvesting</Dots>
+                  <IconWrapper pending={attemptingHarvest} success={!attemptingHarvest}>
+                    <Loader />
+                  </IconWrapper>
+                </span>
+              ) : (
+                <span>
+                  <Text color={theme.text5} fontWeight={600}>
+                    Harvest
+                  </Text>
+                  <BalanceText style={{ fontSize: '10pt' }} fontWeight={600}>
+                    <UnlockIcon size="12px" /> {unlockedPending?.toFixed(0) || '-'}{' '}
+                    <span style={{ flexShrink: 1, fontSize: '7pt' }}>{rewardCurrency.symbol}</span>
+                  </BalanceText>
+                </span>
+              )}
+            </ButtonPrimary>
+          </RowBetween>
+          ) : ''}
           <RowFixed>
             {showMore ? (
-              <ChevronUp size="20" style={{ marginLeft: '10px' }} />
+              <ChevronUp size="20" style={{ marginLeft: '2px' }} />
             ) : (
-              <ChevronDown size="20" style={{ marginLeft: '10px' }} />
+              <ChevronDown size="20" style={{ marginLeft: '2px' }} />
             )}
           </RowFixed>
         </FixedHeightRow>
