@@ -187,7 +187,7 @@ export default function Chef() {
                     key={farmablePool.address}
                     farmablePool={farmablePool}
                     unstakedLPAmount={tokenBalanceMap[farmablePool.address]}
-                    defaultShowMore={true}
+                    defaultShowMore={false}
                   />
                 ))}
               </>

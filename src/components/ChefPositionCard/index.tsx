@@ -11,7 +11,6 @@ import { getEtherscanLink } from '../../utils'
 import { unwrappedToken } from '../../utils/wrappedCurrency'
 import { ButtonSecondary, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
-// import DoubleCurrencyLogo from '../DoubleLogo'
 import { HoverCard, FixedHeightRow, BalanceText } from '../PositionCard'
 import QuestionHelper from '../QuestionHelper'
 import { RowFixed, RowBetween, AutoRow } from '../Row'
@@ -19,6 +18,7 @@ import { Dots } from '../swap/styleds'
 import { Text } from 'rebass'
 import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { ExternalLink } from '../../theme'
+import Logo from '../Logo'
 
 interface ChefCardProps {
   farmablePool: UserInfoFarmablePool
@@ -31,10 +31,8 @@ interface ChefCardProps {
 export function ChefPositionCard({ farmablePool, unstakedLPAmount, border, defaultShowMore }: ChefCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
-  const { stakedAmount, pendingReward } = farmablePool
+  const { stakedAmount, pendingReward, icon, name } = farmablePool
 
-  // const currency0 = unwrappedToken(pair.token0)
-  // const currency1 = unwrappedToken(pair.token1)
   const rewardCurrency = unwrappedToken(pendingReward.token)
 
   const totalPoolTokens = useStakedAmount(farmablePool.token)
@@ -95,17 +93,21 @@ export function ChefPositionCard({ farmablePool, unstakedLPAmount, border, defau
   return (
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>
       <AutoColumn gap="12px">
-        <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer' }}>
+        <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer', height: 40 }}>
           <RowFixed>
-            {/* <DoubleCurrencyLogo currency0={currency0} currency1={currency1} margin={true} size={20} /> */}
-            <Text fontWeight={500} fontSize={20}>
-              {farmablePool.name}
-              {/* {!currency0 || !currency1 ? <Dots>Loading</Dots> : `${currency0.symbol}/${currency1.symbol}`} */}
-            </Text>
-            <Text fontWeight={300} fontSize={12}>
-              {'  - '}
-              {farmablePool.symbol}
-            </Text>
+            <Logo srcs={[`chef-logos/${icon}`]} alt={name} style={{ width: 40, height: 40, objectFit: 'contain', margin: 10 }} />
+            <AutoColumn>
+              <RowFixed>
+                <Text fontWeight={500} fontSize={20}>
+                  {name}
+                </Text>
+              </RowFixed>
+              <RowFixed>
+                <Text fontWeight={300} fontSize={12}>
+                  {farmablePool.symbol}
+                </Text>
+              </RowFixed>
+            </AutoColumn>
           </RowFixed>
           <RowFixed>
             {showMore ? (
