@@ -29,7 +29,6 @@ export default function Analytics() {
       <AppBody>
         <SwapPoolTabs active={'analytics'} />
         <AutoColumn gap="lg" justify="center">
-
           <AutoColumn gap="12px" style={{ width: '100%' }}>
             <RowBetween padding={'0 8px'}>
               <Text color={theme.text1} fontWeight={500}>
