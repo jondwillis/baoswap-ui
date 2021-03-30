@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { ChevronUp, ChevronDown } from 'react-feather'
+import { ChevronUp, ChevronDown, PieChart } from 'react-feather'
 import { ThemeContext } from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
 import { getEtherscanLink } from '../../utils'
@@ -9,7 +9,8 @@ import { RowFixed, AutoRow } from '../Row'
 import { Text } from 'rebass'
 import { ExternalLink } from '../../theme'
 import { PoolInfoFarmablePool } from '../../data/Reserves'
-import { JSBI, TokenAmount } from 'uniswap-xdai-sdk'
+// import { JSBI, TokenAmount } from 'uniswap-xdai-sdk'
+import Logo from '../Logo'
 
 interface FarmCardProps {
   farmablePool: PoolInfoFarmablePool
@@ -20,16 +21,16 @@ interface FarmCardProps {
 export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
-  const { accBaoPerShare, totalSupply } = farmablePool
+  const { accBaoPerShare, totalSupply, icon, name, poolWeight } = farmablePool
 
   // const stakedPoolTokens = useStakedAmount(farmablePool.token)
 
-  const score =
-    totalSupply &&
-    new TokenAmount(
-      totalSupply.token,
-      JSBI.subtract(JSBI.multiply(accBaoPerShare.raw, totalSupply.raw), JSBI.BigInt(1e12))
-    )
+  // const score =
+  //   totalSupply &&
+  //   new TokenAmount(
+  //     totalSupply.token,
+  //     JSBI.subtract(JSBI.multiply(accBaoPerShare.raw, totalSupply.raw), JSBI.BigInt(1e12))
+  //   )
 
   const [showMore, setShowMore] = useState(defaultShowMore)
 
@@ -37,17 +38,27 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>
       <AutoColumn gap="12px">
         <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer' }}>
-          <RowFixed>
-            <Text fontWeight={500} fontSize={20}>
-              {farmablePool.name}
-            </Text>
-            <Text fontWeight={300} fontSize={12}>
-              {'  - '}
-              {farmablePool.symbol}
-            </Text>
+        <RowFixed>
+            <Logo
+              srcs={[`chef-logos/${icon}`]}
+              alt={name}
+              style={{ width: 40, height: 40, objectFit: 'contain', margin: 10 }}
+            />
+            <AutoColumn>
+              <RowFixed>
+                <Text fontWeight={500} fontSize={20}>
+                  {name}
+                </Text>
+              </RowFixed>
+              <RowFixed>
+                <Text fontWeight={300} fontSize={12}>
+                  {farmablePool.symbol}
+                </Text>
+              </RowFixed>
+            </AutoColumn>
           </RowFixed>
-          <RowFixed>{score?.toSignificant(8) ?? '-'}</RowFixed>
           <RowFixed>
+            <PieChart style={{ margin: '10' }} /> {poolWeight?.toString() ?? '-'}
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '10px' }} />
             ) : (
