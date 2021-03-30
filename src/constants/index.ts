@@ -11,7 +11,7 @@ type ChainTokenList = {
 }
 
 export const USDC = new Token(ChainId.XDAI, '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83', 6, 'USDC', 'USDC on xDai')
-export const HONEY = new Token(ChainId.XDAI, '0x82dFe19164729949fD66Da1a37BC70dD6c4746ce', 18, 'BAO', 'BAO')
+export const BAO = new Token(ChainId.XDAI, '0x82dFe19164729949fD66Da1a37BC70dD6c4746ce', 18, 'BAO', 'BAO')
 export const XDAI_WETH = new Token(
   ChainId.XDAI,
   '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1',
@@ -19,12 +19,12 @@ export const XDAI_WETH = new Token(
   'WETH',
   'Wrapped Ether on xDai'
 )
-export const STAKE = new Token(
+export const BAOCX = new Token(
   ChainId.XDAI,
-  '0xb7D311E2Eb55F2f68a9440da38e7989210b9A05e',
+  '0xe0d0b1DBbCF3dd5CAc67edaf9243863Fd70745DA',
   18,
-  'STAKE',
-  'Stake Token on xDai'
+  'BAO.cx',
+  'BAO Coupon on xDai'
 )
 export const WBTC = new Token(ChainId.XDAI, '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252', 18, 'WBTC', 'WBTC')
 
@@ -40,7 +40,7 @@ const WETH_ONLY: ChainTokenList = {
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   ...WETH_ONLY,
-  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, HONEY, STAKE, WBTC]
+  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, BAO, BAOCX, WBTC]
 }
 
 /**
@@ -52,13 +52,13 @@ export const CUSTOM_BASES: { [chainId in ChainId]?: { [tokenAddress: string]: To
 // used for display in the default list when adding liquidity
 export const SUGGESTED_BASES: ChainTokenList = {
   ...WETH_ONLY,
-  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, HONEY, STAKE, WBTC]
+  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, BAO, BAOCX, WBTC]
 }
 
 // used to construct the list of all pairs we consider by default in the frontend
 export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
   ...WETH_ONLY,
-  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, HONEY, STAKE, WBTC]
+  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, BAO, BAOCX, WBTC]
 }
 
 export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {}
