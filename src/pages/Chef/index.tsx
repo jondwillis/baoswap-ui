@@ -20,7 +20,7 @@ import { useRewardToken, useUserInfoFarmablePools } from '../../data/Reserves'
 import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 
-import { useMasterChefContract } from '../../hooks/useContract'
+import { useBaocxBalance, useMasterChefContract } from '../../hooks/useContract'
 import { getEtherscanLink, shortenAddress } from '../../utils'
 import { Fraction, TokenAmount } from 'uniswap-xdai-sdk'
 import { useHarvestAll } from '../../hooks/Chef'
@@ -98,6 +98,8 @@ export default function Chef() {
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
   `
 
+  const baocxBalance = useBaocxBalance()
+
   const selectedListUrl = useSelectedListUrl()
   const noListSelected = !selectedListUrl
 
@@ -146,12 +148,16 @@ export default function Chef() {
                       )}
                     </ButtonPrimary>
                   </RowBetween>
-                  <RowBetween>
-                    <ButtonSecondary padding="0.5rem" as={Link} to={`swap/${BAOCX.address}`}>
-                      <Text fontWeight={600}>Swap BAO.cx</Text>
-                      <ChevronRight />
-                    </ButtonSecondary>
-                  </RowBetween>
+                  {baocxBalance?.greaterThan('0') ? (
+                    <RowBetween>
+                      <ButtonSecondary padding="0.5rem" as={Link} to={`swap/${BAOCX.address}`}>
+                        <Text fontWeight={600}>Swap BAO.cx</Text>
+                        <ChevronRight />
+                      </ButtonSecondary>
+                    </RowBetween>
+                  ) : (
+                    ''
+                  )}
                 </AutoColumn>
               </RowBetween>
             )}

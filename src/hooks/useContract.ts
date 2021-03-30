@@ -1,5 +1,5 @@
 import { Contract } from '@ethersproject/contracts'
-import { ChainId, WETH } from 'uniswap-xdai-sdk'
+import { ChainId, TokenAmount, WETH } from 'uniswap-xdai-sdk'
 import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 import { useMemo } from 'react'
 import ENS_ABI from '../constants/abis/ens-registrar.json'
@@ -16,6 +16,8 @@ import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
 import { contractAddresses } from '../bao/lib/constants'
+import { BAOCX } from '../constants'
+import { useSingleCallResult } from '../state/multicall/hooks'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
@@ -64,6 +66,17 @@ export function useBaoContract(withSignerIfPossible?: boolean): Contract | null 
     BAO,
     withSignerIfPossible
   )
+}
+
+export function useBaocxBalance(withSignerIfPossible?: boolean): TokenAmount | undefined {
+  const { account } = useActiveWeb3React()
+  const contract = useContract(BAOCX.address, ERC20_ABI, withSignerIfPossible)
+  const balance = useSingleCallResult(contract, 'balanceOf', [account ?? undefined]).result?.[0]
+
+  return useMemo(() => (contract && balance ? new TokenAmount(BAOCX, balance?.toString()) : undefined), [
+    balance,
+    contract
+  ])
 }
 
 export function useBaoPriceContract(withSignerIfPossible?: boolean): Contract | null {
