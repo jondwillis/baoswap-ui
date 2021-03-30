@@ -28,12 +28,7 @@ import useToggledVersion, { Version } from '../../hooks/useToggledVersion'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
 import { Field } from '../../state/swap/actions'
-import {
-  useDefaultsFromURLSearch,
-  useDerivedSwapInfo,
-  useSwapActionHandlers,
-  useSwapState
-} from '../../state/swap/hooks'
+import { useDefaultsFromURLSearch, useDerivedSwapInfo, useSwapActionHandlers, useSwapState } from '../../state/swap/hooks'
 import { useExpertModeManager, useUserDeadline, useUserSlippageTolerance } from '../../state/user/hooks'
 import { LinkStyledButton, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
@@ -41,9 +36,14 @@ import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import AppBody from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 import { addTokenToMetamask } from '../../utils/addTokenToMetamask'
+import { RouteComponentProps } from 'react-router-dom'
 
-export default function Swap() {
-  const loadedUrlParams = useDefaultsFromURLSearch()
+export default function Swap({
+  match: {
+    params: { inputCurrency, outputCurrency }
+  }
+}: RouteComponentProps<{ inputCurrency?: string; outputCurrency?: string }>) {
+  const loadedUrlParams = useDefaultsFromURLSearch(inputCurrency, outputCurrency)
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
