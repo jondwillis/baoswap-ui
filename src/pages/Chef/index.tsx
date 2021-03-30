@@ -11,7 +11,7 @@ import { ExternalLink, StyledInternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
 import { RowBetween, RowFixed } from '../../components/Row'
-import { ButtonLight, ButtonPrimary } from '../../components/Button'
+import { ButtonLight, ButtonPrimary, ButtonSecondary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
@@ -26,11 +26,12 @@ import { Fraction, TokenAmount } from 'uniswap-xdai-sdk'
 import { useHarvestAll } from '../../hooks/Chef'
 import { useLockedEarned } from '../../data/Staked'
 import { ChefState, initialChefState } from '../../state/chef/reducer'
-import { Loader, Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
+import { ChevronRight, Loader, Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
 import CurrencySearchModal from '../../components/SearchModal/CurrencySearchModal'
 import { useSelectedListUrl } from '../../state/lists/hooks'
 import { useAllFarmablePools } from '../../bao/lib/constants'
+import { BAOCX } from '../../constants'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -109,41 +110,55 @@ export default function Chef() {
             {chainId && masterChefContract && (
               <RowBetween padding={'0 8px'}>
                 <ExternalLink id="link" href={getEtherscanLink(chainId, masterChefContract.address, 'address')}>
-                  BaoMasterFarmer
+                  BaoMasterFarmer Contract
                   <TYPE.body color={theme.text3}>
-                    <b title={masterChefContract.address}>{shortenAddress(masterChefContract.address)}</b>
+                    <b title={masterChefContract.address}>{shortenAddress(masterChefContract.address)} ↗</b>
                   </TYPE.body>
                 </ExternalLink>
-                <RowFixed>
-                  <ButtonPrimary
-                    padding="0.5rem"
-                    onClick={() => handleHarvestAll()}
-                    disabled={attemptingHarvest || !account || v2IsLoading}
-                  >
-                    {attemptingHarvest ? (
-                      <span>
-                        <Dots>Harvesting</Dots>
-                        <IconWrapper pending={attemptingHarvest} success={!attemptingHarvest}>
-                          <Loader />
-                        </IconWrapper>
-                      </span>
-                    ) : (
-                      <span>
-                        <Text color={theme.text5} fontWeight={600}>
-                          Harvest All
-                        </Text>
-                        <BalanceText style={{ flexShrink: 0, textAlign: 'end' }} pr="0.5rem" fontWeight={800}>
-                          &nbsp;&nbsp;
-                          <UnlockIcon size="14px" /> {unlockedPending?.toFixed(0) || '-'}{' '}
-                          <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
-                          <br />
-                          + <LockIcon size="14px" /> {lockedPending?.toFixed(0) || '-'}{' '}
-                          <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
-                        </BalanceText>
-                      </span>
-                    )}
-                  </ButtonPrimary>
-                </RowFixed>
+                <AutoColumn gap='6px'>
+                  <RowBetween>
+                    <ButtonPrimary
+                      padding="0.5rem"
+                      onClick={() => handleHarvestAll()}
+                      disabled={attemptingHarvest || !account || v2IsLoading}
+                    >
+                      {attemptingHarvest ? (
+                        <span>
+                          <Dots>Harvesting</Dots>
+                          <IconWrapper pending={attemptingHarvest} success={!attemptingHarvest}>
+                            <Loader />
+                          </IconWrapper>
+                        </span>
+                      ) : (
+                        <span>
+                          <Text color={theme.text5} fontWeight={600}>
+                            Harvest All
+                          </Text>
+                          <BalanceText style={{ flexShrink: 0, textAlign: 'end' }} pr="0.5rem" fontWeight={800}>
+                            &nbsp;&nbsp;
+                            <UnlockIcon size="14px" /> {unlockedPending?.toFixed(0) || '-'}{' '}
+                            <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
+                            <br />
+                            + <LockIcon size="14px" /> {lockedPending?.toFixed(0) || '-'}{' '}
+                            <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
+                          </BalanceText>
+                        </span>
+                      )}
+                    </ButtonPrimary>
+                  </RowBetween>
+                  <RowBetween>
+                    <ButtonSecondary
+                      padding="0.5rem"
+                      as={Link}
+                      to={`swap/${BAOCX.address}`}
+                    >
+                      <Text fontWeight={600}>
+                        Swap BAO.cx…
+                      </Text>
+                      <ChevronRight />
+                    </ButtonSecondary>
+                  </RowBetween>
+                </AutoColumn>
               </RowBetween>
             )}
             <RowBetween padding={'0 8px'}>
