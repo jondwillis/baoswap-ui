@@ -1,8 +1,9 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { ThemeContext } from 'styled-components'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'
+import SearchInput from '../../components/SearchInput'
 import { TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
@@ -23,6 +24,17 @@ export default function Analytics() {
   const allFarmablePools = useAllFarmablePools()
   const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools)
 
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const queriedPools: any = []
+  poolInfo.forEach((pool) => {
+    const queryLowerCase = searchQuery.toLowerCase()
+    if (pool.symbol.toLowerCase().includes(queryLowerCase) ||
+        pool.name.toLowerCase().includes(queryLowerCase))
+      queriedPools.push(pool)
+  })
+  const updateSearchQuery = (event: any) => setSearchQuery(event.target.value)
+
   const isLoading = fetchingPoolInfo
   return (
     <>
@@ -37,6 +49,7 @@ export default function Analytics() {
               <Question text="Analytics about all farmable pools" />
             </RowBetween>
 
+            <SearchInput onChange={updateSearchQuery} placeholder='Search Pools'></SearchInput>
             {!account ? (
               <LightCard padding="40px">
                 <TYPE.body color={theme.text3} textAlign="center">
@@ -49,9 +62,9 @@ export default function Analytics() {
                   <Dots>Loading</Dots>
                 </TYPE.body>
               </LightCard>
-            ) : poolInfo?.length > 0 ? (
+            ) : queriedPools?.length > 0 ? (
               <>
-                {poolInfo.map(farm => (
+                {queriedPools.map((farm: any) => (
                   <FarmCard key={farm.address} farmablePool={farm} defaultShowMore={false} />
                 ))}
               </>
