@@ -153,7 +153,7 @@ export default function Header() {
                 >
                   <GitBranch size="20pt" />
                 </ExternalLink>
-                <QuestionHelper text='This is a UI fork of BaoSwap, with an emphasis on Quality of Life for users that harvest and/or compound frequently. Please see the "..." menu to view the source code.' />
+                <QuestionHelper text='This is a UI fork of BaoSwap, with an emphasis on Quality of Life for users that harvest and/or compound frequently. Please see the "..." menu to view the source code. There is no connection w/ bao.finance, nor shall there be any liability in losses incurred due to using this tool. The author shall not be held liable for decisions made using this tool. No offer of financial advice shall be implied.' />
               </NetworkCard>
             </TitleText>
           </Title>
