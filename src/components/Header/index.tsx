@@ -1,6 +1,5 @@
 import { ChainId } from 'uniswap-xdai-sdk'
 import React from 'react'
-import { isMobile } from 'react-device-detect'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
@@ -161,11 +160,19 @@ export default function Header() {
         <HeaderControls>
           <HeaderElement>
             <TestnetWrapper>
-              {!isMobile && chainId && NETWORK_LABELS[chainId] && (
+              {chainId && NETWORK_LABELS[chainId] && (
                 <NetworkCard>
                   <Column style={{ padding: 0, margin: 0 }}>
-                    <RowBetween>{NETWORK_LABELS[chainId]}</RowBetween>
-                    <RowBetween><Text fontWeight={300} fontSize={12}>CHAIN</Text></RowBetween>
+                    <RowBetween>
+                      <Text fontWeight={800} fontSize={10}>
+                        {NETWORK_LABELS[chainId]}
+                      </Text>
+                    </RowBetween>
+                    <RowBetween>
+                      <Text fontWeight={300} fontSize={9}>
+                        CHAIN
+                      </Text>
+                    </RowBetween>
                   </Column>
                 </NetworkCard>
               )}
