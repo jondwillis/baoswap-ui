@@ -115,7 +115,7 @@ export default function Chef() {
                     <b title={masterChefContract.address}>{shortenAddress(masterChefContract.address)} ↗</b>
                   </TYPE.body>
                 </ExternalLink>
-                <AutoColumn gap='6px'>
+                <AutoColumn gap="6px">
                   <RowBetween>
                     <ButtonPrimary
                       padding="0.5rem"
@@ -147,14 +147,8 @@ export default function Chef() {
                     </ButtonPrimary>
                   </RowBetween>
                   <RowBetween>
-                    <ButtonSecondary
-                      padding="0.5rem"
-                      as={Link}
-                      to={`swap/${BAOCX.address}`}
-                    >
-                      <Text fontWeight={600}>
-                        Swap BAO.cx…
-                      </Text>
+                    <ButtonSecondary padding="0.5rem" as={Link} to={`swap/${BAOCX.address}`}>
+                      <Text fontWeight={600}>Swap BAO.cx</Text>
                       <ChevronRight />
                     </ButtonSecondary>
                   </RowBetween>
