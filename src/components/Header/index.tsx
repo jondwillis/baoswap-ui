@@ -9,7 +9,7 @@ import Settings from '../Settings'
 import Menu from '../Menu'
 import Row, { RowBetween } from '../Row'
 import Web3Status from '../Web3Status'
-import Logo from '../../assets/images/bao-logo.png'
+// import Logo from '../../assets/images/bao-logo.png'
 
 import QuestionHelper from '../QuestionHelper'
 import { ExternalLink } from '../../theme'
@@ -93,16 +93,16 @@ const NetworkCard = styled(LightCard)`
   padding: 8px 12px;
 `
 
-const BaoIcon = styled.div`
-  transition: transform 0.3s ease;
-  :hover {
-    transform: rotate(-5deg);
-  }
-  img {
-    width: 50px;
-    height: 50px;
-  }
-`
+// const BaoIcon = styled.div`
+//   transition: transform 0.3s ease;
+//   :hover {
+//     transform: rotate(-5deg);
+//   }
+//   img {
+//     width: 50px;
+//     height: 50px;
+//   }
+// `
 
 const HeaderControls = styled.div`
   display: flex;
@@ -140,9 +140,9 @@ export default function Header() {
       <RowBetween style={{ alignItems: 'flex-start' }} padding="1rem 1rem 0 1rem">
         <HeaderElement>
           <Title href=".">
-            <BaoIcon>
+            {/* <BaoIcon>
               <img src={Logo} alt="logo" />
-            </BaoIcon>
+            </BaoIcon> */}
             <TitleText style={{ flexShrink: 1, margin: 4, height: '0.5rem' }}>
               <NetworkCard>
                 <ExternalLink
