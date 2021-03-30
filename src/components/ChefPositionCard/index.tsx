@@ -100,7 +100,11 @@ export function ChefPositionCard({
       <AutoColumn gap="12px">
         <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer', height: 40 }}>
           <RowFixed>
-            <Logo srcs={[`chef-logos/${icon}`]} alt={name} style={{ width: 40, height: 40, objectFit: 'contain', margin: 10 }} />
+            <Logo
+              srcs={[`chef-logos/${icon}`]}
+              alt={name}
+              style={{ width: 40, height: 40, objectFit: 'contain', margin: 10 }}
+            />
             <AutoColumn>
               <RowFixed>
                 <Text fontWeight={500} fontSize={20}>
