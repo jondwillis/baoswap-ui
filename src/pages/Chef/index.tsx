@@ -104,7 +104,7 @@ export default function Chef() {
   return (
     <>
       <AppBody>
-        <SwapPoolTabs active={'chef'} />
+        <SwapPoolTabs active={'farm'} />
         <AutoColumn gap="lg" justify="center">
           <AutoColumn gap="12px" style={{ width: '100%' }}>
             {chainId && masterChefContract && (
