@@ -41,9 +41,8 @@ import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import AppBody from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 import { addTokenToMetamask } from '../../utils/addTokenToMetamask'
-import { RouteComponentProps } from 'react-router-dom'
 
-export default function Swap({}: RouteComponentProps<{ inputCurrency?: string; outputCurrency?: string }>) {
+export default function Swap() {
   const loadedUrlParams = useDefaultsFromURLSearch()
 
   // token warning stuff
