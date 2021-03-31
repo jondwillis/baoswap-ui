@@ -6,7 +6,11 @@ import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'
 import FullPositionCard from '../../components/PositionCard'
-import { TokenPairWithLiquidityToken, useTokenBalancesWithLoadingIndicator, useTokenPairCandidates } from '../../state/wallet/hooks'
+import {
+  TokenPairWithLiquidityToken,
+  useTokenBalancesWithLoadingIndicator,
+  useTokenPairCandidates
+} from '../../state/wallet/hooks'
 import { StyledInternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
@@ -44,7 +48,10 @@ export default function Pool() {
 
   const [tokenPairCandidates, fetchingTokenPairCandidates] = useTokenPairCandidates(tokenPairsWithLiquidityTokens)
   const farmableAddresses = useMemo(() => allFarmablePools.map(farm => farm.address), [allFarmablePools])
-  const farmableTokenPairCandidates = useMemo(() => tokenPairCandidates.filter(tokenPair => farmableAddresses.includes(tokenPair.liquidityToken.address)), [farmableAddresses, tokenPairCandidates])
+  const farmableTokenPairCandidates = useMemo(
+    () => tokenPairCandidates.filter(tokenPair => farmableAddresses.includes(tokenPair.liquidityToken.address)),
+    [farmableAddresses, tokenPairCandidates]
+  )
 
   // fetch the reserves for all V2 pools in which the user has a balance
   const liquidityTokensWithBalances = useMemo(
@@ -64,9 +71,15 @@ export default function Pool() {
     v2Pairs?.length < liquidityTokensWithBalances.length ||
     v2Pairs?.some(V2Pair => !V2Pair)
 
-  const allV2PairsWithLiquidity = useMemo(() => v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)), [v2Pairs])
-  const allPairCandidatesWithLiquidity = useMemo(() => pairCandidates.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)), [pairCandidates])
-  
+  const allV2PairsWithLiquidity = useMemo(
+    () => v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)),
+    [v2Pairs]
+  )
+  const allPairCandidatesWithLiquidity = useMemo(
+    () => pairCandidates.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)),
+    [pairCandidates]
+  )
+
   return (
     <>
       <AppBody>
