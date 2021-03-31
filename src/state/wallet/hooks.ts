@@ -43,6 +43,16 @@ export function useETHBalances(
   )
 }
 
+function useValidatedTokens(tokens: (Token | undefined)[] | undefined) {
+  const validatedTokens: Token[] = useMemo(
+    () => tokens?.filter((t?: Token): t is Token => isAddress(t?.address) !== false) ?? [],
+    [tokens]
+  )
+
+  const validatedTokenAddresses = useMemo(() => validatedTokens.map(vt => vt.address), [validatedTokens])
+  return { validatedTokenAddresses, validatedTokens }
+}
+
 /**
  * Returns a map of token addresses to their eventually consistent token balances for a single account.
  */
@@ -50,7 +60,10 @@ export function useTokenBalancesWithLoadingIndicator(
   address?: string,
   tokens?: (Token | undefined)[]
 ): [{ [tokenAddress: string]: TokenAmount | undefined }, boolean] {
-  const { validatedTokenAddresses, validatedTokens }: { validatedTokenAddresses: string[]; validatedTokens: Token[] } = useValidatedTokens(tokens)
+  const {
+    validatedTokenAddresses,
+    validatedTokens
+  }: { validatedTokenAddresses: string[]; validatedTokens: Token[] } = useValidatedTokens(tokens)
 
   const balances = useMultipleContractSingleData(validatedTokenAddresses, ERC20_INTERFACE, 'balanceOf', [address])
 
@@ -80,41 +93,39 @@ export interface TokenPairWithLiquidityToken {
   tokens: [Token, Token]
 }
 
-export const useTokenPairCandidates = (tpwlts: TokenPairWithLiquidityToken[]): [TokenPairWithLiquidityToken[], boolean] => {
+export const useTokenPairCandidates = (
+  tpwlts: TokenPairWithLiquidityToken[]
+): [TokenPairWithLiquidityToken[], boolean] => {
   const { account } = useActiveWeb3React()
 
   const tokens = useMemo(() => tpwlts.map(tpwlt => tpwlt.tokens.flat()).flat(), [tpwlts])
-  const { validatedTokenAddresses }: { validatedTokenAddresses: string[]; validatedTokens: Token[] } = useValidatedTokens(tokens)
+  const {
+    validatedTokenAddresses
+  }: { validatedTokenAddresses: string[]; validatedTokens: Token[] } = useValidatedTokens(tokens)
 
-  const balances = useMultipleContractSingleData(validatedTokenAddresses, ERC20_INTERFACE, 'balanceOf', [account || undefined])
+  const balances = useMultipleContractSingleData(validatedTokenAddresses, ERC20_INTERFACE, 'balanceOf', [
+    account || undefined
+  ])
   const anyLoading: boolean = useMemo(() => balances.some(callState => callState.loading), [balances])
 
   const almostZero = JSBI.BigInt('1')
   return [
     useMemo(
-      () => 
-        (balances && tpwlts.filter((_, i) => {
-          const result0 = balances[i * 2]?.result?.[0]
-          const result1 = balances[(i * 2) + 1]?.result?.[0]
-          const balance0 = result0 ? JSBI.BigInt(result0.toString()) : almostZero
-          const balance1 = result1 ? JSBI.BigInt(result1.toString()) : almostZero
+      () =>
+        (balances &&
+          tpwlts.filter((_, i) => {
+            const result0 = balances[i * 2]?.result?.[0]
+            const result1 = balances[i * 2 + 1]?.result?.[0]
+            const balance0 = result0 ? JSBI.BigInt(result0.toString()) : almostZero
+            const balance1 = result1 ? JSBI.BigInt(result1.toString()) : almostZero
 
-          return JSBI.greaterThan(balance0, almostZero) && JSBI.greaterThan(balance1, almostZero)
-        })) ?? [],
-      [balances, tpwlts, almostZero], 
+            return JSBI.greaterThan(balance0, almostZero) && JSBI.greaterThan(balance1, almostZero)
+          })) ??
+        [],
+      [balances, tpwlts, almostZero]
     ),
     anyLoading
   ]
-}
-
-function useValidatedTokens(tokens: (Token | undefined)[] | undefined) {
-  const validatedTokens: Token[] = useMemo(
-    () => tokens?.filter((t?: Token): t is Token => isAddress(t?.address) !== false) ?? [],
-    [tokens]
-  )
-
-  const validatedTokenAddresses = useMemo(() => validatedTokens.map(vt => vt.address), [validatedTokens])
-  return { validatedTokenAddresses, validatedTokens }
 }
 
 export function useTokenBalances(
