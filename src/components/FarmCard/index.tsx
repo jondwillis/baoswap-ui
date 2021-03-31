@@ -38,7 +38,7 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>
       <AutoColumn gap="12px">
         <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer' }}>
-        <RowFixed>
+          <RowFixed>
             <Logo
               srcs={[`chef-logos/${icon}`]}
               alt={name}

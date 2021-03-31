@@ -35,12 +35,7 @@ export function PoolPriceBar({
           </Text>
         </AutoColumn>
         <AutoColumn justify="center">
-          <TYPE.black>
-            {noLiquidity && price
-              ? '100'
-              : poolTokenPercentage?.toSignificant(4) ?? '0'}
-            %
-          </TYPE.black>
+          <TYPE.black>{noLiquidity && price ? '100' : poolTokenPercentage?.toSignificant(4) ?? '0'}%</TYPE.black>
           <Text fontWeight={500} fontSize={14} color={theme.text2} pt={1}>
             Share of Pool
           </Text>

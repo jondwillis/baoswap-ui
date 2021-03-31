@@ -43,12 +43,8 @@ import { ClickableText } from '../Pool/styleds'
 import { addTokenToMetamask } from '../../utils/addTokenToMetamask'
 import { RouteComponentProps } from 'react-router-dom'
 
-export default function Swap({
-  match: {
-    params: { inputCurrency, outputCurrency }
-  }
-}: RouteComponentProps<{ inputCurrency?: string; outputCurrency?: string }>) {
-  const loadedUrlParams = useDefaultsFromURLSearch(inputCurrency, outputCurrency)
+export default function Swap({}: RouteComponentProps<{ inputCurrency?: string; outputCurrency?: string }>) {
+  const loadedUrlParams = useDefaultsFromURLSearch()
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [

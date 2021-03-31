@@ -45,7 +45,7 @@ export function FarmSuggestionCard({ pair, showUnwrapped = false, border }: Posi
 
   const currency0 = showUnwrapped ? pair.token0 : unwrappedToken(pair.token0)
   const currency1 = showUnwrapped ? pair.token1 : unwrappedToken(pair.token1)
-  
+
   const { token0, token1 } = pair
 
   const [showMore, setShowMore] = useState(false)
