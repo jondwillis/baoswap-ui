@@ -31,7 +31,7 @@ import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
 import CurrencySearchModal from '../../components/SearchModal/CurrencySearchModal'
 import { useSelectedListUrl } from '../../state/lists/hooks'
 import { useAllFarmablePools } from '../../bao/lib/constants'
-import { BAOCX } from '../../constants'
+import { BAO, BAOCX } from '../../constants'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -150,7 +150,7 @@ export default function Chef() {
                   </RowBetween>
                   {baocxBalance?.greaterThan('0') ? (
                     <RowBetween>
-                      <ButtonSecondary padding="0.5rem" as={Link} to={`swap/${BAOCX.address}`}>
+                      <ButtonSecondary padding="0.5rem" as={Link} to={`swap/${BAOCX.address}/${BAO.address}`}>
                         <Text fontWeight={600}>Swap BAO.cx</Text>
                         <ChevronRight />
                       </ButtonSecondary>
