@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { ChevronUp, ChevronDown, PieChart, BarChart } from 'react-feather'
+import { ChevronUp, ChevronDown, PieChart } from 'react-feather'
 import { ThemeContext } from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
 import { getEtherscanLink } from '../../utils'
@@ -57,10 +57,9 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
           </RowFixed>
           <RowFixed>
             {apy > 0 && (
-              <>
-                <BarChart style={{ margin: '5' }} />
-                <Text>{apy.toFixed(0)}%</Text>
-              </>
+              <ExternalLink href={`https://baoview.xyz/pool-metrics/${pid}`}> 
+                {apy.toFixed(0)}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
+              </ExternalLink>
             )}
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '10px' }} />

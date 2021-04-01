@@ -130,9 +130,12 @@ export function ChefPositionCard({
             <AutoColumn gap="0.1rem">
               <RowBetween>
                 {apy > 0 && (
-                  <span style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end' }}>
-                    {apy.toFixed(0)}%<span style={{ flexShrink: 1, fontSize: '7pt' }}> APY</span>
-                  </span>
+                  <ExternalLink
+                    href={`https://baoview.xyz/pool-metrics/${pid}`}
+                    style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end' }}
+                  >
+                    {apy.toFixed(0)}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
+                  </ExternalLink>
                 )}
               </RowBetween>
               <RowFixed>
