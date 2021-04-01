@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react'
-import { ChevronUp, ChevronDown, PieChart } from 'react-feather'
+import React, { useContext, useEffect, useState } from 'react'
+import { ChevronUp, ChevronDown, PieChart, BarChart } from 'react-feather'
 import { ThemeContext } from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
 import { getEtherscanLink } from '../../utils'
@@ -9,8 +9,8 @@ import { RowFixed, AutoRow } from '../Row'
 import { Text } from 'rebass'
 import { ExternalLink } from '../../theme'
 import { PoolInfoFarmablePool } from '../../data/Reserves'
-// import { JSBI, TokenAmount } from 'uniswap-xdai-sdk'
 import Logo from '../Logo'
+import { fetchAPY } from '../../hooks/useFetchAPYCallback'
 
 interface FarmCardProps {
   farmablePool: PoolInfoFarmablePool
@@ -21,16 +21,14 @@ interface FarmCardProps {
 export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
-  const { accBaoPerShare, totalSupply, icon, name, poolWeight } = farmablePool
+  const { accBaoPerShare, totalSupply, icon, name, poolWeight, pid } = farmablePool
 
-  // const stakedPoolTokens = useStakedAmount(farmablePool.token)
-
-  // const score =
-  //   totalSupply &&
-  //   new TokenAmount(
-  //     totalSupply.token,
-  //     JSBI.subtract(JSBI.multiply(accBaoPerShare.raw, totalSupply.raw), JSBI.BigInt(1e12))
-  //   )
+  const [apy, setAPY] = useState<number>(-1)
+  useEffect(() => {
+    fetchAPY(pid)
+      .then(apy => setAPY(apy))
+      .catch(() => setAPY(-1))
+  })
 
   const [showMore, setShowMore] = useState(defaultShowMore)
 
@@ -58,7 +56,12 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
             </AutoColumn>
           </RowFixed>
           <RowFixed>
-            <PieChart style={{ margin: '10' }} /> {poolWeight?.toString() ?? '-'}
+            {apy > 0 && (
+              <>
+                <BarChart style={{ margin: '10' }} />
+                <Text>{apy.toFixed(0)}%</Text>
+              </>
+            )}
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '10px' }} />
             ) : (
@@ -68,6 +71,19 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
         </FixedHeightRow>
         {showMore && (
           <AutoColumn gap="8px">
+            <FixedHeightRow>
+              <RowFixed>
+                <PieChart style={{ marginRight: 10 }} />
+                <Text fontSize={16} fontWeight={500}>
+                  Weight
+                </Text>
+              </RowFixed>
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  {poolWeight?.toString() ?? '-'}
+                </Text>
+              </RowFixed>
+            </FixedHeightRow>
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
@@ -84,7 +100,7 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  Acc Bao/Share:
+                  Acc. Bao/Share:
                 </Text>
               </RowFixed>
               <RowFixed>
