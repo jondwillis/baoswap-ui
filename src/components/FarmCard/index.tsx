@@ -58,7 +58,7 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
           <RowFixed>
             {apy > 0 && (
               <>
-                <BarChart style={{ margin: '10' }} />
+                <BarChart style={{ margin: '5' }} />
                 <Text>{apy.toFixed(0)}%</Text>
               </>
             )}

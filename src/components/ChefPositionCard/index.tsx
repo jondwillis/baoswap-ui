@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback } from 'react'
+import React, { useContext, useState, useCallback, useEffect } from 'react'
 import { ChevronUp, ChevronDown, Loader } from 'react-feather'
 import styled, { ThemeContext } from 'styled-components'
 import { TokenAmount, JSBI, Percent, Fraction } from 'uniswap-xdai-sdk'
@@ -19,6 +19,7 @@ import { Text } from 'rebass'
 import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { ExternalLink } from '../../theme'
 import Logo from '../Logo'
+import { fetchAPY } from '../../hooks/useFetchAPYCallback'
 
 interface ChefCardProps {
   farmablePool: UserInfoFarmablePool
@@ -36,7 +37,7 @@ export function ChefPositionCard({
 }: ChefCardProps): JSX.Element {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
-  const { stakedAmount, pendingReward, icon, name } = farmablePool
+  const { stakedAmount, pendingReward, icon, name, pid } = farmablePool
 
   const rewardCurrency = unwrappedToken(pendingReward.token)
 
@@ -51,6 +52,13 @@ export function ChefPositionCard({
     JSBI.greaterThanOrEqual(totalPoolTokens.raw, stakedAmount.raw)
       ? new Percent(stakedAmount.raw, totalPoolTokens.raw)
       : undefined
+
+  const [apy, setAPY] = useState<number>(-1)
+  useEffect(() => {
+    fetchAPY(pid)
+      .then(apy => setAPY(apy))
+      .catch(() => setAPY(-1))
+  })
 
   const { callback: stakeCallback } = useStake(farmablePool, unstakedLPAmount)
   const handleStake = useCallback(() => {
@@ -118,38 +126,49 @@ export function ChefPositionCard({
               </RowFixed>
             </AutoColumn>
           </RowFixed>
-          {!showMore ? (
-            <RowBetween style={{ width: '6rem', alignContent: 'end' }} fontWeight={800}>
-              <ButtonPrimary
-                padding="0.5rem"
-                margin="0"
-                onClick={() => handleHarvestAll()}
-                disabled={attemptingHarvest}
-              >
-                {attemptingHarvest ? (
-                  <span>
-                    <Dots>Harvesting</Dots>
-                    <IconWrapper pending={attemptingHarvest} success={!attemptingHarvest}>
-                      <Loader />
-                    </IconWrapper>
-                  </span>
-                ) : (
-                  <span>
-                    <Text color={theme.text5} fontWeight={600}>
-                      Harvest
-                    </Text>
-                    <BalanceText style={{ fontSize: '10pt' }} fontWeight={600}>
-                      <UnlockIcon size="12px" /> {unlockedPending?.toFixed(0) || '-'}{' '}
-                      <span style={{ flexShrink: 1, fontSize: '7pt' }}>{rewardCurrency.symbol}</span>
-                    </BalanceText>
+          <RowFixed>
+            <AutoColumn gap="0.1rem">
+              <RowBetween>
+                {apy > 0 && (
+                  <span style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end' }}>
+                    {apy.toFixed(0)}%<span style={{ flexShrink: 1, fontSize: '7pt' }}> APY</span>
                   </span>
                 )}
-              </ButtonPrimary>
-            </RowBetween>
-          ) : (
-            ''
-          )}
-          <RowFixed>
+              </RowBetween>
+              <RowFixed>
+                {!showMore ? (
+                  <ButtonSecondary
+                    padding="0.2rem"
+                    style={{ minWidth: '5rem' }}
+                    // paddingLeft="0.5rem"
+                    // paddingRight="0.5rem"
+                    margin="0"
+                    onClick={() => handleHarvestAll()}
+                  >
+                    {attemptingHarvest ? (
+                      <span>
+                        <Dots>Harvesting</Dots>
+                        <IconWrapper pending={attemptingHarvest} success={!attemptingHarvest}>
+                          <Loader />
+                        </IconWrapper>
+                      </span>
+                    ) : (
+                      <span>
+                        <Text color={theme.text5} fontWeight={600}>
+                          Harvest
+                        </Text>
+                        <BalanceText style={{ fontSize: '10pt' }} fontWeight={600}>
+                          <UnlockIcon size="12px" /> {unlockedPending?.toFixed(0) || '-'}{' '}
+                          <span style={{ flexShrink: 1, fontSize: '7pt' }}>{rewardCurrency.symbol}</span>
+                        </BalanceText>
+                      </span>
+                    )}
+                  </ButtonSecondary>
+                ) : (
+                  ''
+                )}
+              </RowFixed>
+            </AutoColumn>
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '2px' }} />
             ) : (
