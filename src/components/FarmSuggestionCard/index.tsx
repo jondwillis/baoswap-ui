@@ -1,6 +1,6 @@
 import { Pair, TokenAmount } from 'uniswap-xdai-sdk'
 import { darken } from 'polished'
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components'
@@ -15,6 +15,9 @@ import DoubleCurrencyLogo from '../DoubleLogo'
 import { RowBetween, RowFixed } from '../Row'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { useActiveWeb3React } from '../../hooks'
+import { fetchAPY } from '../../hooks/useFetchAPYCallback'
+import { useAllFarmablePools } from '../../bao/lib/constants'
+import { ExternalLink } from '../../theme'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -40,7 +43,7 @@ interface PositionCardProps {
   border?: string
 }
 
-export function FarmSuggestionCard({ pair, showUnwrapped = false, border }: PositionCardProps) {
+export function FarmSuggestionCard({ pair, showUnwrapped = true, border }: PositionCardProps) {
   const { account } = useActiveWeb3React()
 
   const currency0 = showUnwrapped ? pair.token0 : unwrappedToken(pair.token0)
@@ -53,6 +56,23 @@ export function FarmSuggestionCard({ pair, showUnwrapped = false, border }: Posi
   const token0Balance = useTokenBalance(account ?? undefined, token0)
   const token1Balance = useTokenBalance(account ?? undefined, token1)
 
+  const pairAddress = pair.liquidityToken.address
+
+  const allFarmablePools = useAllFarmablePools()
+  const farmablePool = useMemo(() => allFarmablePools.find(p => p.address == pairAddress), [
+    pairAddress,
+    allFarmablePools
+  ])
+
+  const [apy, setAPY] = useState<number>(-1)
+  useEffect(() => {
+    if (farmablePool?.pid) {
+      fetchAPY(farmablePool.pid)
+        .then(apy => setAPY(apy))
+        .catch(() => setAPY(-1))
+    }
+  })
+
   return (
     <>
       <GreyCard border={border}>
@@ -63,6 +83,16 @@ export function FarmSuggestionCard({ pair, showUnwrapped = false, border }: Posi
               <Text fontWeight={500} fontSize={20}>
                 {currency0.symbol}/{currency1.symbol}
               </Text>
+            </RowFixed>
+            <RowFixed>
+              {apy > 0 && farmablePool?.pid && (
+                <ExternalLink
+                  href={`https://baoview.xyz/pool-metrics/${farmablePool.pid}`}
+                  style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end' }}
+                >
+                  {apy.toFixed(0)}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
+                </ExternalLink>
+              )}
             </RowFixed>
             <RowFixed>
               <ButtonSecondary as={Link} to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`}>

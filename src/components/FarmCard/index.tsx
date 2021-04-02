@@ -57,7 +57,7 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
           </RowFixed>
           <RowFixed>
             {apy > 0 && (
-              <ExternalLink href={`https://baoview.xyz/pool-metrics/${pid}`}> 
+              <ExternalLink href={`https://baoview.xyz/pool-metrics/${pid}`}>
                 {apy.toFixed(0)}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
               </ExternalLink>
             )}
