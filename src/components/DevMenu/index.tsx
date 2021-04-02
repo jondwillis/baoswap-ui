@@ -79,7 +79,7 @@ const MenuItem = styled(ExternalLink)`
 export default function DevMenu() {
   const node = useRef<HTMLDivElement>()
   const { chainId } = useActiveWeb3React()
-  
+
   const [open, setState] = useState<boolean>(false)
 
   const toggle = useCallback(() => setState(state => !state), [setState])
