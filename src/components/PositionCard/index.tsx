@@ -24,6 +24,8 @@ import { getEtherscanLink } from '../../utils'
 import { useStake } from '../../hooks/Chef'
 import QuestionHelper from '../QuestionHelper'
 import { useSupportedLpTokenMap } from '../../bao/lib/constants'
+import { useMasterChefContract } from '../../hooks/useContract'
+import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -166,13 +168,18 @@ export default function FullPositionCard({ pair, unstakedLPAmount, border }: Pos
   const supportedLpTokenMap = useSupportedLpTokenMap()
   const farmablePool = supportedLpTokenMap.get(pair.liquidityToken.address)
 
+  const [stakeApproval, stakeApproveCallback] = useApproveCallback(
+    unstakedLPAmount || undefined,
+    useMasterChefContract()?.address
+  )
+
   const { callback: stakeCallback } = useStake(farmablePool, unstakedLPAmount)
   const handleStake = useCallback(() => {
     if (!stakeCallback) {
       return
     }
-    stakeCallback()
-  }, [stakeCallback])
+    stakeApproveCallback().then(() => stakeCallback())
+  }, [stakeCallback, stakeApproveCallback])
 
   return (
     <HoverCard border={border}>
@@ -192,7 +199,16 @@ export default function FullPositionCard({ pair, unstakedLPAmount, border }: Pos
                 padding="0.5rem"
                 style={{ fontWeight: 800, backgroundColor: theme.primary3, padding: '0.2rem' }}
               >
-                +Stake
+                {stakeApproval === ApprovalState.PENDING ? (
+                  <Dots>Approving</Dots>
+                ) : stakeApproval === ApprovalState.NOT_APPROVED ? (
+                  <AutoColumn>
+                    <Text>+Stake</Text>
+                    <Text style={{ fontSize: 10, fontWeight: 700 }}>(needs approval)</Text>
+                  </AutoColumn>
+                ) : (
+                  '+Stake'
+                )}
                 <QuestionHelper text={`Stakes ALL ${unstakedLPAmount?.toExact()} LP Tokens`} />
               </ButtonSecondary>
             ) : (
