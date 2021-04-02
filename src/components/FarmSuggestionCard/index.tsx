@@ -59,7 +59,7 @@ export function FarmSuggestionCard({ pair, showUnwrapped = true, border }: Posit
   const pairAddress = pair.liquidityToken.address
 
   const allFarmablePools = useAllFarmablePools()
-  const farmablePool = useMemo(() => allFarmablePools.find(p => p.address == pairAddress), [
+  const farmablePool = useMemo(() => allFarmablePools.find(p => p.address === pairAddress), [
     pairAddress,
     allFarmablePools
   ])
