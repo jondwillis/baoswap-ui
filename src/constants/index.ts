@@ -26,7 +26,7 @@ export const BAOCX = new Token(
   'BAO.cx',
   'BAO Coupon on xDai'
 )
-export const WBTC = new Token(ChainId.XDAI, '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252', 18, 'WBTC', 'WBTC')
+export const WBTC = new Token(ChainId.XDAI, '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252', 8, 'WBTC', 'WBTC')
 
 const WETH_ONLY: ChainTokenList = {
   [ChainId.MAINNET]: [WETH[ChainId.MAINNET]],
