@@ -7,6 +7,7 @@ import { NavLink, Link as HistoryLink } from 'react-router-dom'
 import { ArrowLeft } from 'react-feather'
 import { RowBetween } from '../Row'
 import QuestionHelper from '../QuestionHelper'
+import DevMenu from '../DevMenu'
 
 const Tabs = styled.div`
   ${({ theme }) => theme.flexRowNoWrap}
@@ -52,6 +53,12 @@ const StyledArrowLeft = styled(ArrowLeft)`
   color: ${({ theme }) => theme.text1};
 `
 
+// const DevCard = styled(LightCard)`
+//   width: fit-content;
+//   border-radius: 12px;
+//   padding: 4px;
+// `
+
 export function SwapPoolTabs({ active }: { active: 'swap' | 'pool' | 'farm' | 'analytics' }) {
   const { t } = useTranslation()
   return (
@@ -68,6 +75,7 @@ export function SwapPoolTabs({ active }: { active: 'swap' | 'pool' | 'farm' | 'a
       <StyledNavLink id={`analytics-nav-link`} to={'/analytics'} isActive={() => active === 'analytics'}>
         {t('analytics')}
       </StyledNavLink>
+      <DevMenu />
     </Tabs>
   )
 }

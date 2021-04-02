@@ -7,13 +7,10 @@ import { useETHBalances } from '../../state/wallet/hooks'
 import { LightCard } from '../Card'
 import Settings from '../Settings'
 import Menu from '../Menu'
-import Row, { RowBetween } from '../Row'
+import { RowBetween } from '../Row'
 import Web3Status from '../Web3Status'
 // import Logo from '../../assets/images/bao-logo.png'
 
-import QuestionHelper from '../QuestionHelper'
-import { ExternalLink } from '../../theme'
-import { GitBranch } from 'react-feather'
 import { ColumnCenter as Column } from '../Column'
 
 const HeaderFrame = styled.div`
@@ -54,15 +51,6 @@ const Title = styled.a`
   :hover {
     cursor: pointer;
   }
-`
-
-const TitleText = styled(Row)`
-  width: fit-content;
-  white-space: nowrap;
-  transform: scale(0.8);
-  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    transform: scale(0.7);
-  `};
 `
 
 const AccountElement = styled.div<{ active: boolean }>`
@@ -139,23 +127,9 @@ export default function Header() {
     <HeaderFrame>
       <RowBetween style={{ alignItems: 'flex-start' }} padding="1rem 1rem 0 1rem">
         <HeaderElement>
-          <Title href=".">
-            {/* <BaoIcon>
+          <Title href=".">{/* <BaoIcon>
               <img src={Logo} alt="logo" />
-            </BaoIcon> */}
-            <TitleText style={{ flexShrink: 1, margin: 4, height: '0.5rem' }}>
-              <NetworkCard>
-                <ExternalLink
-                  style={{ textDecoration: 'none', padding: 4 }}
-                  id="link"
-                  href="https://github.com/jondwillis/baoswap-ui-source"
-                >
-                  <GitBranch size="20pt" />
-                </ExternalLink>
-                <QuestionHelper text='This is a UI fork of BaoSwap, with an emphasis on Quality of Life for users that harvest and/or compound frequently. Please see the "..." menu to view the source code. There is no connection w/ bao.finance, nor shall there be any liability in losses incurred due to using this tool. The author shall not be held liable for decisions made using this tool. No offer of financial advice shall be implied.' />
-              </NetworkCard>
-            </TitleText>
-          </Title>
+            </BaoIcon> */}</Title>
         </HeaderElement>
         <HeaderControls>
           <HeaderElement>
