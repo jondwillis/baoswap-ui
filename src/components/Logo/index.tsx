@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { HelpCircle } from 'react-feather'
+import { AlertCircle } from 'react-feather'
 import { ImageProps } from 'rebass'
 
 const BAD_SRCS: { [tokenAddress: string]: true } = {}
@@ -30,5 +30,5 @@ export default function Logo({ srcs, alt, ...rest }: LogoProps) {
     )
   }
 
-  return <HelpCircle {...rest} />
+  return <AlertCircle {...rest} />
 }
