@@ -145,7 +145,7 @@ export const priceOracles = {
     [addressMap.SUSHI]: '0xC0a6Bf8d5D408B091D022C3C0653d4056D4B9c01',
     [addressMap.UNI]: '0xd98735d78266c62277Bb4dBf3e3bCdd3694782F4',
     [addressMap.USDC]: '0x26C31ac71010aF62E6B486D1132E266D6298857D',
-    [addressMap.YFI]: '0x14030d5a0C9e63D9606C6f2c8771Fc95b34b07e0',
+    [addressMap.YFI]: '0x14030d5a0C9e63D9606C6f2c8771Fc95b34b07e0'
   }
 }
 //

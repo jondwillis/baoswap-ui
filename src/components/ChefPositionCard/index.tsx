@@ -20,7 +20,7 @@ import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { ExternalLink } from '../../theme'
 import Logo from '../Logo'
 import { fetchAPY } from '../../hooks/useFetchAPYCallback'
-import { usePriceInBaseXDAI } from '../../hooks/Price'
+import { useStakedTVL } from '../../hooks/Price'
 
 interface ChefCardProps {
   farmablePool: UserInfoFarmablePool
@@ -42,16 +42,16 @@ export function ChefPositionCard({
 
   const rewardCurrency = unwrappedToken(pendingReward.token)
 
-  const totalPoolTokens = useStakedAmount(farmablePool.token)
+  const allStakedAmount = useStakedAmount(farmablePool.token)
 
   const [showMore, setShowMore] = useState(defaultShowMore)
 
   const lpStakedPercentage =
     !!stakedAmount &&
-    !!totalPoolTokens &&
+    !!allStakedAmount &&
     stakedAmount.greaterThan('0') &&
-    JSBI.greaterThanOrEqual(totalPoolTokens.raw, stakedAmount.raw)
-      ? new Percent(stakedAmount.raw, totalPoolTokens.raw)
+    JSBI.greaterThanOrEqual(allStakedAmount.raw, stakedAmount.raw)
+      ? new Percent(stakedAmount.raw, allStakedAmount.raw)
       : undefined
 
   const [apy, setAPY] = useState<number>(-1)
@@ -103,7 +103,7 @@ export function ChefPositionCard({
   const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
   `
-  const price = usePriceInBaseXDAI(farmablePool, totalPoolTokens)
+  const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount)
 
   return (
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>
@@ -123,7 +123,7 @@ export function ChefPositionCard({
               </RowFixed>
               <RowFixed>
                 <Text fontWeight={300} fontSize={12}>
-                  {farmablePool.symbol} {price?.toExact() ?? '-'}
+                  {farmablePool.symbol} ${allStakedTVL?.toFixed(2) ?? '-'}
                 </Text>
               </RowFixed>
             </AutoColumn>
@@ -204,7 +204,7 @@ export function ChefPositionCard({
               </RowFixed>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  {totalPoolTokens ? totalPoolTokens.toFixed(3) : '-'}
+                  {allStakedAmount ? allStakedAmount.toFixed(3) : '-'}
                 </Text>
               </RowFixed>
             </FixedHeightRow>
