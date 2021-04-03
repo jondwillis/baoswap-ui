@@ -128,6 +128,24 @@ export const contractAddresses = {
     4: '0x649AfCf002742cf93CbE1F8C3832FD05ACA2D8ea'
   }
 }
+
+export const priceOracles = {
+  [ChainId.MAINNET]: {},
+  [ChainId.XDAI]: {
+    // all XXX-USD
+    [addressMap.AAVE]: '0x2b481Dc923Aa050E009113Dca8dcb0daB4B68cDF',
+    [addressMap.BAL]: '0x1b723C855F7D2c2785F99486973271355e782d77',
+    [addressMap.wBTC]: '0x6C1d7e76EF7304a40e8456ce883BC56d3dEA3F7d',
+    [addressMap.XDAI]: '0x678df3415fc31947dA4324eC63212874be5a82f8',
+    [addressMap.WETH]: '0xa767f745331D267c7751297D982b050c93985627',
+    [addressMap.LINK]: '0xed322A5ac55BAE091190dFf9066760b86751947B',
+    [addressMap.SNX]: '0x3b84d6e6976D5826500572600eB44f9f1753827b',
+    [addressMap.SUSHI]: '0xC0a6Bf8d5D408B091D022C3C0653d4056D4B9c01',
+    [addressMap.UNI]: '0xd98735d78266c62277Bb4dBf3e3bCdd3694782F4',
+    [addressMap.USDC]: '0x26C31ac71010aF62E6B486D1132E266D6298857D',
+    [addressMap.YFI]: '0x14030d5a0C9e63D9606C6f2c8771Fc95b34b07e0',
+  }
+}
 //
 /*
 BAO Address on mainnet for reference
