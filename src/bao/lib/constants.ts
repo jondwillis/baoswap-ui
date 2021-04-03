@@ -130,7 +130,9 @@ export const contractAddresses = {
 }
 
 export const priceOracles = {
-  [ChainId.MAINNET]: {},
+  [ChainId.MAINNET]: {
+    [addressMap.WETH]: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419'
+  },
   [ChainId.XDAI]: {
     // all XXX-USD
     [addressMap.AAVE]: '0x2b481Dc923Aa050E009113Dca8dcb0daB4B68cDF',
