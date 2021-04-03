@@ -3,13 +3,14 @@ import { ChainId, Fraction, JSBI, Token, TokenAmount, WETH } from 'uniswap-xdai-
 import { useActiveWeb3React } from '.'
 import { FarmablePool, priceOracles } from '../bao/lib/constants'
 import { usePair } from '../data/Reserves'
+import { usePoolWeightFraction } from '../data/Staked'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { usePriceOracleContract } from './useContract'
 
 export function useStakedTVL(farmablePool: FarmablePool, stakedAmount: TokenAmount | undefined): Fraction | undefined {
   const { chainId } = useActiveWeb3React()
   const [tokenAddress0, tokenAddress1] = farmablePool.tokenAddress
-  const chainIdNumber = useMemo(() => (chainId == ChainId.XDAI ? 100 : chainId == 1 ? ChainId.MAINNET : undefined), [
+  const chainIdNumber = useMemo(() => (chainId === ChainId.XDAI ? 100 : chainId === ChainId.MAINNET ? 1 : undefined), [
     chainId
   ])
   // FIXME: decimals isn't correct
@@ -68,4 +69,28 @@ export function useStakedTVL(farmablePool: FarmablePool, stakedAmount: TokenAmou
   }, [priceRaw, decimals, chainIdNumber, stakedAmount, pricedInReserve, farmablePool])
 }
 
-// ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
+export function useAPY(farmablePool: FarmablePool, tvl: Fraction | undefined): Fraction | undefined {
+  // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
+  // const rewardToken = useRewardToken()
+  const rewardPriceUsd = new Fraction(JSBI.BigInt(8), JSBI.BigInt(1000)) // TODO: get actual bao/usd
+  // const masterChef = useMasterChefContract()
+  // const rewardPerBlockResult: number | undefined = useSingleCallResult(masterChef, 'getNewRewardPerBlock', [
+  //   farmablePool.pid ?? undefined
+  // ]).result?.[0]
+
+  // const poolInfoPoolWeight = useSingleCallResult(masterChef, 'poolInfo', [farmablePool.pid ?? undefined]).result?.[1]
+
+  // const poolWeight = JSBI.BigInt(poolInfoPoolWeight?.toString() ?? '0')
+  const poolWeight = usePoolWeightFraction(farmablePool)
+
+  const blocksPerYear = JSBI.BigInt(23360000/*12 * 60 * 24 * 365*/)
+  const rawRewardPerBlock = JSBI.BigInt(256000)//JSBI.BigInt(rewardPerBlockResult?.toString() ?? '0')
+  // const rewardDiv = JSBI.multiply(JSBI.BigInt(1000), JSBI.BigInt(rewardToken.decimals.toString()))
+  // const rewardPerBlock = JSBI.divide(rawRewardPerBlock, rewardDiv)
+  const numerator = rewardPriceUsd
+    .multiply(rawRewardPerBlock)
+    .multiply(blocksPerYear)
+    .multiply(poolWeight ?? '0')
+
+  return tvl && numerator.divide(tvl) //.divide(rewardDiv)
+}

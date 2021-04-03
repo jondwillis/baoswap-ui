@@ -1,4 +1,4 @@
-import { Token, TokenAmount } from 'uniswap-xdai-sdk'
+import { Fraction, Token, TokenAmount } from 'uniswap-xdai-sdk'
 import { Contract } from '@ethersproject/contracts'
 import { BigNumber } from '@ethersproject/bignumber'
 
@@ -52,15 +52,14 @@ export function useUserStakedBalance(lpToken?: Token, farmablePool?: FarmablePoo
 
 // see: useTotalSupply(token?:)
 
-export function usePoolWeight(farmablePool?: FarmablePool): number | undefined {
+export function usePoolWeightFraction(farmablePool?: FarmablePool): Fraction | undefined {
   const masterChefContract = useMasterChefContract()
-  const allocPoint = useSingleCallResult(masterChefContract, 'poolInfo', [farmablePool?.pid]).result?.[1]
-  const totalAllocPoint = useSingleCallResult(masterChefContract, 'totalAllocPoint').result?.[0]
+  const allocPoint: string = useSingleCallResult(masterChefContract, 'poolInfo', [farmablePool?.pid]).result?.[1]
+  const totalAllocPoint: string = useSingleCallResult(masterChefContract, 'totalAllocPoint').result?.[0]
 
-  return useMemo(() => (farmablePool && allocPoint && totalAllocPoint ? allocPoint / totalAllocPoint : undefined), [
+  return useMemo(() => (allocPoint && totalAllocPoint ? new Fraction(allocPoint, totalAllocPoint) : undefined), [
     allocPoint,
-    totalAllocPoint,
-    farmablePool
+    totalAllocPoint
   ])
 }
 

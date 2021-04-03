@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useEffect } from 'react'
+import React, { useContext, useState, useCallback } from 'react'
 import { ChevronUp, ChevronDown, Loader } from 'react-feather'
 import styled, { ThemeContext } from 'styled-components'
 import { TokenAmount, JSBI, Percent, Fraction } from 'uniswap-xdai-sdk'
@@ -19,8 +19,7 @@ import { Text } from 'rebass'
 import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { ExternalLink } from '../../theme'
 import Logo from '../Logo'
-import { fetchAPY } from '../../hooks/useFetchAPYCallback'
-import { useStakedTVL } from '../../hooks/Price'
+import { useAPY, useStakedTVL } from '../../hooks/Price'
 
 interface ChefCardProps {
   farmablePool: UserInfoFarmablePool
@@ -54,12 +53,12 @@ export function ChefPositionCard({
       ? new Percent(stakedAmount.raw, allStakedAmount.raw)
       : undefined
 
-  const [apy, setAPY] = useState<number>(-1)
-  useEffect(() => {
-    fetchAPY(pid)
-      .then(apy => setAPY(apy))
-      .catch(() => setAPY(-1))
-  })
+  // const [apy, setAPY] = useState<number>(-1)
+  // useEffect(() => {
+  //   fetchAPY(pid)
+  //     .then(apy => setAPY(apy))
+  //     .catch(() => setAPY(-1))
+  // })
 
   const { callback: stakeCallback } = useStake(farmablePool, unstakedLPAmount)
   const handleStake = useCallback(() => {
@@ -106,6 +105,8 @@ export function ChefPositionCard({
   const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount)
   const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount)
 
+  const apy = useAPY(farmablePool, allStakedTVL)
+
   return (
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>
       <AutoColumn gap="12px">
@@ -138,7 +139,7 @@ export function ChefPositionCard({
             )}
             <AutoColumn gap="0.1rem">
               <RowBetween>
-                {apy > 0 && (
+                {apy?.greaterThan('0') && (
                   <ExternalLink
                     href={`https://baoview.xyz/pool-metrics/${pid}`}
                     style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end' }}
