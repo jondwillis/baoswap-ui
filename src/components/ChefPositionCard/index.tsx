@@ -20,6 +20,7 @@ import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { ExternalLink } from '../../theme'
 import Logo from '../Logo'
 import { fetchAPY } from '../../hooks/useFetchAPYCallback'
+import { usePriceInBaseXDAI } from '../../hooks/Price'
 
 interface ChefCardProps {
   farmablePool: UserInfoFarmablePool
@@ -102,6 +103,7 @@ export function ChefPositionCard({
   const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
   `
+  const price = usePriceInBaseXDAI(farmablePool, totalPoolTokens)
 
   return (
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>
@@ -121,7 +123,7 @@ export function ChefPositionCard({
               </RowFixed>
               <RowFixed>
                 <Text fontWeight={300} fontSize={12}>
-                  {farmablePool.symbol}
+                  {farmablePool.symbol} {price?.toExact() ?? '-'}
                 </Text>
               </RowFixed>
             </AutoColumn>

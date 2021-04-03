@@ -9,7 +9,7 @@ import ERC20_ABI from '../constants/abis/erc20.json'
 import MASTERCHEF_ABI from '../constants/abis/masterchef.json'
 import BAO from '../constants/abis/bao.json'
 import UNI_ORACLE_ABI from '../constants/abis/unioracle.json'
-import CHAINLINK_PRICE_ORACLE from '@chainlink/contracts/abi/v0.6/EACAggregatorProxy.json'
+import CHAINLINK_PRICE_ORACLE from '@chainlink/contracts/abi/v0.6/AggregatorV3Interface.json'
 import UNIV2LP from '../constants/abis/uni_v2_lp.json'
 import UNISOCKS_ABI from '../constants/abis/unisocks.json'
 import WETH_ABI from '../constants/abis/weth.json'
@@ -91,7 +91,7 @@ export function useBaoPriceContract(withSignerIfPossible?: boolean): Contract | 
 }
 
 export function usePriceOracleContract(address?: string | undefined): Contract | null {
-  return useContract(address, CHAINLINK_PRICE_ORACLE)
+  return useContract(address, CHAINLINK_PRICE_ORACLE.compilerOutput.abi)
 }
 
 export function useENSRegistrarContract(withSignerIfPossible?: boolean): Contract | null {
