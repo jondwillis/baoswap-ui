@@ -131,6 +131,7 @@ export function useUserInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Us
 }
 
 export interface PoolInfoFarmablePool extends FarmablePool {
+  stakedAmount: TokenAmount
   totalSupply: TokenAmount
   accBaoPerShare: TokenAmount
   poolWeight: JSBI
@@ -150,42 +151,43 @@ export function usePoolInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Po
 
   const results = useSingleContractMultipleData(masterChefContract, 'poolInfo', poolIds)
   const pairResults = useMultipleContractSingleData(pairAddresses, PAIR_INTERFACE, 'totalSupply')
+  const stakedAmounts = useMultipleContractSingleData(pairAddresses, PAIR_INTERFACE, 'balanceOf', [
+    masterChefContract?.address
+  ])
+
   const anyLoading: boolean = useMemo(
     () => results.some(callState => callState.loading) || pairResults.some(callState => callState.loading),
     [results, pairResults]
   )
 
   const userInfoFarmablePool = useMemo(() => {
-    return pairFarmablePools
-      .map((farmablePool, i) => {
-        const accBaoPerShare = results?.[i]?.result?.[3] // [1] is pool weight
-        const totalSupply = pairResults?.[i].result?.[0]
-        const poolWeight = results?.[i]?.result?.[1]
+    return pairFarmablePools.map((farmablePool, i) => {
+      const accBaoPerShare = results?.[i]?.result?.[3] // [1] is pool weight
+      const totalSupply = pairResults?.[i].result?.[0]
+      const stakedAmount = stakedAmounts?.[i].result?.[0]
+      const poolWeight = results?.[i]?.result?.[1]
 
-        const mergeObject =
-          accBaoPerShare && totalSupply
-            ? {
-                totalSupply: new TokenAmount(farmablePool.token, totalSupply),
-                accBaoPerShare: new TokenAmount(baoRewardToken, accBaoPerShare),
-                poolWeight: JSBI.BigInt(poolWeight)
-              }
-            : {
-                totalSupply: new TokenAmount(farmablePool.token, '1'),
-                accBaoPerShare: new TokenAmount(baoRewardToken, '0'),
-                poolWeight: JSBI.BigInt(0)
-              }
+      const mergeObject =
+        accBaoPerShare && totalSupply && stakedAmount
+          ? {
+              totalSupply: new TokenAmount(farmablePool.token, totalSupply),
+              stakedAmount: new TokenAmount(farmablePool.token, stakedAmount),
+              accBaoPerShare: new TokenAmount(baoRewardToken, accBaoPerShare),
+              poolWeight: JSBI.BigInt(poolWeight)
+            }
+          : {
+              stakedAmount: new TokenAmount(farmablePool.token, '0'),
+              totalSupply: new TokenAmount(farmablePool.token, '1'),
+              accBaoPerShare: new TokenAmount(baoRewardToken, '0'),
+              poolWeight: JSBI.BigInt(0)
+            }
 
-        return {
-          ...farmablePool,
-          ...mergeObject
-        }
-      })
-      .sort((a, b) => {
-        const aProd = JSBI.multiply(JSBI.divide(a.accBaoPerShare.raw, a.totalSupply.raw), a.poolWeight)
-        const bProd = JSBI.multiply(JSBI.divide(b.accBaoPerShare.raw, b.totalSupply.raw), b.poolWeight)
-        return JSBI.greaterThan(aProd, bProd) ? -1 : 1
-      })
-  }, [pairFarmablePools, results, pairResults, baoRewardToken])
+      return {
+        ...farmablePool,
+        ...mergeObject
+      }
+    })
+  }, [pairFarmablePools, results, pairResults, baoRewardToken, stakedAmounts])
 
   return [userInfoFarmablePool, anyLoading]
 }

@@ -11,6 +11,7 @@ import { ExternalLink } from '../../theme'
 import { PoolInfoFarmablePool } from '../../data/Reserves'
 import Logo from '../Logo'
 import { fetchAPY } from '../../hooks/useFetchAPYCallback'
+import { Percent } from 'uniswap-xdai-sdk'
 
 interface FarmCardProps {
   farmablePool: PoolInfoFarmablePool
@@ -21,7 +22,7 @@ interface FarmCardProps {
 export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
-  const { accBaoPerShare, totalSupply, icon, name, poolWeight, pid } = farmablePool
+  const { accBaoPerShare, stakedAmount, totalSupply, icon, name, poolWeight, pid } = farmablePool
 
   const [apy, setAPY] = useState<number>(-1)
   useEffect(() => {
@@ -86,12 +87,26 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  All Staked (LP):
+                  All (LP):
                 </Text>
               </RowFixed>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
                   {totalSupply ? totalSupply.toSignificant(8) : '-'}
+                </Text>
+              </RowFixed>
+            </FixedHeightRow>
+            <FixedHeightRow>
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  Staked / (% Total):
+                </Text>
+              </RowFixed>
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  {stakedAmount &&
+                    totalSupply &&
+                    `${stakedAmount.toSignificant(8)} (${new Percent(stakedAmount.raw, totalSupply.raw).toFixed(2)}%)`}
                 </Text>
               </RowFixed>
             </FixedHeightRow>
