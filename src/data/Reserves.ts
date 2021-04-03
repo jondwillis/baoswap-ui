@@ -1,4 +1,4 @@
-import { TokenAmount, Pair, Currency, Token, ChainId, WETH, JSBI } from 'uniswap-xdai-sdk'
+import { TokenAmount, Pair, Currency, Token, ChainId, JSBI } from 'uniswap-xdai-sdk'
 import { useMemo } from 'react'
 import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 import { Interface } from '@ethersproject/abi'
@@ -7,7 +7,8 @@ import { useActiveWeb3React } from '../hooks'
 import { useMultipleContractSingleData, useSingleContractMultipleData } from '../state/multicall/hooks'
 import { wrappedCurrency } from '../utils/wrappedCurrency'
 import { useMasterChefContract } from '../hooks/useContract'
-import { contractAddresses, FarmablePool } from '../bao/lib/constants'
+import { FarmablePool } from '../bao/lib/constants'
+import { BAO, BAOCX } from '../constants'
 
 const PAIR_INTERFACE = new Interface(IUniswapV2PairABI)
 
@@ -65,12 +66,8 @@ export function usePair(tokenA?: Currency, tokenB?: Currency): [PairState, Pair 
 
 export function useRewardToken(): Token {
   const { chainId } = useActiveWeb3React()
-  const chainIdNumber = chainId === ChainId.XDAI ? 100 : 4
-  const rewardSymbol = chainId === ChainId.XDAI ? 'BAO.cx' : 'BAO'
-  const baoRewardToken =
-    (chainId && new Token(chainId, contractAddresses.bao[chainIdNumber], 18, rewardSymbol)) || WETH[100]
-
-  return baoRewardToken
+  const rewardToken = chainId === ChainId.XDAI ? BAOCX : BAO
+  return rewardToken
 }
 
 export interface UserInfoFarmablePool extends FarmablePool {
