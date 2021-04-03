@@ -104,6 +104,7 @@ export function ChefPositionCard({
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
   `
   const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount)
+  const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount)
 
   return (
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>
@@ -123,12 +124,18 @@ export function ChefPositionCard({
               </RowFixed>
               <RowFixed>
                 <Text fontWeight={300} fontSize={12}>
-                  {farmablePool.symbol} ${allStakedTVL?.toFixed(2) ?? '-'}
+                  {farmablePool.symbol}
                 </Text>
               </RowFixed>
             </AutoColumn>
           </RowFixed>
           <RowFixed>
+            {yourStakeTVL && (
+              <AutoColumn justify="end" style={{ paddingRight: 8, maxWidth: '4rem' }}>
+                <Text fontSize="8pt">Your Stake</Text>
+                <BalanceText>{`$${yourStakeTVL.toFixed(2)}`}</BalanceText>
+              </AutoColumn>
+            )}
             <AutoColumn gap="0.1rem">
               <RowBetween>
                 {apy > 0 && (
@@ -183,6 +190,19 @@ export function ChefPositionCard({
         </FixedHeightRow>
         {showMore && (
           <AutoColumn gap="8px">
+            <FixedHeightRow>
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  All Staked TVL (LP):
+                </Text>
+              </RowFixed>
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  {allStakedTVL ? `$${allStakedTVL.toFixed(2)}` : '-'}
+                </Text>
+              </RowFixed>
+            </FixedHeightRow>
+
             <FixedHeightRow>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
