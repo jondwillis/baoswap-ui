@@ -83,14 +83,17 @@ export function useAPY(farmablePool: FarmablePool, tvl: Fraction | undefined): F
   // const poolWeight = JSBI.BigInt(poolInfoPoolWeight?.toString() ?? '0')
   const poolWeight = usePoolWeightFraction(farmablePool)
 
-  const blocksPerYear = JSBI.BigInt(23360000/*12 * 60 * 24 * 365*/)
-  const rawRewardPerBlock = JSBI.BigInt(256000)//JSBI.BigInt(rewardPerBlockResult?.toString() ?? '0')
+  const blocksPerYear = JSBI.BigInt(6311390) // (31556952 (seconds / year)) / (5 blocks/second) = 6311390.4
+  const rawRewardPerBlock = JSBI.BigInt(256)//JSBI.BigInt(rewardPerBlockResult?.toString() ?? '0')
   // const rewardDiv = JSBI.multiply(JSBI.BigInt(1000), JSBI.BigInt(rewardToken.decimals.toString()))
   // const rewardPerBlock = JSBI.divide(rawRewardPerBlock, rewardDiv)
-  const numerator = rewardPriceUsd
-    .multiply(rawRewardPerBlock)
-    .multiply(blocksPerYear)
-    .multiply(poolWeight ?? '0')
-
-  return tvl && numerator.divide(tvl) //.divide(rewardDiv)
+  return (
+    tvl &&
+    rewardPriceUsd
+      .multiply(rawRewardPerBlock)
+      .multiply(blocksPerYear)
+      .multiply(poolWeight ?? '0')
+      .divide(tvl)
+      .multiply('100')
+  )
 }
