@@ -34,24 +34,24 @@ export function useStakedTVL(
 
   const priceOraclesForChain = useMemo(() => chainIdNumber && priceOracles[chainIdNumber], [chainIdNumber])
 
-  const { priceOracleToken, priceOracleAddress } = useMemo(() => {
-    if (!priceOraclesForChain || !token0 || !token1) {
+  const { priceOracleBaseToken, priceOracleAddress } = useMemo(() => {
+    if (!priceOraclesForChain || !token0 || !token1 || farmablePool.isSushi) {
       return { priceOracleToken: undefined, priceOracleAddress: undefined }
     }
     const token0Oracle = priceOraclesForChain[tokenDescriptor0.address]
     const token1Oracle = priceOraclesForChain[tokenDescriptor1.address]
     if (token0Oracle) {
-      return { priceOracleToken: token0, priceOracleAddress: token0Oracle }
+      return { priceOracleBaseToken: token0, priceOracleAddress: token0Oracle }
     } else if (token1Oracle) {
-      return { priceOracleToken: token1, priceOracleAddress: token1Oracle }
+      return { priceOracleBaseToken: token1, priceOracleAddress: token1Oracle }
     } else {
-      return { priceOracleToken: undefined, priceOracleAddress: undefined }
+      return { priceOracleBaseToken: undefined, priceOracleAddress: undefined }
     }
-  }, [priceOraclesForChain, tokenDescriptor0, tokenDescriptor1, token0, token1])
+  }, [priceOraclesForChain, tokenDescriptor0, tokenDescriptor1, token0, token1, farmablePool])
 
   const [, pair] = usePair(token0, token1)
-  const pricedInReserve = useMemo(() => pair && priceOracleToken && pair.reserveOf(priceOracleToken), [
-    priceOracleToken,
+  const pricedInReserve = useMemo(() => pair && priceOracleBaseToken && pair.reserveOf(priceOracleBaseToken), [
+    priceOracleBaseToken,
     pair
   ])
   const priceOracleContract = usePriceOracleContract(priceOracleAddress)
