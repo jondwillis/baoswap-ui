@@ -3,9 +3,9 @@ import { ChainId, Fraction, JSBI, Token, TokenAmount, WETH } from 'uniswap-xdai-
 import { useActiveWeb3React } from '.'
 import { FarmablePool, priceOracles } from '../bao/lib/constants'
 import { usePair, useRewardToken } from '../data/Reserves'
-// import { usePoolWeightFraction } from '../data/Staked'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { useMasterChefContract, usePriceOracleContract } from './useContract'
+import { BigNumber } from '@ethersproject/bignumber'
 
 const ten = JSBI.BigInt(10)
 const hundred = JSBI.BigInt(100)
