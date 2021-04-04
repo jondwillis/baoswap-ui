@@ -21,7 +21,7 @@ export const network = new NetworkConnector({
   urls: { [NETWORK_CHAIN_ID]: NETWORK_URL }
 })
 
-export const mainnet = new NetworkConnector({ urls: { [1]: NETWORK_URL }, defaultChainId: 1 })
+export const mainnet = new NetworkConnector({ urls: { 1: NETWORK_URL }, defaultChainId: 1 })
 
 let networkLibrary: Web3Provider | undefined
 export function getNetworkLibrary(): Web3Provider {
