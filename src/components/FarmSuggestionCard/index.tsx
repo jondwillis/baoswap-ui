@@ -68,14 +68,6 @@ export function FarmSuggestionCard({
   const token0Balance = useTokenBalance(account ?? undefined, token0)
   const token1Balance = useTokenBalance(account ?? undefined, token1)
 
-  // const pairAddress = pair.liquidityToken.address
-
-  // const allFarmablePools = useAllFarmablePools()
-  // const farmablePool = useMemo(() => allFarmablePools.find(p => p.address === pairAddress), [
-  //   pairAddress,
-  //   allFarmablePools
-  // ])
-
   const stakedAmount = useStakedAmount(farmablePool.token)
   const totalSupply = useTotalSupply(pair.liquidityToken)
 
