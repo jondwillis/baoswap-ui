@@ -56,13 +56,6 @@ export function ChefPositionCard({
       ? new Percent(stakedAmount.raw, allStakedAmount.raw)
       : undefined
 
-  // const [apy, setAPY] = useState<number>(-1)
-  // useEffect(() => {
-  //   fetchAPY(pid)
-  //     .then(apy => setAPY(apy))
-  //     .catch(() => setAPY(-1))
-  // })
-
   const { callback: stakeCallback } = useStake(farmablePool, unstakedLPAmount)
   const handleStake = useCallback(() => {
     if (!stakeCallback) {
@@ -105,8 +98,8 @@ export function ChefPositionCard({
   const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
   `
-  const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount)
-  const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount)
+  const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount, allStakedAmount)
+  const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount, allStakedAmount)
 
   const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
   useEffect(() => {

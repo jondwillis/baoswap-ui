@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { ChainId, Fraction, JSBI, Token, TokenAmount, WETH } from 'uniswap-xdai-sdk'
+import { ChainId, Fraction, JSBI, Token, TokenAmount } from 'uniswap-xdai-sdk'
 import { useActiveWeb3React } from '.'
 import { FarmablePool, priceOracles } from '../bao/lib/constants'
 import { usePair, useRewardToken } from '../data/Reserves'
@@ -8,9 +8,12 @@ import { useMasterChefContract, usePriceOracleContract } from './useContract'
 import { BigNumber } from '@ethersproject/bignumber'
 
 const ten = JSBI.BigInt(10)
-const hundred = JSBI.BigInt(100)
 
-export function useStakedTVL(farmablePool: FarmablePool, stakedAmount: TokenAmount | undefined): Fraction | undefined {
+export function useStakedTVL(
+  farmablePool: FarmablePool,
+  stakedAmount: TokenAmount | undefined,
+  totalSupply: TokenAmount | undefined
+): Fraction | undefined {
   const { chainId } = useActiveWeb3React()
   const [tokenDescriptor0, tokenDescriptor1] = farmablePool.tokenAddresses
   const chainIdNumber = useMemo(() => (chainId === ChainId.XDAI ? 100 : chainId === ChainId.MAINNET ? 1 : undefined), [
@@ -24,6 +27,8 @@ export function useStakedTVL(farmablePool: FarmablePool, stakedAmount: TokenAmou
     () => chainId && new Token(chainId, tokenDescriptor1.address, tokenDescriptor1.decimals, tokenDescriptor1.symbol),
     [chainId, tokenDescriptor1]
   )
+
+  const ratioStaked = totalSupply ? stakedAmount?.divide(totalSupply) : undefined
 
   const priceOraclesForChain = useMemo(() => chainIdNumber && priceOracles[chainIdNumber], [chainIdNumber])
 
@@ -41,32 +46,24 @@ export function useStakedTVL(farmablePool: FarmablePool, stakedAmount: TokenAmou
       return { priceOracleToken: undefined, priceOracleAddress: undefined }
     }
   }, [priceOraclesForChain, tokenDescriptor0, tokenDescriptor1, token0, token1])
-  priceOracleToken &&
-    console.log(priceOracleToken?.symbol, priceOracleToken.decimals, `priceOracleToken for ${farmablePool.symbol}`)
+
   const [, pair] = usePair(token0, token1)
   const pricedInReserve = useMemo(() => pair && priceOracleToken && pair.reserveOf(priceOracleToken), [
     priceOracleToken,
     pair
   ])
-  console.log(pricedInReserve?.toFixed(4), `pricedInReserve for ${farmablePool.name}`)
   const priceOracleContract = usePriceOracleContract(priceOracleAddress)
 
-  const priceRaw: JSBI | undefined = useSingleCallResult(priceOracleContract, 'latestRoundData').result?.[1]
-  const decimals: JSBI | undefined = useSingleCallResult(priceOracleContract, 'decimals').result?.[0]
+  const priceRaw: string | undefined = useSingleCallResult(priceOracleContract, 'latestRoundData').result?.[1]
+  const decimals: string | undefined = useSingleCallResult(priceOracleContract, 'decimals').result?.[0]
 
   return useMemo(() => {
-    const decimated = decimals && JSBI.multiply(hundred, JSBI.exponentiate(ten, JSBI.BigInt(decimals.toString())))
-    const priceInUsd = priceRaw && decimated && JSBI.multiply(JSBI.BigInt(priceRaw.toString()), decimated)
-    // TODO: convert to XDAI/USD
-    const XDAI = chainIdNumber && WETH[chainIdNumber]
-    const price = XDAI && priceInUsd && new TokenAmount(XDAI, priceInUsd)
-    // console.log(pricedInReserve?.toFixed(4), `tvl reserve for ${farmablePool.symbol}`)
-    const tvl = price && pricedInReserve && new Fraction(price.raw, pricedInReserve.raw)
-    const tvlRawPriceInUsd = stakedAmount && tvl && stakedAmount.multiply(tvl)
-    const tvlPriceInUsd = tvlRawPriceInUsd
-    console.log(tvlPriceInUsd?.toFixed(4), `tvlPriceInUsd for ${farmablePool.symbol}`)
-    return tvlPriceInUsd ?? undefined //stakedAmount && priceInUsd && priceInUsd.mul(stakedAmount.toExact())
-  }, [priceRaw, decimals, chainIdNumber, stakedAmount, pricedInReserve, farmablePool])
+    const decimated = decimals ? JSBI.exponentiate(ten, JSBI.BigInt(decimals.toString())) : undefined
+    const priceInUsd = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
+    const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply('2')
+    const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
+    return stakedTVL ?? undefined
+  }, [priceRaw, decimals, pricedInReserve, ratioStaked])
 }
 
 // TODO: oracle/ABI doesn't work
