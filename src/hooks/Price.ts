@@ -12,21 +12,18 @@ const hundred = JSBI.BigInt(100)
 
 export function useStakedTVL(farmablePool: FarmablePool, stakedAmount: TokenAmount | undefined): Fraction | undefined {
   const { chainId } = useActiveWeb3React()
-  const [tokenAddress0, tokenAddress1] = farmablePool.tokenAddress
+  const [tokenDescriptor0, tokenDescriptor1] = farmablePool.tokenAddresses
   const chainIdNumber = useMemo(() => (chainId === ChainId.XDAI ? 100 : chainId === ChainId.MAINNET ? 1 : undefined), [
     chainId
   ])
-  // FIXME: decimals isn't correct
-  const token0 = useMemo(() => chainId && new Token(chainId, tokenAddress0, farmablePool.token.decimals), [
-    chainId,
-    tokenAddress0,
-    farmablePool
-  ])
-  const token1 = useMemo(() => chainId && new Token(chainId, tokenAddress1, farmablePool.token.decimals), [
-    chainId,
-    tokenAddress1,
-    farmablePool
-  ])
+  const token0 = useMemo(
+    () => chainId && new Token(chainId, tokenDescriptor0.address, tokenDescriptor0.decimals, tokenDescriptor0.symbol),
+    [chainId, tokenDescriptor0]
+  )
+  const token1 = useMemo(
+    () => chainId && new Token(chainId, tokenDescriptor1.address, tokenDescriptor1.decimals, tokenDescriptor1.symbol),
+    [chainId, tokenDescriptor1]
+  )
 
   const priceOraclesForChain = useMemo(() => chainIdNumber && priceOracles[chainIdNumber], [chainIdNumber])
 
@@ -34,8 +31,8 @@ export function useStakedTVL(farmablePool: FarmablePool, stakedAmount: TokenAmou
     if (!priceOraclesForChain || !token0 || !token1) {
       return { priceOracleToken: undefined, priceOracleAddress: undefined }
     }
-    const token0Oracle = priceOraclesForChain[tokenAddress0]
-    const token1Oracle = priceOraclesForChain[tokenAddress1]
+    const token0Oracle = priceOraclesForChain[tokenDescriptor0.address]
+    const token1Oracle = priceOraclesForChain[tokenDescriptor1.address]
     if (token0Oracle) {
       return { priceOracleToken: token0, priceOracleAddress: token0Oracle }
     } else if (token1Oracle) {
@@ -43,13 +40,15 @@ export function useStakedTVL(farmablePool: FarmablePool, stakedAmount: TokenAmou
     } else {
       return { priceOracleToken: undefined, priceOracleAddress: undefined }
     }
-  }, [priceOraclesForChain, tokenAddress0, tokenAddress1, token0, token1])
-  priceOracleToken && console.log(priceOracleToken?.address, `priceOracleToken for ${farmablePool.symbol}`)
+  }, [priceOraclesForChain, tokenDescriptor0, tokenDescriptor1, token0, token1])
+  priceOracleToken &&
+    console.log(priceOracleToken?.symbol, priceOracleToken.decimals, `priceOracleToken for ${farmablePool.symbol}`)
   const [, pair] = usePair(token0, token1)
   const pricedInReserve = useMemo(() => pair && priceOracleToken && pair.reserveOf(priceOracleToken), [
     priceOracleToken,
     pair
   ])
+  console.log(pricedInReserve?.toFixed(4), `pricedInReserve for ${farmablePool.name}`)
   const priceOracleContract = usePriceOracleContract(priceOracleAddress)
 
   const priceRaw: JSBI | undefined = useSingleCallResult(priceOracleContract, 'latestRoundData').result?.[1]
