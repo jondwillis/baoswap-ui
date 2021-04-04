@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ChainId, Fraction, JSBI, Token, TokenAmount } from 'uniswap-xdai-sdk'
 import { useActiveWeb3React } from '.'
 import { FarmablePool, priceOracles } from '../bao/lib/constants'
@@ -10,6 +10,63 @@ import { BigNumber } from '@ethersproject/bignumber'
 const ten = JSBI.BigInt(10)
 // WARN: this could break if bao price changes dramatically and breaks out of js number size
 const baoPriceExponent = 100000000
+
+const useFetchPrice = (
+  priceId?: string | string,
+  base?: string
+): { response: BigNumber | null; error: Error | null } => {
+  const [response, setResponse] = useState<BigNumber | null>(null)
+  const [error, setError] = useState<Error | null>(null)
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!priceId || !base) {
+        setError(new Error('No URL'))
+        return
+      }
+      try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${priceId}&vs_currencies=${base}`, {
+          headers: {
+            accept: 'application/json'
+          }
+        })
+        const json = await res.json()
+        const price: number = json[priceId][base]
+        const priceExp = price * baoPriceExponent
+        setResponse(BigNumber.from(priceExp))
+      } catch (error) {
+        setError(error)
+      }
+    }
+    fetchData()
+  }, [priceId, base])
+  return { response, error }
+}
+
+export const fetchPrice = async (priceId?: string | string, base?: string): Promise<BigNumber> => {
+  if (!priceId || !base) {
+    return Promise.reject()
+  }
+  let response
+  try {
+    response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${priceId}&vs_currencies=${base}`, {
+      headers: {
+        accept: 'application/json'
+      }
+    })
+  } catch (error) {
+    console.debug('Failed to fetch APY', error)
+  }
+
+  if (!response?.ok) {
+    throw new Error(`Failed to fetch APY`)
+  }
+
+  const json = await response?.json()
+
+  const price: number = json[priceId][base]
+  const priceExp = price * baoPriceExponent
+  return BigNumber.from(priceExp)
+}
 
 export function useStakedTVL(
   farmablePool: FarmablePool,
@@ -49,46 +106,37 @@ export function useStakedTVL(
     }
   }, [priceOraclesForChain, tokenDescriptor0, tokenDescriptor1, token0, token1, farmablePool])
 
+  const isUsingFetchPrice = useMemo(
+    () => !farmablePool.isSushi && (!priceOracleAddress || !priceOracleAddress?.startsWith('0x')),
+    [farmablePool, priceOracleAddress]
+  )
+  const fetchPriceCurrency = useMemo(() => (isUsingFetchPrice ? priceOracleAddress : undefined), [
+    isUsingFetchPrice,
+    priceOracleAddress
+  ])
+  const fetchPriceBase = useMemo(() => (isUsingFetchPrice ? 'usd' : undefined), [isUsingFetchPrice])
+  const fetchPrice = useFetchPrice(fetchPriceCurrency, fetchPriceBase)
   const [, pair] = usePair(token0, token1)
   const pricedInReserve = useMemo(() => pair && priceOracleBaseToken && pair.reserveOf(priceOracleBaseToken), [
     priceOracleBaseToken,
     pair
   ])
-  const priceOracleContract = usePriceOracleContract(priceOracleAddress)
+  const priceOracleContract = usePriceOracleContract(!isUsingFetchPrice ? priceOracleAddress : undefined)
 
   const priceRaw: string | undefined = useSingleCallResult(priceOracleContract, 'latestRoundData').result?.[1]
   const decimals: string | undefined = useSingleCallResult(priceOracleContract, 'decimals').result?.[0]
 
   return useMemo(() => {
     const decimated = decimals ? JSBI.exponentiate(ten, JSBI.BigInt(decimals.toString())) : undefined
-    const priceInUsd = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
+    const fetchedPriceInUsd = isUsingFetchPrice && !fetchPrice.error ? fetchPrice.response : undefined
+    const fetchedBI = fetchedPriceInUsd ? JSBI.BigInt(fetchedPriceInUsd?.toString()) : undefined
+    const fetchedFraction = fetchedBI ? new Fraction(fetchedBI, JSBI.BigInt(baoPriceExponent)) : undefined
+    const chainFraction = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
+    const priceInUsd = fetchedFraction ? fetchedFraction : chainFraction
     const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply('2')
     const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
     return !farmablePool.isSushi ? stakedTVL ?? undefined : undefined
-  }, [priceRaw, decimals, pricedInReserve, ratioStaked, farmablePool])
-}
-
-export const fetchPrice = async (priceId = 'bao-finance', base = 'usd'): Promise<BigNumber> => {
-  let response
-  try {
-    response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${priceId}&vs_currencies=${base}`, {
-      headers: {
-        accept: 'application/json'
-      }
-    })
-  } catch (error) {
-    console.debug('Failed to fetch APY', error)
-  }
-
-  if (!response?.ok) {
-    throw new Error(`Failed to fetch APY`)
-  }
-
-  const json = await response?.json()
-
-  const price: number = json[priceId][base]
-  const priceExp = price * baoPriceExponent
-  return BigNumber.from(priceExp)
+  }, [decimals, isUsingFetchPrice, fetchPrice, farmablePool.isSushi, priceRaw, pricedInReserve, ratioStaked])
 }
 
 // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0

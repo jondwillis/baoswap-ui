@@ -237,12 +237,14 @@ const tokenMap = {
   NEXO: new TokenDescriptor(addressMap.NEXO, 'NEXT', 18)
 }
 
+// non-address looksups can be used to fetchPrice
 export const priceOracles = {
   [ChainId.MAINNET]: {
     [addressMap.WETH]: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419'
   },
   [ChainId.XDAI]: {
     // all XXX-USD
+    [addressMap['BAO.cx']]: 'bao-finance',
     [addressMap.AAVE]: '0x2b481Dc923Aa050E009113Dca8dcb0daB4B68cDF',
     [addressMap.BAL]: '0x1b723C855F7D2c2785F99486973271355e782d77',
     [addressMap.wBTC]: '0x6C1d7e76EF7304a40e8456ce883BC56d3dEA3F7d',
