@@ -13,6 +13,29 @@ export interface PoolInfo {
   refUrl: string
 }
 
+export const contractAddresses = {
+  bao: {
+    100: '0xe0d0b1DBbCF3dd5CAc67edaf9243863Fd70745DA',
+    4: '0xE5AFBb49BeB7552a1167df6aAED70d88279787e8'
+  },
+  masterChef: {
+    100: '0xf712a82DD8e2Ac923299193e9d6dAEda2d5a32fd',
+    4: '0xdA6CFdB12112309E4587D4a747a55E2970Eda4f3'
+  },
+  weth: {
+    100: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d',
+    4: '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+  },
+  wethPrice: {
+    100: '0xa767f745331D267c7751297D982b050c93985627',
+    4: '0x8A753747A1Fa494EC906cE90E9f37563A8AF630e'
+  },
+  baoPrice: {
+    100: '0xdcf3aC78f37098222C53C79974faaC5ce1aaF707',
+    4: '0x649AfCf002742cf93CbE1F8C3832FD05ACA2D8ea'
+  }
+}
+
 export const addressMap = {
   uniswapFactory: '0x45DE240fbE2077dd3e711299538A09854FAE9c9b',
   uniswapFactoryV2: '0x45DE240fbE2077dd3e711299538A09854FAE9c9b',
@@ -106,27 +129,112 @@ export const addressMap = {
   NEXO: '0x26DC03E492763068CCfE7C39B93A22442807C360'
 }
 
-export const contractAddresses = {
-  bao: {
-    100: '0xe0d0b1DBbCF3dd5CAc67edaf9243863Fd70745DA',
-    4: '0xE5AFBb49BeB7552a1167df6aAED70d88279787e8'
-  },
-  masterChef: {
-    100: '0xf712a82DD8e2Ac923299193e9d6dAEda2d5a32fd',
-    4: '0xdA6CFdB12112309E4587D4a747a55E2970Eda4f3'
-  },
-  weth: {
-    100: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d',
-    4: '0xc778417E063141139Fce010982780140Aa0cD5Ab'
-  },
-  wethPrice: {
-    100: '0xa767f745331D267c7751297D982b050c93985627',
-    4: '0x8A753747A1Fa494EC906cE90E9f37563A8AF630e'
-  },
-  baoPrice: {
-    100: '0xdcf3aC78f37098222C53C79974faaC5ce1aaF707',
-    4: '0x649AfCf002742cf93CbE1F8C3832FD05ACA2D8ea'
+interface DescribesToken {
+  address: string
+  decimals: number
+  symbol: string
+}
+
+class TokenDescriptor implements DescribesToken {
+  address: string
+  decimals: number
+  symbol: string
+  constructor(address: string, symbol: string, decimals: number) {
+    this.address = address //Object.keys(addressMap).find(k => k === symbol)
+    this.symbol = symbol
+    this.decimals = decimals
   }
+}
+
+const tokenMap = {
+  XDAI: new TokenDescriptor(addressMap.XDAI, 'XDAI', 18),
+  BAO: new TokenDescriptor(addressMap.BAO, 'BAO', 18),
+  'BAO.cx': new TokenDescriptor(addressMap['BAO.cx'], 'BAO.cx', 18),
+  WETH: new TokenDescriptor(addressMap.WETH, 'WETH', 18),
+  YFI: new TokenDescriptor(addressMap.YFI, 'YFI', 18),
+  SUSHI: new TokenDescriptor(addressMap.SUSHI, 'SUSHI', 18),
+  XSUSHI: new TokenDescriptor(addressMap.XSUSHI, 'XSUSHI', 18),
+  GRT: new TokenDescriptor(addressMap.GRT, 'GRT', 18),
+  RUNE: new TokenDescriptor(addressMap.RUNE, 'RUNE', 18),
+  '1inch': new TokenDescriptor(addressMap['1inch'], '1INCH', 18),
+  NFTX: new TokenDescriptor(addressMap.stETH, 'stETH', 18),
+  stETH: new TokenDescriptor(addressMap.stETH, '', 18),
+  TVK: new TokenDescriptor(addressMap.TVK, 'TVK', 18),
+  wBTC: new TokenDescriptor(addressMap.wBTC, 'WBTC', 8),
+  USDT: new TokenDescriptor(addressMap.USDT, 'USDT', 18),
+  LINK: new TokenDescriptor(addressMap.LINK, 'LINK', 18),
+  USDC: new TokenDescriptor(addressMap.USDC, 'USDC', 6),
+  OKB: new TokenDescriptor(addressMap.OKB, 'OKB', 18),
+  HT: new TokenDescriptor(addressMap.HT, 'HT', 18),
+  AAVE: new TokenDescriptor(addressMap.AAVE, 'AAVE', 18),
+  CEL: new TokenDescriptor(addressMap.CEL, 'CEL', 4),
+  SNX: new TokenDescriptor(addressMap.SNX, 'SNX', 18),
+  CRV: new TokenDescriptor(addressMap.CRV, 'CRV', 18),
+  COMP: new TokenDescriptor(addressMap.COMP, 'COMP', 18),
+  MKR: new TokenDescriptor(addressMap.MKR, 'MKR', 18),
+  FTT: new TokenDescriptor(addressMap.FTT, 'FTT', 18),
+  RENBTC: new TokenDescriptor(addressMap.RENBTC, 'renBTC', 8),
+  BAT: new TokenDescriptor(addressMap.BAT, 'BAT', 18),
+  TUSD: new TokenDescriptor(addressMap.TUSD, 'TUSD', 18),
+  HUSD: new TokenDescriptor(addressMap.HUSD, 'HUSD', 8),
+  ZRX: new TokenDescriptor(addressMap.ZRX, 'ZRX', 18),
+  OCEAN: new TokenDescriptor(addressMap.OCEAN, 'OCEAN', 18),
+  KNC: new TokenDescriptor(addressMap.KNC, 'KNC', 18),
+  RSR: new TokenDescriptor(addressMap.RSR, 'RSR', 18),
+  ENJ: new TokenDescriptor(addressMap.ENJ, 'ENJ', 18),
+  NMR: new TokenDescriptor(addressMap.NMR, 'NMR', 18),
+  BAL: new TokenDescriptor(addressMap.BAL, 'BAL', 18),
+  MANA: new TokenDescriptor(addressMap.MANA, 'MANA', 18),
+  MATIC: new TokenDescriptor(addressMap.MATIC, 'MATIC', 18),
+  SXP: new TokenDescriptor(addressMap.SXP, 'SXP', 18),
+  HEGIC: new TokenDescriptor(addressMap.HEGIC, 'HEGIC', 18),
+  HBTC: new TokenDescriptor(addressMap.HBTC, 'HBTC', 18),
+  MPH: new TokenDescriptor(addressMap.MPH, 'MPH', 18),
+  sUSD: new TokenDescriptor(addressMap.sUSD, 'sUSD', 18),
+  MATH: new TokenDescriptor(addressMap.MATH, 'MATH', 18),
+  SRM: new TokenDescriptor(addressMap.SRM, 'SRM', 6),
+  RPL: new TokenDescriptor(addressMap.RPL, 'RPL', 18),
+  BNT: new TokenDescriptor(addressMap.BNT, 'BNT', 18),
+  UBT: new TokenDescriptor(addressMap.UBT, 'UBT', 18),
+  mUSD: new TokenDescriptor(addressMap.mUSD, 'mUSD', 18),
+  EURS: new TokenDescriptor(addressMap.EURS, 'EURS', 2),
+  AXS: new TokenDescriptor(addressMap.AXS, 'AXS', 18),
+  STAKE: new TokenDescriptor(addressMap.STAKE, 'STAKE', 18),
+  BZRX: new TokenDescriptor(addressMap.BZRX, 'BZRX', 18),
+  MLN: new TokenDescriptor(addressMap.MLN, 'MLN', 18),
+  DPI: new TokenDescriptor(addressMap.DPI, 'DPI', 18),
+  tBTC: new TokenDescriptor(addressMap.tBTC, 'tBTC', 18),
+  KP3R: new TokenDescriptor(addressMap.KP3R, 'KP3R', 18),
+  AKRO: new TokenDescriptor(addressMap.AKRO, 'AKRO', 18),
+  MTA: new TokenDescriptor(addressMap.MTA, 'MTA', 18),
+  TKN: new TokenDescriptor(addressMap.TKN, 'TKN', 8),
+  AUDIO: new TokenDescriptor(addressMap.AUDIO, 'AUDIO', 18),
+  Lien: new TokenDescriptor(addressMap.Lien, 'LIEN', 8),
+  JRT: new TokenDescriptor(addressMap.JRT, 'JRT', 18),
+  BOND: new TokenDescriptor(addressMap.BOND, 'BOND', 8),
+  INDEX: new TokenDescriptor(addressMap.INDEX, 'INDEX', 18),
+  DOUGH: new TokenDescriptor(addressMap.DOUGH, 'DOUGH', 18),
+  ROOK: new TokenDescriptor(addressMap.ROOK, 'ROOK', 18),
+  RSV: new TokenDescriptor(addressMap.RSV, 'RSV', 18),
+  SOCKS: new TokenDescriptor(addressMap.SOCKS, 'SOCKS', 18),
+  DONUT: new TokenDescriptor(addressMap.DONUT, 'DONUT', 18),
+  GNO: new TokenDescriptor(addressMap.GNO, 'GNO', 18),
+  RGT: new TokenDescriptor(addressMap.RGT, 'RGT', 18),
+  REN: new TokenDescriptor(addressMap.REN, 'REN', 18),
+  RARI: new TokenDescriptor(addressMap.RARI, 'RARI', 18),
+  IDLE: new TokenDescriptor(addressMap.IDLE, 'IDLE', 18),
+  PERP: new TokenDescriptor(addressMap.PERP, 'PERP', 18),
+  API3: new TokenDescriptor(addressMap.API3, 'API3', 18),
+  FRONT: new TokenDescriptor(addressMap.FRONT, 'FRONT', 18),
+  DUCK: new TokenDescriptor(addressMap.DUCK, 'DUCK', 18),
+  TRU: new TokenDescriptor(addressMap.TRU, 'TRU', 8),
+  FRAX: new TokenDescriptor(addressMap.FRAX, 'FRAX', 18),
+  MASK: new TokenDescriptor(addressMap.MASK, 'MASK', 18),
+  UNI: new TokenDescriptor(addressMap.UNI, 'UNI', 18),
+  HNY: new TokenDescriptor(addressMap.HNY, 'HNY', 18),
+  AGVE: new TokenDescriptor(addressMap.AGVE, 'AGVE', 18),
+  sETH: new TokenDescriptor(addressMap.sETH, 'sETH', 18),
+  NEXO: new TokenDescriptor(addressMap.NEXO, 'NEXT', 18)
 }
 
 export const priceOracles = {
@@ -174,7 +282,7 @@ export const supportedPools = [
       100: '0x82820a99c431d0Bb7cA775Fa7247d1AC481f2E56'
     },
     tokenAddresses: {
-      100: [addressMap.BAO, addressMap.XDAI]
+      100: [tokenMap.BAO, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'BAO PARTY',
@@ -189,7 +297,7 @@ export const supportedPools = [
       100: '0x4659640F3444e96ac96cb901177486c1775aAE09'
     },
     tokenAddresses: {
-      100: [addressMap.BAO, addressMap.WETH]
+      100: [tokenMap.BAO, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'BAO PARTYv2',
@@ -204,7 +312,7 @@ export const supportedPools = [
       100: '0x3D1d2B236ad8ef3FD7C6C1625845fB59dFFaCCa1'
     },
     tokenAddresses: {
-      100: [addressMap.BAO, addressMap.WETH]
+      100: [tokenMap.BAO, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'BAO PARTYv2',
@@ -220,7 +328,7 @@ export const supportedPools = [
       100: '0x42d69d4b7fC4506504dc4aaA224565B6618e5722'
     },
     tokenAddresses: {
-      100: [addressMap.BAO, addressMap['BAO.cx']]
+      100: [tokenMap.BAO, tokenMap['BAO.cx']]
     },
     tokenDecimals: 18,
     name: 'BAO Two Ways',
@@ -235,7 +343,7 @@ export const supportedPools = [
       100: '0xFEeC1B8Acd23068fa29Bf01759e0DA1C7cede4F4'
     },
     tokenAddresses: {
-      100: [addressMap.BAO, addressMap.USDC]
+      100: [tokenMap.BAO, tokenMap.USDC]
     },
     tokenDecimals: 18,
     name: 'BAO USDC',
@@ -251,7 +359,7 @@ export const supportedPools = [
       100: '0xcf076d7663cc16109f3879b3C60A60CdD2ef31DB'
     },
     tokenAddresses: {
-      100: [addressMap.BAO, addressMap.YFI]
+      100: [tokenMap.BAO, tokenMap.YFI]
     },
     tokenDecimals: 18,
     name: 'BAO YFI',
@@ -267,7 +375,7 @@ export const supportedPools = [
       100: '0xF768945410933cA301C347FB6C945EC6E9B4c497'
     },
     tokenAddresses: {
-      100: [addressMap.BAO, addressMap.SUSHI]
+      100: [tokenMap.BAO, tokenMap.SUSHI]
     },
     tokenDecimals: 18,
     name: 'BAO Sushi',
@@ -283,7 +391,7 @@ export const supportedPools = [
       100: '0xd83ce865aBcE674Ec61116c4aBDA281f0184cff7'
     },
     tokenAddresses: {
-      100: [addressMap.BAO, addressMap.XDAI]
+      100: [tokenMap.BAO, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'BAO DAI',
@@ -299,7 +407,7 @@ export const supportedPools = [
       100: '0xf2F9Ff5Cb8E2B21117715B2E3B5C6285349da498'
     },
     tokenAddresses: {
-      100: [addressMap.SUSHI, addressMap.WETH]
+      100: [tokenMap.SUSHI, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Sushi Eth',
@@ -315,7 +423,7 @@ export const supportedPools = [
       100: '0x1987399C0C023869ea00a51750667721BA009be6'
     },
     tokenAddresses: {
-      100: [addressMap.SUSHI, addressMap.XSUSHI]
+      100: [tokenMap.SUSHI, tokenMap.XSUSHI]
     },
     tokenDecimals: 18,
     name: 'Sushi xSushi',
@@ -331,7 +439,7 @@ export const supportedPools = [
       100: '0xfE536fE3c3E870675083f66441dF0F8ed3273650'
     },
     tokenAddresses: {
-      100: [addressMap.XSUSHI, addressMap.WETH]
+      100: [tokenMap.XSUSHI, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'xSushi ETH',
@@ -347,7 +455,7 @@ export const supportedPools = [
       100: '0xF8f02044B74F34CBd83dCa483547B7F32768Fe50'
     },
     tokenAddresses: {
-      100: [addressMap.GRT, addressMap.XDAI]
+      100: [tokenMap.GRT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'GRT Gummies',
@@ -362,7 +470,7 @@ export const supportedPools = [
       100: '0x40B8EB2575926B1F67C939B01d1716296576dc33'
     },
     tokenAddresses: {
-      100: [addressMap.GRT, addressMap.wBTC]
+      100: [tokenMap.GRT, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'GRT Gummies',
@@ -377,7 +485,7 @@ export const supportedPools = [
       100: '0x0378cc2fb49Ae06b857dEBfcbB45339dC692802C'
     },
     tokenAddresses: {
-      100: [addressMap.RUNE, addressMap.XDAI]
+      100: [tokenMap.RUNE, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Rune Ramen',
@@ -392,7 +500,7 @@ export const supportedPools = [
       100: '0x8746355882E10AAE144d3709889dfAA39FF2a692'
     },
     tokenAddresses: {
-      100: [addressMap['1inch'], addressMap.XDAI]
+      100: [tokenMap['1inch'], tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: '1Inch Nibbles',
@@ -407,7 +515,7 @@ export const supportedPools = [
       100: '0x9fbB63681bD9939514Fc437944B404E8e5208E20'
     },
     tokenAddresses: {
-      100: [addressMap.NFTX, addressMap.XDAI]
+      100: [tokenMap.NFTX, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'NFTX Nuggets',
@@ -422,7 +530,7 @@ export const supportedPools = [
       100: '0x539672a592a4EC2cA58d0CC594D1757A838C4292'
     },
     tokenAddresses: {
-      100: [addressMap.stETH, addressMap.XDAI]
+      100: [tokenMap.stETH, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'stETH xDAI',
@@ -437,7 +545,7 @@ export const supportedPools = [
       100: '0x855A564DE501eDB4d11b475f47e69d86E686Fae6'
     },
     tokenAddresses: {
-      100: [addressMap.stETH, addressMap.WETH]
+      100: [tokenMap.stETH, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'stETH wETH',
@@ -452,7 +560,7 @@ export const supportedPools = [
       100: '0x0EEb6dFda017Db4F76A7Da69AD6670fF6b841618'
     },
     tokenAddresses: {
-      100: [addressMap.TVK, addressMap.XDAI]
+      100: [tokenMap.TVK, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'TVK Shared Meal',
@@ -467,7 +575,7 @@ export const supportedPools = [
       100: '0x8c36F7CA02D50bF8E705F582328b873Acbe9438D'
     },
     tokenAddresses: {
-      100: [addressMap.WETH, addressMap.XDAI]
+      100: [tokenMap.WETH, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'wETH xDAI',
@@ -482,7 +590,7 @@ export const supportedPools = [
       100: '0xa498fFe098f4dc9a52FAB6fBdd5c624Ca237F39c'
     },
     tokenAddresses: {
-      100: [addressMap.wBTC, addressMap.XDAI]
+      100: [tokenMap.wBTC, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'wBTC Wraps',
@@ -497,7 +605,7 @@ export const supportedPools = [
       100: '0x7143aB1782bD66d966CAC3dba902Bde4c1Bfe31B'
     },
     tokenAddresses: {
-      100: [addressMap.USDT, addressMap.XDAI]
+      100: [tokenMap.USDT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Tether Truffles',
@@ -512,7 +620,7 @@ export const supportedPools = [
       100: '0x4cCB2Fe7472c0a6f73a7154023a6F652F24694ee'
     },
     tokenAddresses: {
-      100: [addressMap.LINK, addressMap.XDAI]
+      100: [tokenMap.LINK, tokenMap.XDAI]
     },
     tokenDecimals: 6,
     name: 'Link Lunch',
@@ -527,7 +635,7 @@ export const supportedPools = [
       100: '0x71c20bfCb1170E1643ccDf1FF25714615eEF6701'
     },
     tokenAddresses: {
-      100: [addressMap.USDC, addressMap.XDAI]
+      100: [tokenMap.USDC, tokenMap.XDAI]
     },
     tokenDecimals: 6,
     name: 'USDC Crunch',
@@ -542,7 +650,7 @@ export const supportedPools = [
       100: '0xB3F137f8966317DDB63e59d28831962f30C56be2'
     },
     tokenAddresses: {
-      100: [addressMap.OKB, addressMap.XDAI]
+      100: [tokenMap.OKB, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'OKB Okra',
@@ -557,7 +665,7 @@ export const supportedPools = [
       100: '0x456Cbcf435f8c21280F947C6197a725c508cbC29'
     },
     tokenAddresses: {
-      100: [addressMap.HT, addressMap.XDAI]
+      100: [tokenMap.HT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Huobi Har Gow',
@@ -572,7 +680,7 @@ export const supportedPools = [
       100: '0xfE146525b01dcF721d0714eb46a2E5dE3C01357a'
     },
     tokenAddresses: {
-      100: [addressMap.AAVE, addressMap.XDAI]
+      100: [tokenMap.AAVE, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Aave Appetizer',
@@ -587,7 +695,7 @@ export const supportedPools = [
       100: '0xDb9f7C72B9bCE159dba62f3E4C84477A6Baf4597'
     },
     tokenAddresses: {
-      100: [addressMap.CEL, addressMap.XDAI]
+      100: [tokenMap.CEL, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Celcius Compote',
@@ -602,7 +710,7 @@ export const supportedPools = [
       100: '0xCEAd5C71231764aBfc8B809824666603E8614853'
     },
     tokenAddresses: {
-      100: [addressMap.SNX, addressMap.XDAI]
+      100: [tokenMap.SNX, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Synthetix Snacks',
@@ -617,7 +725,7 @@ export const supportedPools = [
       100: '0xCdf15b16B5dd71f17ef1d1996292Af205f960A68'
     },
     tokenAddresses: {
-      100: [addressMap.CRV, addressMap.XDAI]
+      100: [tokenMap.CRV, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Curve Custard',
@@ -632,7 +740,7 @@ export const supportedPools = [
       100: '0x2fB0dD74f6365Ff77dA7Aa7D4b1B790847a5DA00'
     },
     tokenAddresses: {
-      100: [addressMap.COMP, addressMap.XDAI]
+      100: [tokenMap.COMP, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Compound Congee',
@@ -647,7 +755,7 @@ export const supportedPools = [
       100: '0x6AcE292e8e67d66597F9598f593c986c88A062cA'
     },
     tokenAddresses: {
-      100: [addressMap.MKR, addressMap.XDAI]
+      100: [tokenMap.MKR, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Maker Mooncake',
@@ -662,7 +770,7 @@ export const supportedPools = [
       100: '0x0196706CE5610541E4AD54B7B81216ca9F69C99A'
     },
     tokenAddresses: {
-      100: [addressMap.FTT, addressMap.XDAI]
+      100: [tokenMap.FTT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'FTT Fried Tofu',
@@ -677,7 +785,7 @@ export const supportedPools = [
       100: '0x1de82AF7622F3c1c9b4c7917C417222B97A6aE27'
     },
     tokenAddresses: {
-      100: [addressMap.RENBTC, addressMap.XDAI]
+      100: [tokenMap.RENBTC, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'RenBTC Red Bean Soup',
@@ -692,7 +800,7 @@ export const supportedPools = [
       100: '0x1B405646d8c8506Ff51DAD739c61A64040b0b8F5'
     },
     tokenAddresses: {
-      100: [addressMap.BAT, addressMap.XDAI]
+      100: [tokenMap.BAT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Brave Braised Pork',
@@ -707,7 +815,7 @@ export const supportedPools = [
       100: '0x013CCFFec2209829407De76108DFBa65857E395B'
     },
     tokenAddresses: {
-      100: [addressMap.TUSD, addressMap.XDAI]
+      100: [tokenMap.TUSD, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'TUSD Tea Egg',
@@ -722,7 +830,7 @@ export const supportedPools = [
       100: '0x447Fe71ABCc00959B8cA9eD4E55b3D4bEA5E15E5'
     },
     tokenAddresses: {
-      100: [addressMap.HUSD, addressMap.XDAI]
+      100: [tokenMap.HUSD, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'HUSD Hot Pot',
@@ -737,7 +845,7 @@ export const supportedPools = [
       100: '0xB3b5D8f6108C19FeedE2525D9c7DbaD29C8Dd20e'
     },
     tokenAddresses: {
-      100: [addressMap.ZRX, addressMap.XDAI]
+      100: [tokenMap.ZRX, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: '0x Ox Tail',
@@ -752,7 +860,7 @@ export const supportedPools = [
       100: '0xD4AaD8CAD77fc255B1a7F4aB0e4273deFe529Fb4'
     },
     tokenAddresses: {
-      100: [addressMap.OCEAN, addressMap.XDAI]
+      100: [tokenMap.OCEAN, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Ocean Orange Chicken',
@@ -767,7 +875,7 @@ export const supportedPools = [
       100: '0xc8812c9BBb3554F862e427CA063E3A057Ec2b335'
     },
     tokenAddresses: {
-      100: [addressMap.KNC, addressMap.XDAI]
+      100: [tokenMap.KNC, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Kyber Kung Pao Chicken',
@@ -782,7 +890,7 @@ export const supportedPools = [
       100: '0x7d3B30c6b2B0A4868bf080E732841e406a6CaD7c'
     },
     tokenAddresses: {
-      100: [addressMap.RSR, addressMap.XDAI]
+      100: [tokenMap.RSR, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Reserve Ragout',
@@ -797,7 +905,7 @@ export const supportedPools = [
       100: '0xeB3BAC49C4ab021590BF0FD73F7cD22d462b47a4'
     },
     tokenAddresses: {
-      100: [addressMap.ENJ, addressMap.XDAI]
+      100: [tokenMap.ENJ, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Enjin Egg',
@@ -812,7 +920,7 @@ export const supportedPools = [
       100: '0x7D3E57341dD6Cc8aEbE07a78a43cB085eA033fde'
     },
     tokenAddresses: {
-      100: [addressMap.NMR, addressMap.XDAI]
+      100: [tokenMap.NMR, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'NMR Niurou Wan',
@@ -827,7 +935,7 @@ export const supportedPools = [
       100: '0xD068967Bf363e3149a60fCD35925cE0a2B863455'
     },
     tokenAddresses: {
-      100: [addressMap.BAL, addressMap.XDAI]
+      100: [tokenMap.BAL, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Balancer Bento',
@@ -842,7 +950,7 @@ export const supportedPools = [
       100: '0xe0AcaC02638F4BA6Be14d3e49b9e028157610306'
     },
     tokenAddresses: {
-      100: [addressMap.MANA, addressMap.XDAI]
+      100: [tokenMap.MANA, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Mana Miantiao',
@@ -857,7 +965,7 @@ export const supportedPools = [
       100: '0x01E0AC7AC401705809ac4EF4E5E480F0C4F54a97'
     },
     tokenAddresses: {
-      100: [addressMap.MATIC, addressMap.XDAI]
+      100: [tokenMap.MATIC, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Matic Mandarin Fish',
@@ -872,7 +980,7 @@ export const supportedPools = [
       100: '0xF8a9c9F1853eD36Af45e8d5B16E8D119Aca44f26'
     },
     tokenAddresses: {
-      100: [addressMap.SXP, addressMap.XDAI]
+      100: [tokenMap.SXP, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'SXP Suan La Tang',
@@ -887,7 +995,7 @@ export const supportedPools = [
       100: '0xc02716a93fD05e7704699a09091565f79305887F'
     },
     tokenAddresses: {
-      100: [addressMap.HEGIC, addressMap.XDAI]
+      100: [tokenMap.HEGIC, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Hegic Hom Sui Gok',
@@ -902,7 +1010,7 @@ export const supportedPools = [
       100: '0x4Ef2294c429EB72c7463beb8dBFe3Fe6B01AA749'
     },
     tokenAddresses: {
-      100: [addressMap.HBTC, addressMap.XDAI]
+      100: [tokenMap.HBTC, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'HBTC Har Cheung',
@@ -917,7 +1025,7 @@ export const supportedPools = [
       100: '0x33d4E2EDe208B3616210558a4d99FB4eCF40e411'
     },
     tokenAddresses: {
-      100: [addressMap.MPH, addressMap.XDAI]
+      100: [tokenMap.MPH, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: '88mph Chilis',
@@ -932,7 +1040,7 @@ export const supportedPools = [
       100: '0xD054A866F8cc3031e4CB9f2C1C72EBa4820b6E60'
     },
     tokenAddresses: {
-      100: [addressMap.sUSD, addressMap.XDAI]
+      100: [tokenMap.sUSD, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'sUSD Sticky Rice',
@@ -947,7 +1055,7 @@ export const supportedPools = [
       100: '0xba18cA5450acc124EA756bA3fb2ba55F2bABD0e7'
     },
     tokenAddresses: {
-      100: [addressMap.MATH, addressMap.XDAI]
+      100: [tokenMap.MATH, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Math Mapo Tofu',
@@ -962,7 +1070,7 @@ export const supportedPools = [
       100: '0xA08678B12CAa9573920B934d700b15e625eA13fa'
     },
     tokenAddresses: {
-      100: [addressMap.SRM, addressMap.XDAI]
+      100: [tokenMap.SRM, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'SRM Springrolls',
@@ -977,7 +1085,7 @@ export const supportedPools = [
       100: '0x3B62358d139451898A57513Fc5e8E1b75b587740'
     },
     tokenAddresses: {
-      100: [addressMap.RPL, addressMap.XDAI]
+      100: [tokenMap.RPL, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Rocketpool Roe',
@@ -992,7 +1100,7 @@ export const supportedPools = [
       100: '0x1eBe02AEBd5FFD6847D03A435C21DF90974435be'
     },
     tokenAddresses: {
-      100: [addressMap.BNT, addressMap.XDAI]
+      100: [tokenMap.BNT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Bancor Black Bean Sauce',
@@ -1007,7 +1115,7 @@ export const supportedPools = [
       100: '0x2f77238399b19B16B98c502b37C8d4D6a56331B0'
     },
     tokenAddresses: {
-      100: [addressMap.UBT, addressMap.XDAI]
+      100: [tokenMap.UBT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'UBT Umeboshi',
@@ -1022,7 +1130,7 @@ export const supportedPools = [
       100: '0x65B0671997391ff6983142d4DAc9fa08Eb0daFdb'
     },
     tokenAddresses: {
-      100: [addressMap.mUSD, addressMap.XDAI]
+      100: [tokenMap.mUSD, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'mUSD Meatballs',
@@ -1037,7 +1145,7 @@ export const supportedPools = [
       100: '0x4841B38EeC7E0c1A48EFa5dDDC5e1e35572E5E9f'
     },
     tokenAddresses: {
-      100: [addressMap.EURS, addressMap.XDAI]
+      100: [tokenMap.EURS, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'EURS Eclairs',
@@ -1052,7 +1160,7 @@ export const supportedPools = [
       100: '0x93888156eCd6E1D8644285A057dde37fdBd620D1'
     },
     tokenAddresses: {
-      100: [addressMap.AXS, addressMap.XDAI]
+      100: [tokenMap.AXS, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'AXS Ahi Tuna',
@@ -1067,7 +1175,7 @@ export const supportedPools = [
       100: '0x3CFd76aF96be1491dc58c76458791763D354f275'
     },
     tokenAddresses: {
-      100: [addressMap.STAKE, addressMap.WETH]
+      100: [tokenMap.STAKE, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Stake Soy Sauce',
@@ -1083,7 +1191,7 @@ export const supportedPools = [
       100: '0x7cC121D777C4322fb1DaaB5d511236e682d83512'
     },
     tokenAddresses: {
-      100: [addressMap.BZRX, addressMap.WETH]
+      100: [tokenMap.BZRX, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'BZRX Beef Tendon',
@@ -1099,7 +1207,7 @@ export const supportedPools = [
       100: '0xB1C5372E620FFDBfc98187Ee08C80043Ca5aB201'
     },
     tokenAddresses: {
-      100: [addressMap.MLN, addressMap.XDAI]
+      100: [tokenMap.MLN, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Melon Marmalade',
@@ -1114,7 +1222,7 @@ export const supportedPools = [
       100: '0xbBb715Ab2c1188ae2c63533EE57f0FEd16E2bE20'
     },
     tokenAddresses: {
-      100: [addressMap.DPI, addressMap.XDAI]
+      100: [tokenMap.DPI, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'DPI Deep Fried Shrimp',
@@ -1129,7 +1237,7 @@ export const supportedPools = [
       100: '0x29601D0743a1c28d07b11aBD6A7790d14152302D'
     },
     tokenAddresses: {
-      100: [addressMap.tBTC, addressMap.XDAI]
+      100: [tokenMap.tBTC, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'tBTC Taro Dumpling',
@@ -1144,7 +1252,7 @@ export const supportedPools = [
       100: '0x78Ac941CE1b0A3B7cAf09d374c186D1A170B1B51'
     },
     tokenAddresses: {
-      100: [addressMap.KP3R, addressMap.XDAI]
+      100: [tokenMap.KP3R, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'KP3R Kebab',
@@ -1159,7 +1267,7 @@ export const supportedPools = [
       100: '0xf79De375c6e3d7CCa91fA5cFbfcFa1f1a09C0A80'
     },
     tokenAddresses: {
-      100: [addressMap.AKRO, addressMap.XDAI]
+      100: [tokenMap.AKRO, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Akro Amygdalota',
@@ -1174,7 +1282,7 @@ export const supportedPools = [
       100: '0xFCFEb63c60dfed479Bc0fbB0D3774341330B0545'
     },
     tokenAddresses: {
-      100: [addressMap.MTA, addressMap.XDAI]
+      100: [tokenMap.MTA, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'MTA Mantou',
@@ -1189,7 +1297,7 @@ export const supportedPools = [
       100: '0x24aC1A1bb7993eDbB4cFA45A6fc60DeBFF29aA23'
     },
     tokenAddresses: {
-      100: [addressMap.TKN, addressMap.XDAI]
+      100: [tokenMap.TKN, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Monolith Matcha',
@@ -1204,7 +1312,7 @@ export const supportedPools = [
       100: '0xEaa608CC858b2C315216A40d3F5263121D06ddC2'
     },
     tokenAddresses: {
-      100: [addressMap.AUDIO, addressMap.XDAI]
+      100: [tokenMap.AUDIO, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Audio Arame',
@@ -1219,7 +1327,7 @@ export const supportedPools = [
       100: '0x439440133E47acC5F22A26dA574F81137bac7d0e'
     },
     tokenAddresses: {
-      100: [addressMap.Lien, addressMap.XDAI]
+      100: [tokenMap.Lien, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Lien Lo Mein',
@@ -1234,7 +1342,7 @@ export const supportedPools = [
       100: '0x2590eB745199436b404757e8d2e38b31049633b0'
     },
     tokenAddresses: {
-      100: [addressMap.JRT, addressMap.XDAI]
+      100: [tokenMap.JRT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'JRT Jiaohua Ji',
@@ -1249,7 +1357,7 @@ export const supportedPools = [
       100: '0x1c47428d5B07bf19cca9a770484204b02352a337'
     },
     tokenAddresses: {
-      100: [addressMap.BOND, addressMap.XDAI]
+      100: [tokenMap.BOND, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'BOND Baobing',
@@ -1264,7 +1372,7 @@ export const supportedPools = [
       100: '0xC0F1596DcdEb142af173F85b972064e6d55253AA'
     },
     tokenAddresses: {
-      100: [addressMap.INDEX, addressMap.XDAI]
+      100: [tokenMap.INDEX, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Index Ice Tea',
@@ -1279,7 +1387,7 @@ export const supportedPools = [
       100: '0xBA4c502cF4eC63c34ea58713c23b602365eabd36'
     },
     tokenAddresses: {
-      100: [addressMap.DOUGH, addressMap.XDAI]
+      100: [tokenMap.DOUGH, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'DOUGH(nut)',
@@ -1294,7 +1402,7 @@ export const supportedPools = [
       100: '0x481166914c85de5709751974407e29506e2AA8bA'
     },
     tokenAddresses: {
-      100: [addressMap.ROOK, addressMap.XDAI]
+      100: [tokenMap.ROOK, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Rook Rice Noodle Roll',
@@ -1309,7 +1417,7 @@ export const supportedPools = [
       100: '0x10cb3eeDA12958b9260e4346f4AEDEFaDfcC3238'
     },
     tokenAddresses: {
-      100: [addressMap.RSV, addressMap.XDAI]
+      100: [tokenMap.RSV, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'RSV Radish Cake',
@@ -1324,7 +1432,7 @@ export const supportedPools = [
       100: '0xCa5BecAe7788BdD3025f243835866464262543e4'
     },
     tokenAddresses: {
-      100: [addressMap.SOCKS, addressMap.XDAI]
+      100: [tokenMap.SOCKS, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'SOCKS Non-Edible',
@@ -1339,7 +1447,7 @@ export const supportedPools = [
       100: '0x9C43b67cf7af1e65253634ac1c48c7FE8E5D8234'
     },
     tokenAddresses: {
-      100: [addressMap.DONUT, addressMap.XDAI]
+      100: [tokenMap.DONUT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'DONUT (Snoo Sprinkles)',
@@ -1354,7 +1462,7 @@ export const supportedPools = [
       100: '0xba2fc9EDBA4944973Ab0cB26f0B80DD2D58389E1'
     },
     tokenAddresses: {
-      100: [addressMap.GNO, addressMap.XDAI]
+      100: [tokenMap.GNO, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'GNO Gongbao Jiding',
@@ -1369,7 +1477,7 @@ export const supportedPools = [
       100: '0x246eb65d5527AcdD24De2949071Ff82694BEC758'
     },
     tokenAddresses: {
-      100: [addressMap.RGT, addressMap.XDAI]
+      100: [tokenMap.RGT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'RGT Reheated',
@@ -1384,7 +1492,7 @@ export const supportedPools = [
       100: '0x9013Ce7AA5CdFD6665e4F1796eA58197BAea80cd'
     },
     tokenAddresses: {
-      100: [addressMap.REN, addressMap.XDAI]
+      100: [tokenMap.REN, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'REN Roast Chicken',
@@ -1399,7 +1507,7 @@ export const supportedPools = [
       100: '0xb8f9d3F58c4243bE33DB8246877Bbf89614869d4'
     },
     tokenAddresses: {
-      100: [addressMap.RARI, addressMap.XDAI]
+      100: [tokenMap.RARI, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Rari Riceballs',
@@ -1414,7 +1522,7 @@ export const supportedPools = [
       100: '0xD73A386b836D02e44cf9F9CC95f029d8B803C226'
     },
     tokenAddresses: {
-      100: [addressMap.IDLE, addressMap.XDAI]
+      100: [tokenMap.IDLE, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Idle Ice',
@@ -1429,7 +1537,7 @@ export const supportedPools = [
       100: '0xEdE0e75533EF8987777139778E5fDC187622FD65'
     },
     tokenAddresses: {
-      100: [addressMap.PERP, addressMap.XDAI]
+      100: [tokenMap.PERP, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Perpetual Pizza',
@@ -1444,7 +1552,7 @@ export const supportedPools = [
       100: '0x71696a13a1e3e4a5e3929d88DA6E0aA3091ECf96'
     },
     tokenAddresses: {
-      100: [addressMap.API3, addressMap.XDAI]
+      100: [tokenMap.API3, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'API3 Avocado Toast',
@@ -1459,7 +1567,7 @@ export const supportedPools = [
       100: '0xe2ed9f396F8c4AE1b0B51a928222A65dD0019C3d'
     },
     tokenAddresses: {
-      100: [addressMap.FRONT, addressMap.XDAI]
+      100: [tokenMap.FRONT, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Front Frog Legs',
@@ -1474,7 +1582,7 @@ export const supportedPools = [
       100: '0xC8FA93d318686cd542709a28939D0E7E0Ba0E35a'
     },
     tokenAddresses: {
-      100: [addressMap.TRU, addressMap.XDAI]
+      100: [tokenMap.TRU, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Tru Turtle Soup',
@@ -1489,7 +1597,7 @@ export const supportedPools = [
       100: '0xD17E2024B1357B8485D0CeC16370D5258f5b1634'
     },
     tokenAddresses: {
-      100: [addressMap.DUCK, addressMap.XDAI]
+      100: [tokenMap.DUCK, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Duck Roasted',
@@ -1504,7 +1612,7 @@ export const supportedPools = [
       100: '0xf8837744F1036838E054e68d8d53F337702c240E'
     },
     tokenAddresses: {
-      100: [addressMap.FRAX, addressMap.XDAI]
+      100: [tokenMap.FRAX, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Frax Fries',
@@ -1519,7 +1627,7 @@ export const supportedPools = [
       100: '0x98425c753d945d3124Bc1335bCb09595DFa029F4'
     },
     tokenAddresses: {
-      100: [addressMap.USDT, addressMap.USDC]
+      100: [tokenMap.USDT, tokenMap.USDC]
     },
     tokenDecimals: 18,
     name: 'USDT USDC',
@@ -1534,7 +1642,7 @@ export const supportedPools = [
       100: '0xa59f0B26fD802AEc20AF0B24e26b12C08c1b64F7'
     },
     tokenAddresses: {
-      100: [addressMap.MASK, addressMap.XDAI]
+      100: [tokenMap.MASK, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Mask Maki',
@@ -1549,7 +1657,7 @@ export const supportedPools = [
       100: '0xC1c4D3070f2E87686777bEE0011CFd05c5c60115'
     },
     tokenAddresses: {
-      100: [addressMap.wBTC, addressMap.tBTC]
+      100: [tokenMap.wBTC, tokenMap.tBTC]
     },
     tokenDecimals: 18,
     name: 'wBTC tBTC',
@@ -1564,7 +1672,7 @@ export const supportedPools = [
       100: '0xD7eaa697f60fE733eA12526698C88302BA1b4060'
     },
     tokenAddresses: {
-      100: [addressMap.SUSHI, addressMap.wBTC]
+      100: [tokenMap.SUSHI, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'Sushi wBTC',
@@ -1579,7 +1687,7 @@ export const supportedPools = [
       100: '0x1E6c53215Da8CcccEF524Fb0b68Ee9fb28f04a43'
     },
     tokenAddresses: {
-      100: [addressMap.YFI, addressMap.wBTC]
+      100: [tokenMap.YFI, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'YFI wBTC',
@@ -1594,7 +1702,7 @@ export const supportedPools = [
       100: '0x7A7A8b21EFdcD131Dd894fF32609c2d0c5F6677C'
     },
     tokenAddresses: {
-      100: [addressMap.UNI, addressMap.wBTC]
+      100: [tokenMap.UNI, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'UNI wBTC',
@@ -1609,7 +1717,7 @@ export const supportedPools = [
       100: '0xBa594Eb3B58A2Dc380c67C63CeE00182B119457a'
     },
     tokenAddresses: {
-      100: [addressMap.BAL, addressMap.wBTC]
+      100: [tokenMap.BAL, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'BAL wBTC',
@@ -1624,7 +1732,7 @@ export const supportedPools = [
       100: '0xD61F580370E8C53757935119B7c08818f238506d'
     },
     tokenAddresses: {
-      100: [addressMap.LINK, addressMap.wBTC]
+      100: [tokenMap.LINK, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'LINK wBTC',
@@ -1639,7 +1747,7 @@ export const supportedPools = [
       100: '0xF7bA0d722b98a9e7da3c387887B5fF6610c491E7'
     },
     tokenAddresses: {
-      100: [addressMap.FTT, addressMap.wBTC]
+      100: [tokenMap.FTT, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'FTT wBTC',
@@ -1654,7 +1762,7 @@ export const supportedPools = [
       100: '0x25BFfC0B93536Ac36FEe29B028Cde0BDfA74Ff60'
     },
     tokenAddresses: {
-      100: [addressMap.AAVE, addressMap.wBTC]
+      100: [tokenMap.AAVE, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'AAVE wBTC',
@@ -1669,7 +1777,7 @@ export const supportedPools = [
       100: '0xbbB23f86cCb36c471bF466c36Ae6C38De417EF16'
     },
     tokenAddresses: {
-      100: [addressMap.SNX, addressMap.wBTC]
+      100: [tokenMap.SNX, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'SNX wBTC',
@@ -1684,7 +1792,7 @@ export const supportedPools = [
       100: '0x88B781026565214894aC74F11d4B246AA334143E'
     },
     tokenAddresses: {
-      100: [addressMap.DPI, addressMap.wBTC]
+      100: [tokenMap.DPI, tokenMap.wBTC]
     },
     tokenDecimals: 18,
     name: 'DPI wBTC',
@@ -1699,7 +1807,7 @@ export const supportedPools = [
       100: '0xe3e70e8607e120dbf271e0af6b549531b37d14d8'
     },
     tokenAddresses: {
-      100: [addressMap.HNY, addressMap.XDAI]
+      100: [tokenMap.HNY, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Honey!',
@@ -1714,7 +1822,7 @@ export const supportedPools = [
       100: '0x9fed63B4Cf4EC2706C1111A081597921b99EBC8d'
     },
     tokenAddresses: {
-      100: [addressMap.HNY, addressMap.BAO]
+      100: [tokenMap.HNY, tokenMap.BAO]
     },
     tokenDecimals: 18,
     name: 'Honey Bunz ;)',
@@ -1729,7 +1837,7 @@ export const supportedPools = [
       100: '0xcf7f4a04f204fcFea7d8617C9c8e80f95920A8c5'
     },
     tokenAddresses: {
-      100: [addressMap.AGVE, addressMap.XDAI]
+      100: [tokenMap.AGVE, tokenMap.XDAI]
     },
     tokenDecimals: 18,
     name: 'Agave Nectar',
@@ -1744,7 +1852,7 @@ export const supportedPools = [
       100: '0x4b2c191198ACd5F1C941fa1ba0C870b38470F331'
     },
     tokenAddresses: {
-      100: [addressMap.YFI, addressMap.WETH]
+      100: [tokenMap.YFI, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'YFI Youtiao',
@@ -1760,7 +1868,7 @@ export const supportedPools = [
       100: '0x43BC76493dEa7c82116A38e9C012B9a03127132c'
     },
     tokenAddresses: {
-      100: [addressMap.UNI, addressMap.WETH]
+      100: [tokenMap.UNI, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Uni Unagi',
@@ -1776,7 +1884,7 @@ export const supportedPools = [
       100: '0x110961C70E6C745cCEdA58FfAF9Ab09f53b5aF14'
     },
     tokenAddresses: {
-      100: [addressMap.USDC, addressMap.WETH]
+      100: [tokenMap.USDC, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'USDC Crunch',
@@ -1792,7 +1900,7 @@ export const supportedPools = [
       100: '0x11a79faa23B045af86B5a319ae33d82FF38379b5'
     },
     tokenAddresses: {
-      100: [addressMap.TUSD, addressMap.WETH]
+      100: [tokenMap.TUSD, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'TUSD Tea Egg',
@@ -1808,7 +1916,7 @@ export const supportedPools = [
       100: '0x743335D8EC69b176AC5AF20B523258254e1D686a'
     },
     tokenAddresses: {
-      100: [addressMap.ROOK, addressMap.WETH]
+      100: [tokenMap.ROOK, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Rook Rice Noodle Roll',
@@ -1824,7 +1932,7 @@ export const supportedPools = [
       100: '0x3802C6e89cFe9a30B11557a13BeFD7e5849Ea1e2'
     },
     tokenAddresses: {
-      100: [addressMap.GRT, addressMap.WETH]
+      100: [tokenMap.GRT, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'GRT Gummies',
@@ -1840,7 +1948,7 @@ export const supportedPools = [
       100: '0xdEE4e0b8f9A0d3AA253EAC11E4C5C7AcBFb466aE'
     },
     tokenAddresses: {
-      100: [addressMap.wBTC, addressMap.WETH]
+      100: [tokenMap.wBTC, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'wBTC Wraps',
@@ -1856,7 +1964,7 @@ export const supportedPools = [
       100: '0xB656d7B1632c713c5F3C3B6ABd71B94022Dc0f62'
     },
     tokenAddresses: {
-      100: [addressMap.RARI, addressMap.WETH]
+      100: [tokenMap.RARI, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Rari Riceballs',
@@ -1872,7 +1980,7 @@ export const supportedPools = [
       100: '0x10cF0409A5F11073ccDF8Df6f94B9df324445603'
     },
     tokenAddresses: {
-      100: [addressMap.WETH, addressMap.WETH] // FIXME: no Leverj on XDAI?
+      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no Leverj on XDAI?
     },
     tokenDecimals: 18,
     name: 'Leverj Gluon Lucky Cookie',
@@ -1888,7 +1996,7 @@ export const supportedPools = [
       100: '0x5D83eA923D62066f2547DFAd7ff662e41FB961b4'
     },
     tokenAddresses: {
-      100: [addressMap.LINK, addressMap.WETH]
+      100: [tokenMap.LINK, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Link Lunch',
@@ -1904,7 +2012,7 @@ export const supportedPools = [
       100: '0xc4265D14Eff50179771D65345f0814B3d852CCfC'
     },
     tokenAddresses: {
-      100: [addressMap.RSR, addressMap.WETH]
+      100: [tokenMap.RSR, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Reserve Ragout',
@@ -1920,7 +2028,7 @@ export const supportedPools = [
       100: '0xde9f126eb737f2aa480527992d18266f5261e0a5'
     },
     tokenAddresses: {
-      100: [addressMap.AXS, addressMap.WETH]
+      100: [tokenMap.AXS, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'AXS Ahi Tuna',
@@ -1936,7 +2044,7 @@ export const supportedPools = [
       100: '0x8c60b82dd2861F06B7E49E37A990edCa94044470'
     },
     tokenAddresses: {
-      100: [addressMap.FTT, addressMap.WETH]
+      100: [tokenMap.FTT, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'FTX Fried Tofu (Vege!)',
@@ -1952,7 +2060,7 @@ export const supportedPools = [
       100: '0x9411991Cd3Ec8745597658434C49970Fa2654480'
     },
     tokenAddresses: {
-      100: [addressMap.SRM, addressMap.WETH]
+      100: [tokenMap.SRM, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'SRM Spring Rolls (Vegan)',
@@ -1968,7 +2076,7 @@ export const supportedPools = [
       100: '0x71a25ca8f3554ee518474d9ab1f2c9380ec04c90'
     },
     tokenAddresses: {
-      100: [addressMap.RUNE, addressMap.WETH]
+      100: [tokenMap.RUNE, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Rune Ramen',
@@ -1984,7 +2092,7 @@ export const supportedPools = [
       100: '0x58D145532d4faA53A3a21ea5b262cE0F29afdd42'
     },
     tokenAddresses: {
-      100: [addressMap.WETH, addressMap.WETH] // FIXME: no yUSD on xDAI
+      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no yUSD on xDAI
     },
     tokenDecimals: 18,
     name: 'yVault Youtiao',
@@ -2000,7 +2108,7 @@ export const supportedPools = [
       100: '0xab68e00e5d402005fad284c8e0d48766650ddd2b'
     },
     tokenAddresses: {
-      100: [addressMap.NFTX, addressMap.WETH]
+      100: [tokenMap.NFTX, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'NFTX Nuggets',
@@ -2016,7 +2124,7 @@ export const supportedPools = [
       100: '0x5ADDec6b4F6a79a13EaCAeE24F08b317d6EA99A0'
     },
     tokenAddresses: {
-      100: [addressMap.WETH, addressMap.WETH] // FIXME: no QSP on xDAI
+      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no QSP on xDAI
     },
     tokenDecimals: 18,
     name: 'QSP Quail Eggs',
@@ -2032,7 +2140,7 @@ export const supportedPools = [
       100: '0x4e52D29d591E64DDE67977078ed3182f1aC8A8C3'
     },
     tokenAddresses: {
-      100: [addressMap['1inch'], addressMap.WETH]
+      100: [tokenMap['1inch'], tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: '1INCH Nibbles',
@@ -2048,7 +2156,7 @@ export const supportedPools = [
       100: '0xA700Cf3775C747762426C223A293C9C505a71D44'
     },
     tokenAddresses: {
-      100: [addressMap.AKRO, addressMap.WETH]
+      100: [tokenMap.AKRO, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'AKRO Amygdalota',
@@ -2064,7 +2172,7 @@ export const supportedPools = [
       100: '0x614d04630faf994187b7AA19C7B5d2E6BC3336E7'
     },
     tokenAddresses: {
-      100: [addressMap.WETH, addressMap.WETH] // FIXME: no cUNI on xDAI
+      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no cUNI on xDAI
     },
     tokenDecimals: 18,
     name: 'cUNI Clams',
@@ -2080,7 +2188,7 @@ export const supportedPools = [
       100: '0x54f10fd56a4990c96735c5dd8ca746538be97199'
     },
     tokenAddresses: {
-      100: [addressMap.DPI, addressMap.WETH]
+      100: [tokenMap.DPI, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'DPI Deep Fried Shrimp',
@@ -2096,7 +2204,7 @@ export const supportedPools = [
       100: '0x60bd77d5988c0676d4644ee7f0dd07f42ff2edc7'
     },
     tokenAddresses: {
-      100: [addressMap.BAT, addressMap.WETH]
+      100: [tokenMap.BAT, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Brave Braised Pork',
@@ -2112,7 +2220,7 @@ export const supportedPools = [
       100: '0xDD11aEc1FF78b06F73528D7Ce0216F1890D7b45c'
     },
     tokenAddresses: {
-      100: [addressMap.WETH, addressMap.WETH] // FIXME: no aETH on xDAI
+      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no aETH on xDAI
     },
     tokenDecimals: 18,
     name: 'Aave ETH Aperitif',
@@ -2128,7 +2236,7 @@ export const supportedPools = [
       100: '0xb7E7FE460b00d8Bc3ceB728F72652B82f433322B'
     },
     tokenAddresses: {
-      100: [addressMap.KP3R, addressMap.WETH]
+      100: [tokenMap.KP3R, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'KP3R Kebab',
@@ -2144,7 +2252,7 @@ export const supportedPools = [
       100: '0xaBc2E2b87fEC5d79b8143F82f4c4ac1Dcecfe7ef'
     },
     tokenAddresses: {
-      100: [addressMap.MPH, addressMap.WETH]
+      100: [tokenMap.MPH, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: '88MPH Chilis',
@@ -2160,7 +2268,7 @@ export const supportedPools = [
       100: '0xBdb9B0D78854db895b5D28F67Aed04EF761D2780'
     },
     tokenAddresses: {
-      100: [addressMap.WETH, addressMap.WETH] // FIXME: no YAX on xDAI
+      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no YAX on xDAI
     },
     tokenDecimals: 18,
     name: 'YAX Yellowfin',
@@ -2176,7 +2284,7 @@ export const supportedPools = [
       100: '0xe8E8937b92259adb26d510aa2f6aD6cA65243d9e'
     },
     tokenAddresses: {
-      100: [addressMap.sETH, addressMap.WETH]
+      100: [tokenMap.sETH, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'sETH/ETH',
@@ -2192,7 +2300,7 @@ export const supportedPools = [
       100: '0x89920B17e1753ad2c51a567d6f4e1f3ebB29fEDe'
     },
     tokenAddresses: {
-      100: [addressMap.WETH, addressMap.WETH] // FIXME: no ALPHA on xDAI
+      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no ALPHA on xDAI
     },
     tokenDecimals: 18,
     name: 'Alpha Apple Pie',
@@ -2208,7 +2316,7 @@ export const supportedPools = [
       100: '0xb2129038a6Ef37945306b0d1194Cc4b8952E55E8'
     },
     tokenAddresses: {
-      100: [addressMap.MATIC, addressMap.WETH]
+      100: [tokenMap.MATIC, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Matic Mandarin Fish',
@@ -2224,7 +2332,7 @@ export const supportedPools = [
       100: '0x40fD32644304577da2f70b7135F9573163B7702D'
     },
     tokenAddresses: {
-      100: [addressMap.MKR, addressMap.WETH]
+      100: [tokenMap.MKR, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Maker Mooncake',
@@ -2240,7 +2348,7 @@ export const supportedPools = [
       100: '0xbc1a3f219f14e0fa86e3a301fba0cf52b32dc77e'
     },
     tokenAddresses: {
-      100: [addressMap.XDAI, addressMap.WETH]
+      100: [tokenMap.XDAI, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Dai Dan Tat',
@@ -2256,7 +2364,7 @@ export const supportedPools = [
       100: '0x1a48e8aae834e3dad8471b507cab07b083040215'
     },
     tokenAddresses: {
-      100: [addressMap.CRV, addressMap.WETH]
+      100: [tokenMap.CRV, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Curve Custard',
@@ -2272,7 +2380,7 @@ export const supportedPools = [
       100: '0x553815c5ADe7B70ceBc094FA1b4175519bE6CAF1'
     },
     tokenAddresses: {
-      100: [addressMap.AAVE, addressMap.WETH]
+      100: [tokenMap.AAVE, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Aave Appetizer',
@@ -2288,7 +2396,7 @@ export const supportedPools = [
       100: '0x4c3887963bd62200f5304aadaa84dbd0bab1e3ad'
     },
     tokenAddresses: {
-      100: [addressMap.SNX, addressMap.WETH]
+      100: [tokenMap.SNX, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Synthetix Snacks',
@@ -2304,7 +2412,7 @@ export const supportedPools = [
       100: '0xDA7712b5959499629a9f6B4cAE2F22910FB894fD'
     },
     tokenAddresses: {
-      100: [addressMap.BAL, addressMap.WETH]
+      100: [tokenMap.BAL, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Balancer Bento',
@@ -2320,7 +2428,7 @@ export const supportedPools = [
       100: '0xa53c15D225558698d3903ABF1482e3ea0FeADA65'
     },
     tokenAddresses: {
-      100: [addressMap.NEXO, addressMap.WETH]
+      100: [tokenMap.NEXO, tokenMap.WETH]
     },
     tokenDecimals: 18,
     name: 'Nexo Noodles',
@@ -2334,7 +2442,7 @@ export const supportedPools = [
 export interface FarmablePool {
   pid: number
   address: string
-  tokenAddress: string[]
+  tokenAddresses: DescribesToken[]
   token: Token
   symbol: string
   name: string
@@ -2346,11 +2454,11 @@ export interface FarmablePool {
 export function useAllFarmablePools(): FarmablePool[] {
   return supportedPools.map(poolInfo => {
     const address = poolInfo.lpAddresses[ChainId.XDAI]
-    const tokenAddress = poolInfo.tokenAddresses[ChainId.XDAI]
+    const tokenAddresses = poolInfo.tokenAddresses[ChainId.XDAI]
     const farmablePool: FarmablePool = {
       pid: poolInfo.pid,
       address,
-      tokenAddress: tokenAddress,
+      tokenAddresses: tokenAddresses,
       token: new Token(ChainId.XDAI, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
       symbol: poolInfo.symbol,
       name: poolInfo.name,
@@ -2364,11 +2472,11 @@ export function useAllFarmablePools(): FarmablePool[] {
 
 const supportedLpTokenEntries = supportedPools.map(poolInfo => {
   const address = poolInfo.lpAddresses[ChainId.XDAI]
-  const tokenAddress = poolInfo.tokenAddresses[ChainId.XDAI]
+  const tokenAddresses = poolInfo.tokenAddresses[ChainId.XDAI]
   const farmablePool: FarmablePool = {
     pid: poolInfo.pid,
     address,
-    tokenAddress: tokenAddress,
+    tokenAddresses,
     token: new Token(ChainId.XDAI, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
     symbol: poolInfo.symbol,
     name: poolInfo.name,
