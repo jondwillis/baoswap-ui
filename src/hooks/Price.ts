@@ -6,9 +6,10 @@ import { usePair, useRewardToken } from '../data/Reserves'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { useMasterChefContract, usePriceOracleContract } from './useContract'
 import { BigNumber } from '@ethersproject/bignumber'
-import { useBlockNumber } from '../state/application/hooks'
 
 const ten = JSBI.BigInt(10)
+// WARN: this could break if bao price changes dramatically and breaks out of js number size
+const baoPriceExponent = 100000000
 
 export function useStakedTVL(
   farmablePool: FarmablePool,
@@ -67,7 +68,6 @@ export function useStakedTVL(
   }, [priceRaw, decimals, pricedInReserve, ratioStaked, farmablePool])
 }
 
-// TODO: oracle/ABI doesn't work
 export const fetchPrice = async (priceId = 'bao-finance', base = 'usd'): Promise<BigNumber> => {
   let response
   try {
@@ -86,21 +86,19 @@ export const fetchPrice = async (priceId = 'bao-finance', base = 'usd'): Promise
 
   const json = await response?.json()
 
-  const price = json[priceId][base]
-  return BigNumber.from(price)
+  const price: number = json[priceId][base]
+  const priceExp = price * baoPriceExponent
+  return BigNumber.from(priceExp)
 }
 
+// ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
 export function useAPY(
   farmablePool: FarmablePool | undefined,
   baoPriceUsd: BigNumber,
   tvlUsd: Fraction | undefined
 ): Fraction | undefined {
-  const block = useBlockNumber()
-  // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
   const rewardToken = useRewardToken()
-  const rewardPriceUsd = new Fraction(JSBI.BigInt(777), JSBI.BigInt(100000)) // TODO: get actual bao/usd
-  // const rewardPriceUsd = baoPriceUsd
-  console.log(baoPriceUsd)
+
   const masterChef = useMasterChefContract()
   const rewardPerBlockResult: string = useSingleCallResult(masterChef, 'getNewRewardPerBlock', [
     farmablePool?.pid ? farmablePool.pid + 1 : undefined
@@ -111,15 +109,17 @@ export function useAPY(
     const rawRewardPerBlock = JSBI.BigInt(rewardPerBlockResult?.toString() ?? '0')
 
     const decimated = JSBI.exponentiate(ten, JSBI.BigInt((rewardToken.decimals - 1).toString()))
+
+    const baoPriceBI = JSBI.BigInt(baoPriceUsd.toString())
+    const baoPriceFraction = new Fraction(baoPriceBI, JSBI.BigInt(baoPriceExponent / 10)) // uhhh
     const rewardPerBlock = new Fraction(rawRewardPerBlock, decimated)
 
-    console.log(block)
     return (
       tvlUsd &&
-      rewardPriceUsd
+      baoPriceFraction
         .multiply(rewardPerBlock)
         .multiply(blocksPerYear)
         .divide(tvlUsd)
     )
-  }, [block])
+  }, [rewardPerBlockResult, baoPriceUsd, rewardToken.decimals, tvlUsd])
 }
