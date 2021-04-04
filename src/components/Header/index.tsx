@@ -1,14 +1,15 @@
 import { ChainId } from 'uniswap-xdai-sdk'
-import React from 'react'
+import React, { useContext } from 'react'
 import { Text } from 'rebass'
-import styled from 'styled-components'
-import { useActiveWeb3React } from '../../hooks'
+import styled, { ThemeContext } from 'styled-components'
+import { useActiveWeb3React, useMainWeb3React } from '../../hooks'
 import { useETHBalances } from '../../state/wallet/hooks'
 import { LightCard } from '../Card'
 import Settings from '../Settings'
 import Menu from '../Menu'
-import { RowBetween } from '../Row'
+import { RowBetween, RowFixed } from '../Row'
 import Web3Status from '../Web3Status'
+import { Zap, ZapOff } from 'react-feather'
 // import Logo from '../../assets/images/bao-logo.png'
 
 import { ColumnCenter as Column } from '../Column'
@@ -70,15 +71,14 @@ const AccountElement = styled.div<{ active: boolean }>`
 const TestnetWrapper = styled.div`
   white-space: nowrap;
   width: fit-content;
-  margin-left: 10px;
+  margin: 5px;
   pointer-events: auto;
 `
 
 const NetworkCard = styled(LightCard)`
   width: fit-content;
-  margin-right: 10px;
   border-radius: 12px;
-  padding: 8px 12px;
+  padding: 6px;
 `
 
 // const BaoIcon = styled.div`
@@ -110,7 +110,7 @@ const BalanceText = styled(Text)`
 `
 
 const NETWORK_LABELS: { [chainId in ChainId]: string | null } = {
-  [ChainId.MAINNET]: null,
+  [ChainId.MAINNET]: 'Ethereum',
   [ChainId.RINKEBY]: 'Rinkeby',
   [ChainId.ROPSTEN]: 'Ropsten',
   [ChainId.GÖRLI]: 'Görli',
@@ -119,7 +119,9 @@ const NETWORK_LABELS: { [chainId in ChainId]: string | null } = {
 }
 
 export default function Header() {
-  const { account, chainId } = useActiveWeb3React()
+  const theme = useContext(ThemeContext)
+  const { account, chainId, active } = useActiveWeb3React()
+  const { chainId: mainChainId, active: mainActive } = useMainWeb3React()
 
   const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
 
@@ -134,19 +136,47 @@ export default function Header() {
         <HeaderControls>
           <HeaderElement>
             <TestnetWrapper>
-              {chainId && NETWORK_LABELS[chainId] && (
+              {chainId && active && NETWORK_LABELS[chainId] && (
                 <NetworkCard>
                   <Column style={{ padding: 0, margin: 0 }}>
                     <RowBetween>
-                      <Text fontWeight={800} fontSize={10}>
+                      {active ? (
+                        <Zap size="10pt" style={{ color: theme.primary1 }} />
+                      ) : (
+                        <ZapOff size="10pt" style={{ color: theme.red1 }} />
+                      )}
+                      <Text paddingLeft="0.15rem" fontWeight={800} fontSize={10}>
                         {NETWORK_LABELS[chainId]}
                       </Text>
                     </RowBetween>
-                    <RowBetween>
+                    <RowFixed>
                       <Text fontWeight={300} fontSize={9}>
-                        CHAIN
+                        PRIMARY
+                      </Text>
+                    </RowFixed>
+                  </Column>
+                </NetworkCard>
+              )}
+            </TestnetWrapper>
+            <TestnetWrapper>
+              {mainChainId && NETWORK_LABELS[mainChainId] && (
+                <NetworkCard>
+                  <Column style={{ padding: 0, margin: 0 }}>
+                    <RowBetween>
+                      {mainActive ? (
+                        <Zap size="10pt" style={{ color: theme.primary1 }} />
+                      ) : (
+                        <ZapOff size="10pt" style={{ color: theme.red1 }} />
+                      )}
+                      <Text paddingLeft="0.15rem" fontWeight={800} fontSize={10}>
+                        {NETWORK_LABELS[mainChainId]}
                       </Text>
                     </RowBetween>
+                    <RowFixed>
+                      <Text fontWeight={300} fontSize={9}>
+                        SIDECHAIN
+                      </Text>
+                    </RowFixed>
                   </Column>
                 </NetworkCard>
               )}

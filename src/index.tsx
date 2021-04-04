@@ -3,7 +3,8 @@ import 'inter-ui'
 import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { NetworkContextName } from './constants'
+import { getNetworkLibrary } from './connectors'
+import { MainNetworkContextName, NetworkContextName } from './constants'
 import './i18n'
 import App from './pages/App'
 import store from './state'
@@ -16,6 +17,7 @@ import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
 import getLibrary from './utils/getLibrary'
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
+const Web3ProviderMainNetwork = createWeb3ReactRoot(MainNetworkContextName)
 
 if ('ethereum' in window) {
   ;(window.ethereum as any).autoRefreshOnNetworkChange = false
@@ -37,14 +39,16 @@ ReactDOM.render(
   <StrictMode>
     <FixedGlobalStyle />
     <Web3ReactProvider getLibrary={getLibrary}>
-      <Web3ProviderNetwork getLibrary={getLibrary}>
-        <Provider store={store}>
-          <Updaters />
-          <ThemeProvider>
-            <ThemedGlobalStyle />
-            <App />
-          </ThemeProvider>
-        </Provider>
+      <Web3ProviderNetwork getLibrary={getNetworkLibrary}>
+        <Web3ProviderMainNetwork getLibrary={getNetworkLibrary}>
+          <Provider store={store}>
+            <Updaters />
+            <ThemeProvider>
+              <ThemedGlobalStyle />
+              <App />
+            </ThemeProvider>
+          </Provider>
+        </Web3ProviderMainNetwork>
       </Web3ProviderNetwork>
     </Web3ReactProvider>
   </StrictMode>,

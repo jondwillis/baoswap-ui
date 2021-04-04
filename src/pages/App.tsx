@@ -62,13 +62,13 @@ export default function App() {
     <Suspense fallback={null}>
       <HashRouter>
         <Route component={DarkModeQueryParamReader} />
-        <AppWrapper>
-          <HeaderWrapper>
-            <Header />
-          </HeaderWrapper>
-          <BodyWrapper>
-            <Popups />
-            <Web3ReactManager>
+        <Web3ReactManager>
+          <AppWrapper>
+            <HeaderWrapper>
+              <Header />
+            </HeaderWrapper>
+            <BodyWrapper>
+              <Popups />
               <Switch>
                 <Route exact strict path="/swap" component={Swap} />
                 <Route exact strict path="/swap/:inputCurrency" component={RedirectToSwap} />
@@ -87,10 +87,10 @@ export default function App() {
                 <Route exact strict path="/remove/:currencyIdA/:currencyIdB" component={RemoveLiquidity} />
                 <Route component={RedirectPathToSwapOnly} />
               </Switch>
-            </Web3ReactManager>
-            <Marginer />
-          </BodyWrapper>
-        </AppWrapper>
+              <Marginer />
+            </BodyWrapper>
+          </AppWrapper>
+        </Web3ReactManager>
       </HashRouter>
     </Suspense>
   )
