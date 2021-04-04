@@ -52,7 +52,7 @@ export default function Analytics() {
 
   const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
   useEffect(() => {
-    fetchPrice()
+    fetchPrice('bao-finance', 'usd')
       .then(apy => setBaoPriceUsd(apy))
       .catch(() => setBaoPriceUsd(BigNumber.from(0)))
   }, [block])
