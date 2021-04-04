@@ -10,8 +10,10 @@ import { Text } from 'rebass'
 import { ExternalLink } from '../../theme'
 import { PoolInfoFarmablePool } from '../../data/Reserves'
 import Logo from '../Logo'
-import { fetchAPY } from '../../hooks/useFetchAPYCallback'
+import { BigNumber } from '@ethersproject/bignumber'
 import { Percent } from 'uniswap-xdai-sdk'
+import { fetchPrice, useAPY, useStakedTVL } from '../../hooks/Price'
+import { useBlockNumber } from '../../state/application/hooks'
 
 interface FarmCardProps {
   farmablePool: PoolInfoFarmablePool
@@ -22,14 +24,19 @@ interface FarmCardProps {
 export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
+  const block = useBlockNumber()
   const { accBaoPerShare, stakedAmount, totalSupply, icon, name, poolWeight, pid } = farmablePool
 
-  const [apy, setAPY] = useState<number>(-1)
+  const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply)
+
+  const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
   useEffect(() => {
-    fetchAPY(pid)
-      .then(apy => setAPY(apy))
-      .catch(() => setAPY(-1))
-  })
+    fetchPrice()
+      .then(apy => setBaoPriceUsd(apy))
+      .catch(() => setBaoPriceUsd(BigNumber.from(0)))
+  }, [block])
+
+  const apy = useAPY(farmablePool, baoPriceUsd, allStakedTVL)
 
   const [showMore, setShowMore] = useState(defaultShowMore)
 
@@ -57,7 +64,7 @@ export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProp
             </AutoColumn>
           </RowFixed>
           <RowFixed>
-            {apy > 0 && (
+            {apy?.greaterThan('0') && (
               <ExternalLink href={`https://baoview.xyz/pool-metrics/${pid}`}>
                 {apy.toFixed(0)}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
               </ExternalLink>
