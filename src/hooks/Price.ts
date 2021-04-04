@@ -63,8 +63,8 @@ export function useStakedTVL(
     const priceInUsd = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
     const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply('2')
     const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
-    return stakedTVL ?? undefined
-  }, [priceRaw, decimals, pricedInReserve, ratioStaked])
+    return !farmablePool.isSushi ? stakedTVL ?? undefined : undefined
+  }, [priceRaw, decimals, pricedInReserve, ratioStaked, farmablePool])
 }
 
 // TODO: oracle/ABI doesn't work
