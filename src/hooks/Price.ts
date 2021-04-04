@@ -90,7 +90,7 @@ export const fetchPrice = async (priceId = 'bao-finance', base = 'usd'): Promise
 }
 
 export function useAPY(
-  farmablePool: FarmablePool,
+  farmablePool: FarmablePool | undefined,
   baoPriceUsd: BigNumber,
   tvlUsd: Fraction | undefined
 ): Fraction | undefined {
@@ -101,7 +101,7 @@ export function useAPY(
   console.log(baoPriceUsd)
   const masterChef = useMasterChefContract()
   const rewardPerBlockResult: string = useSingleCallResult(masterChef, 'getNewRewardPerBlock', [
-    farmablePool.pid + 1 ?? undefined
+    farmablePool?.pid ? farmablePool.pid + 1 : undefined
   ]).result?.[0]
 
   const blocksPerYear = JSBI.BigInt(6311390) // (31556952 (seconds / year)) / (5 blocks/second) = 6311390.4

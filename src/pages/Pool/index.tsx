@@ -76,8 +76,12 @@ export default function Pool() {
     [v2Pairs]
   )
   const allPairCandidatesWithLiquidity = useMemo(
-    () => pairCandidates.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)),
-    [pairCandidates]
+    () =>
+      pairCandidates.flatMap(([, pair]) => {
+        const farmablePool = allFarmablePools.find(p => p.address === pair?.liquidityToken.address)
+        return farmablePool && pair && pair instanceof Pair && Boolean(pair) ? { pair, farmablePool } : undefined
+      }),
+    [pairCandidates, allFarmablePools]
   )
 
   return (
@@ -152,13 +156,18 @@ export default function Pool() {
               </LightCard>
             ) : allPairCandidatesWithLiquidity?.length > 0 ? (
               <>
-                {allPairCandidatesWithLiquidity.map(v2Pair => (
-                  <FarmSuggestionCard
-                    key={`suggest- ${v2Pair.liquidityToken.address}`}
-                    pair={v2Pair}
-                    unstakedLPAmount={v2PairsBalances[v2Pair.liquidityToken.address]}
-                  />
-                ))}
+                {allPairCandidatesWithLiquidity.map(pfp => {
+                  return pfp ? (
+                    <FarmSuggestionCard
+                      key={`suggest- ${pfp.pair.liquidityToken.address}`}
+                      pair={pfp.pair}
+                      farmablePool={pfp.farmablePool}
+                      unstakedLPAmount={v2PairsBalances[pfp.pair.liquidityToken.address]}
+                    />
+                  ) : (
+                    <></>
+                  )
+                })}
               </>
             ) : (
               <LightCard padding="40px">

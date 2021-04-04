@@ -21,9 +21,9 @@ export function useTotalLiquidityAmount(token?: Token, contract?: Contract): Tok
   ])
 }
 
-export function useStakedAmount(token: Token): TokenAmount | undefined {
+export function useStakedAmount(token: Token | undefined): TokenAmount | undefined {
   const masterChefContract = useMasterChefContract()
-  const contract = useLPContract(token.address) || null
+  const contract = useLPContract(token?.address) || null
   const balance = useSingleCallResult(contract, 'balanceOf', [masterChefContract?.address]).result?.[0]
 
   return useMemo(() => (contract && token && balance ? new TokenAmount(token, balance?.toString()) : undefined), [

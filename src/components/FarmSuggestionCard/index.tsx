@@ -1,6 +1,6 @@
 import { Pair, TokenAmount } from 'uniswap-xdai-sdk'
 import { darken } from 'polished'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components'
@@ -15,9 +15,13 @@ import DoubleCurrencyLogo from '../DoubleLogo'
 import { RowBetween, RowFixed } from '../Row'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { useActiveWeb3React } from '../../hooks'
-import { fetchAPY } from '../../hooks/useFetchAPYCallback'
-import { useAllFarmablePools } from '../../bao/lib/constants'
 import { ExternalLink } from '../../theme'
+import { useBlockNumber } from '../../state/application/hooks'
+import { fetchPrice, useAPY, useStakedTVL } from '../../hooks/Price'
+import { useStakedAmount } from '../../data/Staked'
+import { BigNumber } from '@ethersproject/bignumber'
+import { useTotalSupply } from '../../data/TotalSupply'
+import { FarmablePool } from '../../bao/lib/constants'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -38,13 +42,15 @@ export const BalanceText = styled(Text)`
 
 interface PositionCardProps {
   pair: Pair
+  farmablePool: FarmablePool
   unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
 }
 
-export function FarmSuggestionCard({ pair, showUnwrapped = true, border }: PositionCardProps) {
+export function FarmSuggestionCard({ pair, farmablePool, showUnwrapped = true, border }: PositionCardProps) {
   const { account } = useActiveWeb3React()
+  const block = useBlockNumber()
 
   const currency0 = showUnwrapped ? pair.token0 : unwrappedToken(pair.token0)
   const currency1 = showUnwrapped ? pair.token1 : unwrappedToken(pair.token1)
@@ -56,22 +62,27 @@ export function FarmSuggestionCard({ pair, showUnwrapped = true, border }: Posit
   const token0Balance = useTokenBalance(account ?? undefined, token0)
   const token1Balance = useTokenBalance(account ?? undefined, token1)
 
-  const pairAddress = pair.liquidityToken.address
+  // const pairAddress = pair.liquidityToken.address
 
-  const allFarmablePools = useAllFarmablePools()
-  const farmablePool = useMemo(() => allFarmablePools.find(p => p.address === pairAddress), [
-    pairAddress,
-    allFarmablePools
-  ])
+  // const allFarmablePools = useAllFarmablePools()
+  // const farmablePool = useMemo(() => allFarmablePools.find(p => p.address === pairAddress), [
+  //   pairAddress,
+  //   allFarmablePools
+  // ])
 
-  const [apy, setAPY] = useState<number>(-1)
+  const stakedAmount = useStakedAmount(farmablePool.token)
+  const totalSupply = useTotalSupply(pair.liquidityToken)
+
+  const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply)
+
+  const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
   useEffect(() => {
-    if (farmablePool?.pid) {
-      fetchAPY(farmablePool.pid)
-        .then(apy => setAPY(apy))
-        .catch(() => setAPY(-1))
-    }
-  })
+    fetchPrice()
+      .then(apy => setBaoPriceUsd(apy))
+      .catch(() => setBaoPriceUsd(BigNumber.from(0)))
+  }, [block])
+
+  const apy = useAPY(farmablePool, baoPriceUsd, allStakedTVL)
 
   return (
     <>
@@ -85,11 +96,8 @@ export function FarmSuggestionCard({ pair, showUnwrapped = true, border }: Posit
               </Text>
             </RowFixed>
             <RowFixed>
-              {apy > 0 && farmablePool?.pid && (
-                <ExternalLink
-                  href={`https://baoview.xyz/pool-metrics/${farmablePool.pid}`}
-                  style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end' }}
-                >
+              {apy?.greaterThan('0') && (
+                <ExternalLink href={`https://baoview.xyz/pool-metrics/${farmablePool.pid}`}>
                   {apy.toFixed(0)}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
                 </ExternalLink>
               )}
