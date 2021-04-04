@@ -2338,6 +2338,7 @@ export interface FarmablePool {
   token: Token
   symbol: string
   name: string
+  isSushi: boolean
   icon: string
   refUrl: string
 }
@@ -2353,6 +2354,7 @@ export function useAllFarmablePools(): FarmablePool[] {
       token: new Token(ChainId.XDAI, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
       symbol: poolInfo.symbol,
       name: poolInfo.name,
+      isSushi: poolInfo.poolType === 'sushi',
       icon: poolInfo.icon,
       refUrl: poolInfo.refUrl
     }
@@ -2370,6 +2372,7 @@ const supportedLpTokenEntries = supportedPools.map(poolInfo => {
     token: new Token(ChainId.XDAI, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
     symbol: poolInfo.symbol,
     name: poolInfo.name,
+    isSushi: poolInfo.poolType === 'sushi',
     icon: poolInfo.icon,
     refUrl: poolInfo.refUrl
   }
