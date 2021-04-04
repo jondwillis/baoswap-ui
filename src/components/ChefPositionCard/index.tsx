@@ -22,6 +22,7 @@ import Logo from '../Logo'
 import { fetchPrice, useAPY, useStakedTVL } from '../../hooks/Price'
 import { BigNumber } from '@ethersproject/bignumber'
 import { useBlockNumber } from '../../state/application/hooks'
+import { useTotalSupply } from '../../data/TotalSupply'
 
 interface ChefCardProps {
   farmablePool: UserInfoFarmablePool
@@ -44,6 +45,7 @@ export function ChefPositionCard({
   const block = useBlockNumber()
   const rewardCurrency = unwrappedToken(pendingReward.token)
 
+  const totalSupply = useTotalSupply(farmablePool.token)
   const allStakedAmount = useStakedAmount(farmablePool.token)
 
   const [showMore, setShowMore] = useState(defaultShowMore)
@@ -98,8 +100,8 @@ export function ChefPositionCard({
   const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
   `
-  const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount, allStakedAmount)
-  const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount, allStakedAmount)
+  const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount, totalSupply)
+  const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount, totalSupply)
 
   const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
   useEffect(() => {
