@@ -160,8 +160,8 @@ export function usePoolInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Po
   const userInfoFarmablePool = useMemo(() => {
     return pairFarmablePools.map((farmablePool, i) => {
       const accBaoPerShare = results?.[i]?.result?.[3] // [1] is pool weight
-      const totalSupply = pairResults?.[i].result?.[0]
-      const stakedAmount = stakedAmounts?.[i].result?.[0]
+      const totalSupply = pairResults?.[i]?.result?.[0]
+      const stakedAmount = stakedAmounts?.[i]?.result?.[0]
       const poolWeight = results?.[i]?.result?.[1]
 
       const mergeObject =
