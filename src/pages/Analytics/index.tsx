@@ -1,4 +1,4 @@
-import React, { RefObject, useCallback, useContext, useMemo, useRef, useState } from 'react'
+import React, { RefObject, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { ThemeContext } from 'styled-components'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
@@ -17,16 +17,20 @@ import { useAllFarmablePools } from '../../bao/lib/constants'
 import { FarmCard } from '../../components/FarmCard'
 import { usePoolInfoFarmablePools } from '../../data/Reserves'
 import { useTranslation } from 'react-i18next'
+import { useBlockNumber } from '../../state/application/hooks'
+import { BigNumber } from '@ethersproject/bignumber'
+import { fetchPrice } from '../../hooks/Price'
 
 export default function Analytics() {
   const { t } = useTranslation()
   const theme = useContext(ThemeContext)
   const { account } = useActiveWeb3React()
+  const block = useBlockNumber()
 
   const allFarmablePools = useAllFarmablePools()
   const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools)
 
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState('BAO')
 
   const queriedPools = useMemo(() => {
     const query = searchQuery.toLowerCase()
@@ -45,6 +49,13 @@ export default function Analytics() {
     const input = event.target.value
     setSearchQuery(input)
   }, [])
+
+  const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
+  useEffect(() => {
+    fetchPrice()
+      .then(apy => setBaoPriceUsd(apy))
+      .catch(() => setBaoPriceUsd(BigNumber.from(0)))
+  }, [block])
 
   const isLoading = fetchingPoolInfo
   return (
@@ -83,7 +94,7 @@ export default function Analytics() {
             ) : queriedPools?.length > 0 ? (
               <>
                 {queriedPools.map((farm: any) => (
-                  <FarmCard key={farm.address} farmablePool={farm} defaultShowMore={false} />
+                  <FarmCard key={farm.address} farmablePool={farm} baoPriceUsd={baoPriceUsd} defaultShowMore={false} />
                 ))}
               </>
             ) : (

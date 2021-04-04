@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { ChevronUp, ChevronDown, PieChart } from 'react-feather'
 import { ThemeContext } from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
@@ -12,29 +12,22 @@ import { PoolInfoFarmablePool } from '../../data/Reserves'
 import Logo from '../Logo'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Percent } from 'uniswap-xdai-sdk'
-import { fetchPrice, useAPY, useStakedTVL } from '../../hooks/Price'
-import { useBlockNumber } from '../../state/application/hooks'
+import { useAPY, useStakedTVL } from '../../hooks/Price'
 
 interface FarmCardProps {
   farmablePool: PoolInfoFarmablePool
+  baoPriceUsd: BigNumber
   border?: string
   defaultShowMore: boolean
 }
 
-export function FarmCard({ farmablePool, border, defaultShowMore }: FarmCardProps) {
+export function FarmCard({ farmablePool, baoPriceUsd, border, defaultShowMore }: FarmCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
-  const block = useBlockNumber()
+
   const { accBaoPerShare, stakedAmount, totalSupply, icon, name, poolWeight, pid } = farmablePool
 
   const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply)
-
-  const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
-  useEffect(() => {
-    fetchPrice()
-      .then(apy => setBaoPriceUsd(apy))
-      .catch(() => setBaoPriceUsd(BigNumber.from(0)))
-  }, [block])
 
   const apy = useAPY(farmablePool, baoPriceUsd, allStakedTVL)
 

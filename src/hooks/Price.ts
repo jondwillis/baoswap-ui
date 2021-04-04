@@ -6,6 +6,7 @@ import { usePair, useRewardToken } from '../data/Reserves'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { useMasterChefContract, usePriceOracleContract } from './useContract'
 import { BigNumber } from '@ethersproject/bignumber'
+import { useBlockNumber } from '../state/application/hooks'
 
 const ten = JSBI.BigInt(10)
 
@@ -94,6 +95,7 @@ export function useAPY(
   baoPriceUsd: BigNumber,
   tvlUsd: Fraction | undefined
 ): Fraction | undefined {
+  const block = useBlockNumber()
   // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
   const rewardToken = useRewardToken()
   const rewardPriceUsd = new Fraction(JSBI.BigInt(777), JSBI.BigInt(100000)) // TODO: get actual bao/usd
@@ -104,17 +106,20 @@ export function useAPY(
     farmablePool?.pid ? farmablePool.pid + 1 : undefined
   ]).result?.[0]
 
-  const blocksPerYear = JSBI.BigInt(6311390) // (31556952 (seconds / year)) / (5 blocks/second) = 6311390.4
-  const rawRewardPerBlock = JSBI.BigInt(rewardPerBlockResult?.toString() ?? '0')
+  return useMemo(() => {
+    const blocksPerYear = JSBI.BigInt(6311390) // (31556952 (seconds / year)) / (5 blocks/second) = 6311390.4
+    const rawRewardPerBlock = JSBI.BigInt(rewardPerBlockResult?.toString() ?? '0')
 
-  const decimated = JSBI.exponentiate(ten, JSBI.BigInt((rewardToken.decimals - 1).toString()))
-  const rewardPerBlock = new Fraction(rawRewardPerBlock, decimated)
+    const decimated = JSBI.exponentiate(ten, JSBI.BigInt((rewardToken.decimals - 1).toString()))
+    const rewardPerBlock = new Fraction(rawRewardPerBlock, decimated)
 
-  return (
-    tvlUsd &&
-    rewardPriceUsd
-      .multiply(rewardPerBlock)
-      .multiply(blocksPerYear)
-      .divide(tvlUsd)
-  )
+    console.log(block)
+    return (
+      tvlUsd &&
+      rewardPriceUsd
+        .multiply(rewardPerBlock)
+        .multiply(blocksPerYear)
+        .divide(tvlUsd)
+    )
+  }, [block])
 }
