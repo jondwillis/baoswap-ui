@@ -70,10 +70,39 @@ export function useStakedTVL(farmablePool: FarmablePool, stakedAmount: TokenAmou
   }, [priceRaw, decimals, chainIdNumber, stakedAmount, pricedInReserve, farmablePool])
 }
 
-export function useAPY(farmablePool: FarmablePool, tvl: Fraction | undefined): Fraction | undefined {
+// TODO: oracle/ABI doesn't work
+export const fetchPrice = async (priceId = 'bao-finance', base = 'usd'): Promise<BigNumber> => {
+  let response
+  try {
+    response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${priceId}&vs_currencies=${base}`, {
+      headers: {
+        accept: 'application/json'
+      }
+    })
+  } catch (error) {
+    console.debug('Failed to fetch APY', error)
+  }
+
+  if (!response?.ok) {
+    throw new Error(`Failed to fetch APY`)
+  }
+
+  const json = await response?.json()
+
+  const price = json[priceId][base]
+  return BigNumber.from(price)
+}
+
+export function useAPY(
+  farmablePool: FarmablePool,
+  baoPriceUsd: BigNumber,
+  tvlUsd: Fraction | undefined
+): Fraction | undefined {
   // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
   const rewardToken = useRewardToken()
-  const rewardPriceUsd = new Fraction(JSBI.BigInt(8), JSBI.BigInt(1000)) // TODO: get actual bao/usd
+  const rewardPriceUsd = new Fraction(JSBI.BigInt(777), JSBI.BigInt(100000)) // TODO: get actual bao/usd
+  // const rewardPriceUsd = baoPriceUsd
+  console.log(baoPriceUsd)
   const masterChef = useMasterChefContract()
   const rewardPerBlockResult: string = useSingleCallResult(masterChef, 'getNewRewardPerBlock', [
     farmablePool.pid + 1 ?? undefined
@@ -84,13 +113,12 @@ export function useAPY(farmablePool: FarmablePool, tvl: Fraction | undefined): F
 
   const decimated = JSBI.exponentiate(ten, JSBI.BigInt((rewardToken.decimals - 1).toString()))
   const rewardPerBlock = new Fraction(rawRewardPerBlock, decimated)
-  console.log(rewardPerBlock.toFixed(4), 'rewardPerBlock')
 
   return (
-    tvl &&
+    tvlUsd &&
     rewardPriceUsd
       .multiply(rewardPerBlock)
       .multiply(blocksPerYear)
-      .divide(tvl)
+      .divide(tvlUsd)
   )
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback } from 'react'
+import React, { useContext, useState, useCallback, useEffect } from 'react'
 import { ChevronUp, ChevronDown, Loader } from 'react-feather'
 import styled, { ThemeContext } from 'styled-components'
 import { TokenAmount, JSBI, Percent, Fraction } from 'uniswap-xdai-sdk'
@@ -19,7 +19,9 @@ import { Text } from 'rebass'
 import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { ExternalLink } from '../../theme'
 import Logo from '../Logo'
-import { useAPY, useStakedTVL } from '../../hooks/Price'
+import { fetchPrice, useAPY, useStakedTVL } from '../../hooks/Price'
+import { BigNumber } from '@ethersproject/bignumber'
+import { useBlockNumber } from '../../state/application/hooks'
 
 interface ChefCardProps {
   farmablePool: UserInfoFarmablePool
@@ -39,6 +41,7 @@ export function ChefPositionCard({
   const { chainId } = useActiveWeb3React()
   const { stakedAmount, pendingReward, icon, name, pid } = farmablePool
 
+  const block = useBlockNumber()
   const rewardCurrency = unwrappedToken(pendingReward.token)
 
   const allStakedAmount = useStakedAmount(farmablePool.token)
@@ -105,7 +108,14 @@ export function ChefPositionCard({
   const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount)
   const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount)
 
-  const apy = useAPY(farmablePool, allStakedTVL)
+  const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
+  useEffect(() => {
+    fetchPrice()
+      .then(apy => setBaoPriceUsd(apy))
+      .catch(() => setBaoPriceUsd(BigNumber.from(0)))
+  }, [block])
+
+  const apy = useAPY(farmablePool, baoPriceUsd, allStakedTVL)
 
   return (
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>

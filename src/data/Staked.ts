@@ -74,28 +74,6 @@ export function useContractWETHBalance(contract?: Contract): TokenAmount | undef
   )
 }
 
-// TODO: oracle/ABI doesn't work
-export function useBaoPrice(): BigNumber {
-  // const baoPriceContract = useBaoPriceContract()
-  // const baoPriceRaw = useSingleCallResult(baoPriceContract, 'consult', [
-  //   '0xdcf3aC78f37098222C53C79974faaC5ce1aaF707'.toString(),
-  //   1
-  // ]).result
-  // console.log(baoPriceRaw, 'baoPriceRaw')
-  return BigNumber.from('0')
-}
-
-// export function useHttpPrices(ids: string[] | undefined = ['weth', 'bao-finance'], base: string | undefined = 'usd'): BigNumber {
-//   useCallback(async )
-//   const commaSeparatedPrices = ids.join(',')
-//   const httpResponse = fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${commaSeparatedPrices}&vs_currencies=base`, {
-//     "headers": {
-//       "accept": "application/json"
-//     }
-//   })
-//   httpResponse.map()
-// }
-
 export interface StakedValue {
   tokenAmount: BigNumber
   wethAmount: BigNumber
