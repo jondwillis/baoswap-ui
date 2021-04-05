@@ -3,6 +3,7 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
 import { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { ChainId } from 'uniswap-xdai-sdk'
 import { useActiveWeb3React } from '../../hooks'
 import { useBlockNumber } from '../application/hooks'
 import { AppDispatch, AppState } from '../index'
@@ -49,8 +50,14 @@ export const NEVER_RELOAD: ListenerOptions = {
 }
 
 // the lowest level call for subscribing to contract data
-function useCallsData(calls: (Call | undefined)[], options?: ListenerOptions): CallResult[] {
-  const { chainId } = useActiveWeb3React()
+function useCallsData(
+  calls: (Call | undefined)[],
+  options?: ListenerOptions,
+  overrideChainId?: ChainId | undefined
+): CallResult[] {
+  const activeWeb3 = useActiveWeb3React()
+  const chainId = overrideChainId ?? activeWeb3.chainId
+
   const callResults = useSelector<AppState, AppState['multicall']['callResults']>(state => state.multicall.callResults)
   const dispatch = useDispatch<AppDispatch>()
 
@@ -232,8 +239,12 @@ export function useSingleCallResult(
   contract: Contract | null | undefined,
   methodName: string,
   inputs?: OptionalMethodInputs,
-  options?: ListenerOptions
+  options?: ListenerOptions,
+  overrideChainId?: ChainId
 ): CallState {
+  const activeWeb3 = useActiveWeb3React()
+  const chainId = overrideChainId ?? activeWeb3.chainId
+
   const fragment = useMemo(() => contract?.interface?.getFunction(methodName), [contract, methodName])
 
   const calls = useMemo<Call[]>(() => {
@@ -241,14 +252,15 @@ export function useSingleCallResult(
       ? [
           {
             address: contract.address,
-            callData: contract.interface.encodeFunctionData(fragment, inputs)
+            callData: contract.interface.encodeFunctionData(fragment, inputs),
+            chainId
           }
         ]
       : []
-  }, [contract, fragment, inputs])
+  }, [contract, fragment, inputs, chainId])
 
-  const result = useCallsData(calls, options)[0]
-  const latestBlockNumber = useBlockNumber()
+  const result = useCallsData(calls, options, chainId)[0]
+  const latestBlockNumber = useBlockNumber(chainId)
 
   return useMemo(() => {
     return toCallState(result, contract?.interface, fragment, latestBlockNumber)
