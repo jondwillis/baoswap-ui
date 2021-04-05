@@ -485,7 +485,6 @@ export const supportedPools = [
   {
     pid: 0,
     lpAddresses: {
-      1: '0x9973bb0fe5f8df5de730776df09e946c74254fb3',
       100: '0x82820a99c431d0Bb7cA775Fa7247d1AC481f2E56'
     },
     tokenAddresses: {
@@ -2665,6 +2664,7 @@ export interface FarmablePool {
   refUrl: string
 }
 
+// this could use EternalStorageProxy.foreignAddress instead
 export function sidechainFarmablePool(
   chainId: ChainId.XDAI | ChainId.MAINNET = ChainId.MAINNET,
   farmablePool: FarmablePool

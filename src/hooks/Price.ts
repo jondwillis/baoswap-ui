@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ChainId, Fraction, JSBI, Token, TokenAmount } from 'uniswap-xdai-sdk'
+import { ChainId, Fraction, JSBI, Pair, Token, TokenAmount } from 'uniswap-xdai-sdk'
 import { useActiveWeb3React } from '.'
 import { FarmablePool, priceOracles, sidechainFarmablePool } from '../bao/lib/constants'
 import { usePair, useRewardToken } from '../data/Reserves'
 import { useSingleCallResult } from '../state/multicall/hooks'
-import { useMasterChefContract, usePriceOracleContract } from './useContract'
+import { useLPContract, useMasterChefContract, usePriceOracleContract } from './useContract'
 import { BigNumber } from '@ethersproject/bignumber'
 
 const ten = JSBI.BigInt(10)
@@ -68,30 +68,33 @@ export const fetchPrice = async (priceId?: string | string, base?: string): Prom
   return BigNumber.from(priceExp)
 }
 
-function useForeignPair(token0: Token, token1: Token, isFirstTokenInPair: boolean) {
+function useForeignPair(
+  farmablePool: FarmablePool,
+  token0: Token | undefined,
+  token1: Token | undefined
+): Pair | undefined {
   const foreignToken = useMemo(() => {
-    return isSushi ? sidechainFarmablePool(ChainId.MAINNET, farmablePool)?.token : undefined
-  }, [isSushi, farmablePool])
+    return sidechainFarmablePool(ChainId.MAINNET, farmablePool)?.token
+  }, [farmablePool])
+  console.log(foreignToken?.address, 'foreignToken')
+  const foreignTokenContract = useLPContract(foreignToken?.address)
 
-  // const results = useMultipleContractSingleData(pairAddresses, PAIR_INTERFACE, 'getReserves')
+  const result = useSingleCallResult(foreignTokenContract, 'getReserves')
 
-  // return useMemo(() => {
-  //   return results.map((result, i) => {
-  //     const { result: reserves, loading } = result
-  //     const tokenA = tokens[i][0]
-  //     const tokenB = tokens[i][1]
+  console.log(result)
 
-  //     if (loading) return [PairState.LOADING, null]
-  //     if (!tokenA || !tokenB || tokenA.equals(tokenB)) return [PairState.INVALID, null]
-  //     if (!reserves) return [PairState.NOT_EXISTS, null]
-  //     const { reserve0, reserve1 } = reserves
-  //     const [token0, token1] = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
-  //     return [
-  //       PairState.EXISTS,
-  //       new Pair(new TokenAmount(token0, reserve0.toString()), new TokenAmount(token1, reserve1.toString()))
-  //     ]
-  //   })
-  // }, [results, tokens])
+  return useMemo(() => {
+    if (!token0 || !token1) {
+      return undefined
+    }
+    const { result: reserves } = result
+    return reserves
+      ? new Pair(
+          new TokenAmount(token0, reserves.reserve0.toString()),
+          new TokenAmount(token1, reserves.reserve1.toString())
+        )
+      : undefined
+  }, [result, token0, token1])
 }
 
 export function useStakedTVL(
@@ -101,7 +104,7 @@ export function useStakedTVL(
 ): Fraction | undefined {
   const { chainId } = useActiveWeb3React()
   const { isSushi } = farmablePool
-  
+
   const [tokenDescriptor0, tokenDescriptor1] = farmablePool.tokenAddresses
   const chainIdNumber = useMemo(() => (chainId === ChainId.XDAI ? 100 : chainId === ChainId.MAINNET ? 1 : undefined), [
     chainId
@@ -119,18 +122,18 @@ export function useStakedTVL(
 
   const priceOraclesForChain = useMemo(() => chainIdNumber && priceOracles[chainIdNumber], [chainIdNumber])
 
-  const { priceOracleBaseToken, priceOracleAddress, isFirstTokenInPair } = useMemo(() => {
+  const { priceOracleBaseToken, priceOracleAddress } = useMemo(() => {
     if (!priceOraclesForChain || !token0 || !token1 || isSushi) {
-      return { priceOracleToken: undefined, priceOracleAddress: undefined, isFirstTokenInPair: undefined }
+      return { priceOracleToken: undefined, priceOracleAddress: undefined }
     }
     const token0Oracle = priceOraclesForChain[tokenDescriptor0.address]
     const token1Oracle = priceOraclesForChain[tokenDescriptor1.address]
     if (token0Oracle) {
-      return { priceOracleBaseToken: token0, priceOracleAddress: token0Oracle, isFirstTokenInPair: true }
+      return { priceOracleBaseToken: token0, priceOracleAddress: token0Oracle }
     } else if (token1Oracle) {
-      return { priceOracleBaseToken: token1, priceOracleAddress: token1Oracle, isFirstTokenInPair: false }
+      return { priceOracleBaseToken: token1, priceOracleAddress: token1Oracle }
     } else {
-      return { priceOracleBaseToken: undefined, priceOracleAddress: undefined, isFirstTokenInPair: undefined }
+      return { priceOracleBaseToken: undefined, priceOracleAddress: undefined }
     }
   }, [priceOraclesForChain, tokenDescriptor0, tokenDescriptor1, token0, token1, isSushi])
 
@@ -145,10 +148,14 @@ export function useStakedTVL(
   const fetchPriceBase = useMemo(() => (isUsingFetchPrice ? 'usd' : undefined), [isUsingFetchPrice])
   const fetchPrice = useFetchPrice(fetchPriceCurrency, fetchPriceBase)
   const [, pair] = usePair(token0, token1)
-  const pricedInReserve = useMemo(() => pair && priceOracleBaseToken && pair.reserveOf(priceOracleBaseToken), [
-    priceOracleBaseToken,
-    pair
-  ])
+  const foreignPair = useForeignPair(farmablePool, token0, token1)
+  const pricedInReserve = useMemo(() => {
+    if (!priceOracleBaseToken) {
+      return null
+    }
+    const usingPair = isSushi ? foreignPair : pair
+    return usingPair?.reserveOf(priceOracleBaseToken)
+  }, [priceOracleBaseToken, pair, foreignPair, isSushi])
   const priceOracleContract = usePriceOracleContract(!isUsingFetchPrice ? priceOracleAddress : undefined)
 
   const priceRaw: string | undefined = useSingleCallResult(priceOracleContract, 'latestRoundData').result?.[1]
