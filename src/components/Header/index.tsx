@@ -151,7 +151,7 @@ export default function Header() {
                     </RowBetween>
                     <RowFixed>
                       <Text fontWeight={300} fontSize={9}>
-                        PRIMARY
+                        ACTIVE
                       </Text>
                     </RowFixed>
                   </Column>
@@ -174,7 +174,7 @@ export default function Header() {
                     </RowBetween>
                     <RowFixed>
                       <Text fontWeight={300} fontSize={9}>
-                        SIDECHAIN
+                        NETWORK LOOKUP
                       </Text>
                     </RowFixed>
                   </Column>
