@@ -2699,7 +2699,7 @@ export function sidechainFarmablePool(
       foreignAddress,
       farmablePool.token.decimals,
       farmablePool.token.symbol,
-      farmablePool.token.symbol
+      farmablePool.token.name
     ),
     symbol: farmablePool.symbol,
     name: farmablePool.name,
