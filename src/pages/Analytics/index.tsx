@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { useBlockNumber } from '../../state/application/hooks'
 import { BigNumber } from '@ethersproject/bignumber'
 import { fetchPrice } from '../../hooks/Price'
+import useDebounce from '../../hooks/useDebounce'
 
 export default function Analytics() {
   const { t } = useTranslation()
@@ -32,16 +33,19 @@ export default function Analytics() {
 
   const [searchQuery, setSearchQuery] = useState('BAO')
 
-  const queriedPools = useMemo(() => {
-    const query = searchQuery.toLowerCase()
-    return poolInfo.filter(
-      p =>
-        p.symbol
-          .split(' ')[0]
-          .toLowerCase()
-          .includes(query) || p.name.toLowerCase().includes(query)
-    )
-  }, [poolInfo, searchQuery])
+  const queriedPools = useDebounce(
+    useMemo(() => {
+      const query = searchQuery.toLowerCase()
+      return poolInfo.filter(
+        p =>
+          p.symbol
+            .split(' ')[0]
+            .toLowerCase()
+            .includes(query) || p.name.toLowerCase().includes(query)
+      )
+    }, [poolInfo, searchQuery]),
+    500
+  )
 
   // manage focus on modal show
   const inputRef = useRef<HTMLInputElement>()

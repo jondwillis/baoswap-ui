@@ -6,6 +6,7 @@ import { usePair, useRewardToken } from '../data/Reserves'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { useLPContract, useMasterChefContract, usePriceOracleContract } from './useContract'
 import { BigNumber } from '@ethersproject/bignumber'
+import useDebounce from './useDebounce'
 
 const ten = JSBI.BigInt(10)
 // WARN: this could break if bao price changes dramatically and breaks out of js number size
@@ -155,7 +156,7 @@ export function useStakedTVL(
     priceOracleAddress
   ])
   const fetchPriceBase = useMemo(() => (isUsingFetchPrice ? 'usd' : undefined), [isUsingFetchPrice])
-  const fetchPrice = useFetchPrice(fetchPriceCurrency, fetchPriceBase)
+  const fetchPrice = useDebounce(useFetchPrice(fetchPriceCurrency, fetchPriceBase), 200)
   const [, pair] = usePair(token0, token1)
   const foreignReserve = useForeignReserveOf(farmablePool, token0, token1, isSushi ? priceOracleBaseToken : undefined)
   const pricedInReserve = useMemo(() => {
