@@ -467,17 +467,17 @@ export const priceOracles = {
     // all XXX-USD
     [addressMap[ChainId.XDAI].BAO]: 'bao-finance',
     [addressMap[ChainId.XDAI]['BAO.cx']]: 'bao-finance',
-    // [addressMap[ChainId.XDAI].AAVE]: '0x2b481Dc923Aa050E009113Dca8dcb0daB4B68cDF',
-    // [addressMap[ChainId.XDAI].BAL]: '0x1b723C855F7D2c2785F99486973271355e782d77',
+    [addressMap[ChainId.XDAI].AAVE]: '0x2b481Dc923Aa050E009113Dca8dcb0daB4B68cDF',
+    [addressMap[ChainId.XDAI].BAL]: '0x1b723C855F7D2c2785F99486973271355e782d77',
     [addressMap[ChainId.XDAI].wBTC]: '0x6C1d7e76EF7304a40e8456ce883BC56d3dEA3F7d',
     [addressMap[ChainId.XDAI].XDAI]: '0x678df3415fc31947dA4324eC63212874be5a82f8',
     [addressMap[ChainId.XDAI].WETH]: '0xa767f745331D267c7751297D982b050c93985627',
-    // [addressMap[ChainId.XDAI].LINK]: '0xed322A5ac55BAE091190dFf9066760b86751947B',
-    // [addressMap[ChainId.XDAI].SNX]: '0x3b84d6e6976D5826500572600eB44f9f1753827b',
+    [addressMap[ChainId.XDAI].LINK]: '0xed322A5ac55BAE091190dFf9066760b86751947B',
+    [addressMap[ChainId.XDAI].SNX]: '0x3b84d6e6976D5826500572600eB44f9f1753827b',
     [addressMap[ChainId.XDAI].SUSHI]: '0xC0a6Bf8d5D408B091D022C3C0653d4056D4B9c01',
-    // [addressMap[ChainId.XDAI].UNI]: '0xd98735d78266c62277Bb4dBf3e3bCdd3694782F4',
-    [addressMap[ChainId.XDAI].USDC]: '0x26C31ac71010aF62E6B486D1132E266D6298857D'
-    // [addressMap[ChainId.XDAI].YFI]: '0x14030d5a0C9e63D9606C6f2c8771Fc95b34b07e0'
+    [addressMap[ChainId.XDAI].UNI]: '0xd98735d78266c62277Bb4dBf3e3bCdd3694782F4',
+    [addressMap[ChainId.XDAI].USDC]: '0x26C31ac71010aF62E6B486D1132E266D6298857D',
+    [addressMap[ChainId.XDAI].YFI]: '0x14030d5a0C9e63D9606C6f2c8771Fc95b34b07e0'
   }
 }
 
