@@ -10,6 +10,7 @@ import { BigNumber } from '@ethersproject/bignumber'
 const ten = JSBI.BigInt(10)
 // WARN: this could break if bao price changes dramatically and breaks out of js number size
 const baoPriceExponent = 100000000
+const disableSushiAPY = true
 
 const useFetchPrice = (
   priceId?: string | string,
@@ -169,13 +170,16 @@ export function useStakedTVL(
   const decimals: string | undefined = useSingleCallResult(priceOracleContract, 'decimals').result?.[0]
 
   return useMemo(() => {
+    if (isSushi && disableSushiAPY) {
+      return undefined
+    }
     const decimated = decimals ? JSBI.exponentiate(ten, JSBI.BigInt(decimals.toString())) : undefined
     const fetchedPriceInUsd = isUsingFetchPrice && !fetchPrice.error ? fetchPrice.response : undefined
     const fetchedBI = fetchedPriceInUsd ? JSBI.BigInt(fetchedPriceInUsd?.toString()) : undefined
     const fetchedFraction = fetchedBI ? new Fraction(fetchedBI, JSBI.BigInt(baoPriceExponent)) : undefined
     const chainFraction = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
     const priceInUsd = fetchedFraction ? fetchedFraction : chainFraction
-    const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply(isSushi ? '1' : '2')
+    const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve)
     const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
     return stakedTVL
   }, [decimals, isUsingFetchPrice, fetchPrice, priceRaw, pricedInReserve, ratioStaked, isSushi])
