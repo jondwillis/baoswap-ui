@@ -25,7 +25,7 @@ export function usePairs(
 ): [PairState, Pair | null][] {
   const { chainId: activeChainId } = useActiveWeb3React()
 
-  const chainId = changedChainId ?? activeChainId
+  const chainId = useMemo(() => changedChainId ?? activeChainId, [changedChainId, activeChainId])
 
   const tokens = useMemo(
     () =>
