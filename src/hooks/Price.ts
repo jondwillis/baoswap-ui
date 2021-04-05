@@ -127,7 +127,10 @@ export function useStakedTVL(
     stakedAmount
   ])
 
-  const priceOraclesForChain = useMemo(() => chainIdNumber && priceOracles[chainIdNumber], [chainIdNumber])
+  const priceOraclesForChain = useMemo(() => !isSushi && chainIdNumber && priceOracles[chainIdNumber], [
+    chainIdNumber,
+    isSushi
+  ])
 
   const { priceOracleBaseToken, priceOracleAddress } = useMemo(() => {
     if (!priceOraclesForChain || !token0 || !token1) {
@@ -158,7 +161,7 @@ export function useStakedTVL(
     priceOracleAddress
   ])
   const fetchPriceBase = useMemo(() => (isUsingFetchPrice ? 'usd' : undefined), [isUsingFetchPrice])
-  const fetchPrice = useDebounce(useFetchPrice(fetchPriceCurrency, fetchPriceBase), 200)
+  const fetchPrice = useDebounce(useFetchPrice(fetchPriceCurrency, fetchPriceBase), 1000)
   const [, pair] = usePair(token0, token1)
   const foreignReserve = useForeignReserveOf(farmablePool, token0, token1, isSushi ? priceOracleBaseToken : undefined)
   const pricedInReserve = useMemo(() => {
@@ -175,6 +178,9 @@ export function useStakedTVL(
   const decimals: string | undefined = useSingleCallResult(priceOracleContract, 'decimals').result?.[0]
 
   return useMemo(() => {
+    if (isSushi) {
+      return undefined
+    }
     const decimated = decimals ? JSBI.exponentiate(ten, JSBI.BigInt(decimals.toString())) : undefined
     const fetchedPriceInUsd = isUsingFetchPrice && !fetchPrice.error ? fetchPrice.response : undefined
     const fetchedBI = fetchedPriceInUsd ? JSBI.BigInt(fetchedPriceInUsd?.toString()) : undefined
@@ -184,7 +190,7 @@ export function useStakedTVL(
     const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply('2')
     const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
     return stakedTVL
-  }, [decimals, isUsingFetchPrice, fetchPrice, priceRaw, pricedInReserve, ratioStaked])
+  }, [decimals, isUsingFetchPrice, fetchPrice, priceRaw, pricedInReserve, ratioStaked, isSushi])
 }
 
 // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
@@ -201,7 +207,7 @@ export function useAPY(
   ]).result?.[0]
 
   return useMemo(() => {
-    if (!baoPriceUsd) {
+    if (!baoPriceUsd || !tvlUsd || !tvlUsd.greaterThan('0') || farmablePool?.isSushi) {
       return undefined
     }
     const blocksPerYear = JSBI.BigInt(6311390) // (31556952 (seconds / year)) / (5 blocks/second) = 6311390.4
@@ -220,5 +226,5 @@ export function useAPY(
         .multiply(blocksPerYear)
         .divide(tvlUsd)
     )
-  }, [rewardPerBlockResult, baoPriceUsd, rewardToken.decimals, tvlUsd])
+  }, [rewardPerBlockResult, baoPriceUsd, rewardToken.decimals, tvlUsd, farmablePool])
 }
