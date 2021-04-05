@@ -2655,6 +2655,19 @@ export const supportedPools = [
 export interface FarmablePool {
   pid: number
   address: string
+  lpAddresses:
+    | {
+        100: string
+        1?: undefined
+      }
+    | {
+        1: string
+        100: string
+      }
+    | {
+        100: string
+        1?: undefined
+      }
   tokenAddresses: DescribesToken[]
   token: Token
   symbol: string
@@ -2672,10 +2685,14 @@ export function sidechainFarmablePool(
   if (!farmablePool.isSushi) {
     return undefined
   }
-  const foreignAddress = farmablePool.address
+  const foreignAddress = farmablePool.lpAddresses[chainId]
+  if (!foreignAddress) {
+    return undefined
+  }
   return {
     pid: farmablePool.pid,
     address: foreignAddress,
+    lpAddresses: farmablePool.lpAddresses,
     tokenAddresses: farmablePool.tokenAddresses,
     token: new Token(
       chainId,
@@ -2702,13 +2719,14 @@ export function useAllFarmablePools(chainId: ChainId.XDAI | ChainId.MAINNET = Ch
       return []
     }
     const isSushi = poolInfo.poolType === 'sushi'
-    const tokenAddresses = poolInfo.tokenAddresses[100] // TODO: token addresses for mainnet
+    const tokenAddresses = poolInfo.tokenAddresses[100] // TODO: need token addresses for mainnet?
     if (!tokenAddresses) {
       return []
     }
     const farmablePool: FarmablePool = {
       pid: poolInfo.pid,
       address,
+      lpAddresses: poolInfo.lpAddresses,
       tokenAddresses: tokenAddresses,
       token: new Token(chainId, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
       symbol: poolInfo.symbol,
@@ -2727,6 +2745,7 @@ const supportedLpTokenEntries = supportedPools.map(poolInfo => {
   const farmablePool: FarmablePool = {
     pid: poolInfo.pid,
     address,
+    lpAddresses: poolInfo.lpAddresses,
     tokenAddresses,
     token: new Token(ChainId.XDAI, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
     symbol: poolInfo.symbol,

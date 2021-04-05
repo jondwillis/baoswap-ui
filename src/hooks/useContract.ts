@@ -19,10 +19,19 @@ import { useActiveWeb3React } from './index'
 import { contractAddresses } from '../bao/lib/constants'
 import { BAOCX } from '../constants'
 import { useSingleCallResult } from '../state/multicall/hooks'
+import { Web3ReactContextInterface } from '@web3-react/core/dist/types'
+import { Web3Provider } from '@ethersproject/providers'
 
 // returns null on errors
-function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
-  const { library, account } = useActiveWeb3React()
+function useContract(
+  address: string | undefined,
+  ABI: any,
+  withSignerIfPossible = true,
+  overrideWeb3: (Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId }) | undefined = undefined
+): Contract | null {
+  const activeWeb3React = useActiveWeb3React()
+  const usingWeb3React = overrideWeb3 ?? activeWeb3React
+  const { library, account } = usingWeb3React
 
   return useMemo(() => {
     if (!address || !ABI || !library) return null
@@ -45,8 +54,12 @@ export function useWETHContract(withSignerIfPossible?: boolean): Contract | null
   return useContract(chainId ? WETH[chainId].address : undefined, WETH_ABI, withSignerIfPossible)
 }
 
-export function useLPContract(address?: string, withSignerIfPossible?: boolean): Contract | null {
-  return useContract(address, UNIV2LP, withSignerIfPossible)
+export function useLPContract(
+  address?: string,
+  withSignerIfPossible?: boolean,
+  overrideWeb3: (Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId }) | undefined = undefined
+): Contract | null {
+  return useContract(address, UNIV2LP, withSignerIfPossible, overrideWeb3)
 }
 
 export function useMasterChefContract(withSignerIfPossible?: boolean): Contract | null {

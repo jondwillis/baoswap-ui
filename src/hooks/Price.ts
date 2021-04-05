@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ChainId, Fraction, JSBI, Pair, Token, TokenAmount } from 'uniswap-xdai-sdk'
-import { useActiveWeb3React } from '.'
+import { useActiveWeb3React, useMainWeb3React } from '.'
 import { FarmablePool, priceOracles, sidechainFarmablePool } from '../bao/lib/constants'
 import { usePair, useRewardToken } from '../data/Reserves'
 import { useSingleCallResult } from '../state/multicall/hooks'
@@ -73,15 +73,18 @@ function useForeignPair(
   token0: Token | undefined,
   token1: Token | undefined
 ): Pair | undefined {
+  const mainnetWeb3 = useMainWeb3React()
   const foreignToken = useMemo(() => {
     return sidechainFarmablePool(ChainId.MAINNET, farmablePool)?.token
   }, [farmablePool])
-  console.log(foreignToken?.address, 'foreignToken')
-  const foreignTokenContract = useLPContract(foreignToken?.address)
+  foreignToken && console.log(foreignToken?.address, 'foreignToken')
+  const foreignTokenContract = useLPContract(foreignToken?.address, false, mainnetWeb3)
+
+  foreignToken && console.log(foreignTokenContract?.resolvedAddress, 'resolvedAddress')
 
   const result = useSingleCallResult(foreignTokenContract, 'getReserves')
 
-  console.log(result)
+  foreignToken && console.log(result)
 
   return useMemo(() => {
     if (!token0 || !token1) {
