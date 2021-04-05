@@ -84,15 +84,15 @@ function useForeignReserveOf(
 
   return useMemo(() => {
     if (!token0 || !token1 || !reserveToken) {
-      console.log(`no token, token1, or reserveToken for ${farmablePool.symbol}`)
+      // console.log(`no token, token1, or reserveToken for ${farmablePool.symbol}`)
       return undefined
     }
-    const reserve = token0 === reserveToken ? result.result?.[0] : result.result?.[1]
-    reserve && console.log(reserve, `useForeignReserveOf for ${farmablePool.symbol}`)
+    const reserve: BigNumber | undefined = token0 === reserveToken ? result.result?.[0] : result.result?.[1]
+    // reserve && console.log(reserve.toString(), `reserve for ${farmablePool.symbol}`)
 
     // const { result: reserves } = result
     return reserve ? new TokenAmount(reserveToken, reserve.toString()) : undefined
-  }, [result, token0, token1, reserveToken, farmablePool])
+  }, [result, token0, token1, reserveToken])
 }
 
 export function useStakedTVL(
@@ -131,7 +131,11 @@ export function useStakedTVL(
     const token1Oracle = priceOraclesForChain[tokenDescriptor1.address]
     // console.log(token0Oracle, `token0Oracle`)
     // console.log(token1Oracle, `token1Oracle for ${farmablePool.symbol}`)
-    if (token0Oracle) {
+    if (token0Oracle && token0Oracle.startsWith('0x')) {
+      return { priceOracleBaseToken: token0, priceOracleAddress: token0Oracle }
+    } else if (token1Oracle && token1Oracle.startsWith('0x')) {
+      return { priceOracleBaseToken: token1, priceOracleAddress: token1Oracle }
+    } else if (token0Oracle) {
       return { priceOracleBaseToken: token0, priceOracleAddress: token0Oracle }
     } else if (token1Oracle) {
       return { priceOracleBaseToken: token1, priceOracleAddress: token1Oracle }
@@ -158,7 +162,7 @@ export function useStakedTVL(
     const usingReserve = isSushi ? foreignReserve : pair?.reserveOf(priceOracleBaseToken)
     return usingReserve
   }, [priceOracleBaseToken, pair, foreignReserve, isSushi])
-  foreignReserve && console.log(foreignReserve, `foreignReserve for ${farmablePool.symbol}`)
+  // foreignReserve && console.log(foreignReserve.toExact(), `foreignReserve for ${farmablePool.symbol}`)
   const priceOracleContract = usePriceOracleContract(!isUsingFetchPrice ? priceOracleAddress : undefined)
 
   const priceRaw: string | undefined = useSingleCallResult(priceOracleContract, 'latestRoundData').result?.[1]
@@ -171,10 +175,10 @@ export function useStakedTVL(
     const fetchedFraction = fetchedBI ? new Fraction(fetchedBI, JSBI.BigInt(baoPriceExponent)) : undefined
     const chainFraction = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
     const priceInUsd = fetchedFraction ? fetchedFraction : chainFraction
-    const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply('2')
+    const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply(isSushi ? '1' : '2')
     const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
     return stakedTVL
-  }, [decimals, isUsingFetchPrice, fetchPrice, priceRaw, pricedInReserve, ratioStaked])
+  }, [decimals, isUsingFetchPrice, fetchPrice, priceRaw, pricedInReserve, ratioStaked, isSushi])
 }
 
 // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0

@@ -249,7 +249,6 @@ export function useSingleCallResult(
 
   const fragment = useMemo(() => contract?.interface?.getFunction(methodName), [contract, methodName])
 
-  console.log(`calling ${methodName} on contract ${contract?.address}`)
   const calls = useMemo<Call[]>(() => {
     return contract && fragment && isValidMethodArgs(inputs)
       ? [
