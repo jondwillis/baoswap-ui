@@ -2665,7 +2665,7 @@ export interface FarmablePool {
   refUrl: string
 }
 
-export function useSidechainFarmablePool(
+export function sidechainFarmablePool(
   chainId: ChainId.XDAI | ChainId.MAINNET = ChainId.MAINNET,
   farmablePool: FarmablePool
 ): FarmablePool | undefined {
