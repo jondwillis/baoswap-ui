@@ -1,12 +1,14 @@
 import { Interface, FunctionFragment } from '@ethersproject/abi'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
+import { Web3ReactContextInterface } from '@web3-react/core/dist/types'
 import { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ChainId } from 'uniswap-xdai-sdk'
 import { useActiveWeb3React } from '../../hooks'
 import { useBlockNumber } from '../application/hooks'
 import { AppDispatch, AppState } from '../index'
+import { Web3Provider } from '@ethersproject/providers'
 import {
   addMulticallListeners,
   Call,
@@ -240,13 +242,14 @@ export function useSingleCallResult(
   methodName: string,
   inputs?: OptionalMethodInputs,
   options?: ListenerOptions,
-  overrideChainId?: ChainId
+  overrideWeb3?: (Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId }) | undefined
 ): CallState {
-  const activeWeb3 = useActiveWeb3React()
-  const chainId = overrideChainId ?? activeWeb3.chainId
+  const web3 = overrideWeb3 ?? useActiveWeb3React()
+  const chainId = web3.chainId
 
   const fragment = useMemo(() => contract?.interface?.getFunction(methodName), [contract, methodName])
 
+  console.log(`calling ${methodName} on contract ${contract?.address}`)
   const calls = useMemo<Call[]>(() => {
     return contract && fragment && isValidMethodArgs(inputs)
       ? [

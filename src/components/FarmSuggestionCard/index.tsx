@@ -22,7 +22,6 @@ import { useTotalSupply } from '../../data/TotalSupply'
 import { FarmablePool } from '../../bao/lib/constants'
 import { BigNumber } from '@ethersproject/bignumber'
 
-
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
 `

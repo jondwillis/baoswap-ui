@@ -116,8 +116,7 @@ export default function Updater({ chainId }: { chainId: ChainId }): null {
   // wait for listeners to settle before triggering updates
   const debouncedListeners = useDebounce(state.callListeners, 500)
   const latestBlockNumber = useBlockNumber(chainId)
-  // const { chainId } = useActiveWeb3React()
-  const multicallContract = useMulticallContract()
+  const multicallContract = useMulticallContract(chainId)
   const cancellations = useRef<{ blockNumber: number; cancellations: (() => void)[] }>()
 
   const listeningKeys: { [callKey: string]: number } = useMemo(() => {

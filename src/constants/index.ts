@@ -40,7 +40,7 @@ const WETH_ONLY: ChainTokenList = {
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   ...WETH_ONLY,
-  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, BAO, BAOCX, WBTC]
+  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, BAO, BAOCX, WBTC, USDC]
 }
 
 /**
@@ -58,10 +58,12 @@ export const SUGGESTED_BASES: ChainTokenList = {
 // used to construct the list of all pairs we consider by default in the frontend
 export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
   ...WETH_ONLY,
-  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, BAO, BAOCX, WBTC]
+  [ChainId.XDAI]: [...WETH_ONLY[ChainId.XDAI], XDAI_WETH, BAO, BAOCX, WBTC, USDC]
 }
 
-export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {}
+export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {
+  [ChainId.XDAI]: [[BAO, BAOCX]]
+}
 
 export interface WalletInfo {
   connector?: AbstractConnector

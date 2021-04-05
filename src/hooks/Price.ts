@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ChainId, Fraction, JSBI, Pair, Token, TokenAmount } from 'uniswap-xdai-sdk'
+import { ChainId, Fraction, JSBI, Token, TokenAmount } from 'uniswap-xdai-sdk'
 import { useActiveWeb3React, useMainWeb3React } from '.'
 import { FarmablePool, priceOracles, sidechainFarmablePool } from '../bao/lib/constants'
 import { usePair, useRewardToken } from '../data/Reserves'
@@ -68,36 +68,31 @@ export const fetchPrice = async (priceId?: string | string, base?: string): Prom
   return BigNumber.from(priceExp)
 }
 
-function useForeignPair(
+function useForeignReserveOf(
   farmablePool: FarmablePool,
   token0: Token | undefined,
-  token1: Token | undefined
-): Pair | undefined {
+  token1: Token | undefined,
+  reserveToken: Token | undefined
+): TokenAmount | undefined {
   const mainnetWeb3 = useMainWeb3React()
   const foreignToken = useMemo(() => {
     return sidechainFarmablePool(ChainId.MAINNET, farmablePool)?.token
   }, [farmablePool])
-  foreignToken && console.log(foreignToken?.address, 'foreignToken')
-  const foreignTokenContract = useLPContract(foreignToken?.address, false, mainnetWeb3)
+  const foreignTokenContract = useLPContract(foreignToken?.address, false, mainnetWeb3.chainId)
 
-  foreignToken && console.log(foreignTokenContract?.resolvedAddress, 'resolvedAddress')
-
-  const result = useSingleCallResult(foreignTokenContract, 'getReserves')
-
-  foreignToken && console.log(result)
+  const result = useSingleCallResult(foreignTokenContract, 'getReserves', undefined, undefined, mainnetWeb3)
 
   return useMemo(() => {
-    if (!token0 || !token1) {
+    if (!token0 || !token1 || !reserveToken) {
+      console.log(`no token, token1, or reserveToken for ${farmablePool.symbol}`)
       return undefined
     }
-    const { result: reserves } = result
-    return reserves
-      ? new Pair(
-          new TokenAmount(token0, reserves.reserve0.toString()),
-          new TokenAmount(token1, reserves.reserve1.toString())
-        )
-      : undefined
-  }, [result, token0, token1])
+    const reserve = token0 === reserveToken ? result.result?.[0] : result.result?.[1]
+    reserve && console.log(reserve, `useForeignReserveOf for ${farmablePool.symbol}`)
+
+    // const { result: reserves } = result
+    return reserve ? new TokenAmount(reserveToken, reserve.toString()) : undefined
+  }, [result, token0, token1, reserveToken, farmablePool])
 }
 
 export function useStakedTVL(
@@ -121,16 +116,21 @@ export function useStakedTVL(
     [chainId, tokenDescriptor1]
   )
 
+  // console.log(tokenDescriptor0, `token0Descriptor for ${farmablePool.symbol}`)
+  // console.log(token0, `token0 for ${farmablePool.symbol}`)
+
   const ratioStaked = totalSupply ? stakedAmount?.divide(totalSupply) : undefined
 
   const priceOraclesForChain = useMemo(() => chainIdNumber && priceOracles[chainIdNumber], [chainIdNumber])
 
   const { priceOracleBaseToken, priceOracleAddress } = useMemo(() => {
-    if (!priceOraclesForChain || !token0 || !token1 || isSushi) {
+    if (!priceOraclesForChain || !token0 || !token1) {
       return { priceOracleToken: undefined, priceOracleAddress: undefined }
     }
     const token0Oracle = priceOraclesForChain[tokenDescriptor0.address]
     const token1Oracle = priceOraclesForChain[tokenDescriptor1.address]
+    // console.log(token0Oracle, `token0Oracle`)
+    // console.log(token1Oracle, `token1Oracle for ${farmablePool.symbol}`)
     if (token0Oracle) {
       return { priceOracleBaseToken: token0, priceOracleAddress: token0Oracle }
     } else if (token1Oracle) {
@@ -138,10 +138,9 @@ export function useStakedTVL(
     } else {
       return { priceOracleBaseToken: undefined, priceOracleAddress: undefined }
     }
-  }, [priceOraclesForChain, tokenDescriptor0, tokenDescriptor1, token0, token1, isSushi])
+  }, [priceOraclesForChain, tokenDescriptor0, tokenDescriptor1, token0, token1])
 
-  const isUsingFetchPrice = useMemo(() => !isSushi && (!priceOracleAddress || !priceOracleAddress?.startsWith('0x')), [
-    isSushi,
+  const isUsingFetchPrice = useMemo(() => !priceOracleAddress || !priceOracleAddress?.startsWith('0x'), [
     priceOracleAddress
   ])
   const fetchPriceCurrency = useMemo(() => (isUsingFetchPrice ? priceOracleAddress : undefined), [
@@ -151,14 +150,15 @@ export function useStakedTVL(
   const fetchPriceBase = useMemo(() => (isUsingFetchPrice ? 'usd' : undefined), [isUsingFetchPrice])
   const fetchPrice = useFetchPrice(fetchPriceCurrency, fetchPriceBase)
   const [, pair] = usePair(token0, token1)
-  const foreignPair = useForeignPair(farmablePool, token0, token1)
+  const foreignReserve = useForeignReserveOf(farmablePool, token0, token1, isSushi ? priceOracleBaseToken : undefined)
   const pricedInReserve = useMemo(() => {
     if (!priceOracleBaseToken) {
       return null
     }
-    const usingPair = isSushi ? foreignPair : pair
-    return usingPair?.reserveOf(priceOracleBaseToken)
-  }, [priceOracleBaseToken, pair, foreignPair, isSushi])
+    const usingReserve = isSushi ? foreignReserve : pair?.reserveOf(priceOracleBaseToken)
+    return usingReserve
+  }, [priceOracleBaseToken, pair, foreignReserve, isSushi])
+  foreignReserve && console.log(foreignReserve, `foreignReserve for ${farmablePool.symbol}`)
   const priceOracleContract = usePriceOracleContract(!isUsingFetchPrice ? priceOracleAddress : undefined)
 
   const priceRaw: string | undefined = useSingleCallResult(priceOracleContract, 'latestRoundData').result?.[1]
@@ -173,8 +173,8 @@ export function useStakedTVL(
     const priceInUsd = fetchedFraction ? fetchedFraction : chainFraction
     const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply('2')
     const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
-    return !farmablePool.isSushi ? stakedTVL ?? undefined : undefined
-  }, [decimals, isUsingFetchPrice, fetchPrice, farmablePool.isSushi, priceRaw, pricedInReserve, ratioStaked])
+    return stakedTVL
+  }, [decimals, isUsingFetchPrice, fetchPrice, priceRaw, pricedInReserve, ratioStaked])
 }
 
 // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0

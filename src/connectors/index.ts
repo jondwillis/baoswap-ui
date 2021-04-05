@@ -25,7 +25,9 @@ export const mainnet = new NetworkConnector({ urls: { 1: NETWORK_URL }, defaultC
 
 let networkLibrary: Web3Provider | undefined
 export function getNetworkLibrary(): Web3Provider {
-  return (networkLibrary = networkLibrary ?? new Web3Provider(network.provider as any))
+  const library = (networkLibrary = networkLibrary ?? new Web3Provider(mainnet.provider as any))
+  library.pollingInterval = 5000
+  return library
 }
 
 export const injected = new InjectedConnector({
