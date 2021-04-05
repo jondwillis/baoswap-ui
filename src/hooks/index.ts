@@ -15,9 +15,7 @@ export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & 
 }
 
 export function useMainWeb3React(): Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId } {
-  const context = useWeb3React<Web3Provider>(MainNetworkContextName)
-  console.log(context.chainId, 'useMainWeb3React')
-  return context
+  return useWeb3React<Web3Provider>(MainNetworkContextName)
 }
 
 export function useEagerConnect() {

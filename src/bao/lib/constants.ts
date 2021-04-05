@@ -340,7 +340,7 @@ export const addressMap = {
     FRAX: '0x853d955acef822db058eb8505911ed77f175b99e',
     LDO: '0x5a98fcbea516cf06857215779fd812ca3bef1b32',
     BOR: '0x3c9d6c1c73b31c837832c72e04d3152f051fc1a9',
-    '1inch': '0x111111111117dc0aa78b770fa6a738034120c302',
+    '1inch': '0x111111111117dc0aa78b770fa6a738034120c302'
   }
 }
 
@@ -465,6 +465,7 @@ export const priceOracles = {
   },
   [ChainId.XDAI]: {
     // all XXX-USD
+    [addressMap[ChainId.XDAI].BAO]: 'bao-finance',
     [addressMap[ChainId.XDAI]['BAO.cx']]: 'bao-finance',
     // [addressMap[ChainId.XDAI].AAVE]: '0x2b481Dc923Aa050E009113Dca8dcb0daB4B68cDF',
     // [addressMap[ChainId.XDAI].BAL]: '0x1b723C855F7D2c2785F99486973271355e782d77',
@@ -475,7 +476,7 @@ export const priceOracles = {
     // [addressMap[ChainId.XDAI].SNX]: '0x3b84d6e6976D5826500572600eB44f9f1753827b',
     [addressMap[ChainId.XDAI].SUSHI]: '0xC0a6Bf8d5D408B091D022C3C0653d4056D4B9c01',
     // [addressMap[ChainId.XDAI].UNI]: '0xd98735d78266c62277Bb4dBf3e3bCdd3694782F4',
-    [addressMap[ChainId.XDAI].USDC]: '0x26C31ac71010aF62E6B486D1132E266D6298857D',
+    [addressMap[ChainId.XDAI].USDC]: '0x26C31ac71010aF62E6B486D1132E266D6298857D'
     // [addressMap[ChainId.XDAI].YFI]: '0x14030d5a0C9e63D9606C6f2c8771Fc95b34b07e0'
   }
 }
@@ -515,6 +516,7 @@ export const supportedPools = [
   {
     pid: 2,
     lpAddresses: {
+      1: '0x0eee7f7319013df1f24f5eaf83004fcf9cf49245',
       100: '0x3D1d2B236ad8ef3FD7C6C1625845fB59dFFaCCa1'
     },
     tokenAddresses: {
@@ -546,6 +548,7 @@ export const supportedPools = [
   {
     pid: 4,
     lpAddresses: {
+      1: '0x072b999fc3d82f9ea08b8adbb9d63a980ff2b14d',
       100: '0xFEeC1B8Acd23068fa29Bf01759e0DA1C7cede4F4'
     },
     tokenAddresses: {
@@ -562,6 +565,7 @@ export const supportedPools = [
   {
     pid: 5,
     lpAddresses: {
+      1: '0x3442801e0ddb9a6d06bc232d51725a658c8bfe10',
       100: '0xcf076d7663cc16109f3879b3C60A60CdD2ef31DB'
     },
     tokenAddresses: {
@@ -578,6 +582,7 @@ export const supportedPools = [
   {
     pid: 6,
     lpAddresses: {
+      1: '0xc599f66e20a8420894d980624671937d5d7e4ea5',
       100: '0xF768945410933cA301C347FB6C945EC6E9B4c497'
     },
     tokenAddresses: {
@@ -594,6 +599,7 @@ export const supportedPools = [
   {
     pid: 7,
     lpAddresses: {
+      1: '0x28bfcf4385c8d32566d8a89a64b7c1e079cb81e6',
       100: '0xd83ce865aBcE674Ec61116c4aBDA281f0184cff7'
     },
     tokenAddresses: {
@@ -626,6 +632,7 @@ export const supportedPools = [
   {
     pid: 8,
     lpAddresses: {
+      1: '0x321198908bd33b066252d63d363667e3f7094a34',
       100: '0x1987399C0C023869ea00a51750667721BA009be6'
     },
     tokenAddresses: {
@@ -642,13 +649,14 @@ export const supportedPools = [
   {
     pid: 9,
     lpAddresses: {
+      1: '0x36e2fcccc59e5747ff63a03ea2e5c0c2c14911e7',
       100: '0xfE536fE3c3E870675083f66441dF0F8ed3273650'
     },
     tokenAddresses: {
       100: [tokenMap.XSUSHI, tokenMap.WETH]
     },
     tokenDecimals: 18,
-    name: 'xSushi ETH',
+    name: 'xSushi Maki',
     symbol: 'xSUSHI-ETH SushiLP',
     tokenSymbol: 'sushi',
     poolType: 'sushi',
@@ -2657,18 +2665,55 @@ export interface FarmablePool {
   refUrl: string
 }
 
-export function useAllFarmablePools(): FarmablePool[] {
-  return supportedPools.map(poolInfo => {
-    const address = poolInfo.lpAddresses[ChainId.XDAI]
-    const tokenAddresses = poolInfo.tokenAddresses[ChainId.XDAI]
+export function useSidechainFarmablePool(
+  chainId: ChainId.XDAI | ChainId.MAINNET = ChainId.MAINNET,
+  farmablePool: FarmablePool
+): FarmablePool | undefined {
+  if (!farmablePool.isSushi) {
+    return undefined
+  }
+  const foreignAddress = farmablePool.address
+  return {
+    pid: farmablePool.pid,
+    address: foreignAddress,
+    tokenAddresses: farmablePool.tokenAddresses,
+    token: new Token(
+      chainId,
+      foreignAddress,
+      farmablePool.token.decimals,
+      farmablePool.token.symbol,
+      farmablePool.token.symbol
+    ),
+    symbol: farmablePool.symbol,
+    name: farmablePool.name,
+    isSushi: farmablePool.isSushi,
+    icon: farmablePool.icon,
+    refUrl: farmablePool.refUrl
+  }
+}
+
+export function useAllFarmablePools(chainId: ChainId.XDAI | ChainId.MAINNET = ChainId.XDAI): FarmablePool[] {
+  return supportedPools.flatMap(poolInfo => {
+    if (!chainId) {
+      return []
+    }
+    const address = poolInfo.lpAddresses[chainId]
+    if (!address) {
+      return []
+    }
+    const isSushi = poolInfo.poolType === 'sushi'
+    const tokenAddresses = poolInfo.tokenAddresses[100] // TODO: token addresses for mainnet
+    if (!tokenAddresses) {
+      return []
+    }
     const farmablePool: FarmablePool = {
       pid: poolInfo.pid,
       address,
       tokenAddresses: tokenAddresses,
-      token: new Token(ChainId.XDAI, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
+      token: new Token(chainId, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
       symbol: poolInfo.symbol,
       name: poolInfo.name,
-      isSushi: poolInfo.poolType === 'sushi',
+      isSushi,
       icon: poolInfo.icon,
       refUrl: poolInfo.refUrl
     }

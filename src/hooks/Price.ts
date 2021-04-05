@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ChainId, Fraction, JSBI, Token, TokenAmount } from 'uniswap-xdai-sdk'
-import { useActiveWeb3React } from '.'
+import { useActiveWeb3React, useMainWeb3React } from '.'
 import { FarmablePool, priceOracles } from '../bao/lib/constants'
 import { usePair, useRewardToken } from '../data/Reserves'
 import { useSingleCallResult } from '../state/multicall/hooks'
@@ -73,7 +73,10 @@ export function useStakedTVL(
   stakedAmount: TokenAmount | undefined,
   totalSupply: TokenAmount | undefined
 ): Fraction | undefined {
-  const { chainId } = useActiveWeb3React()
+  const { chainId: activeChainId } = useActiveWeb3React()
+  const { chainId: mainnetChainId } = useMainWeb3React()
+
+  const chainId = farmablePool.isSushi ? mainnetChainId : activeChainId
   const [tokenDescriptor0, tokenDescriptor1] = farmablePool.tokenAddresses
   const chainIdNumber = useMemo(() => (chainId === ChainId.XDAI ? 100 : chainId === ChainId.MAINNET ? 1 : undefined), [
     chainId
