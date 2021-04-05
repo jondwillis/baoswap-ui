@@ -7,17 +7,19 @@ import { useSingleCallResult } from '../state/multicall/hooks'
 import { useLPContract, useMasterChefContract, usePriceOracleContract } from './useContract'
 import { BigNumber } from '@ethersproject/bignumber'
 import useDebounce from './useDebounce'
+import { useBlockNumber } from '../state/application/hooks'
 
 const ten = JSBI.BigInt(10)
 // WARN: this could break if bao price changes dramatically and breaks out of js number size
 const baoPriceExponent = 100000000
 
-const useFetchPrice = (
+export const useFetchPrice = (
   priceId?: string | string,
   base?: string
 ): { response: BigNumber | null; error: Error | null } => {
   const [response, setResponse] = useState<BigNumber | null>(null)
   const [error, setError] = useState<Error | null>(null)
+  const block = useBlockNumber()
   useEffect(() => {
     const fetchData = async () => {
       if (!priceId || !base) {
@@ -39,35 +41,35 @@ const useFetchPrice = (
       }
     }
     fetchData()
-  }, [priceId, base])
+  }, [priceId, base, block])
   return { response, error }
 }
 
-export const fetchPrice = async (priceId?: string | string, base?: string): Promise<BigNumber> => {
-  if (!priceId || !base) {
-    return Promise.reject()
-  }
-  let response
-  try {
-    response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${priceId}&vs_currencies=${base}`, {
-      headers: {
-        accept: 'application/json'
-      }
-    })
-  } catch (error) {
-    console.debug('Failed to fetch APY', error)
-  }
+// export const e = async (priceId?: string | string, base?: string): Promise<BigNumber> => {
+//   if (!priceId || !base) {
+//     return Promise.reject()
+//   }
+//   let response
+//   try {
+//     response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${priceId}&vs_currencies=${base}`, {
+//       headers: {
+//         accept: 'application/json'
+//       }
+//     })
+//   } catch (error) {
+//     console.debug('Failed to fetch APY', error)
+//   }
 
-  if (!response?.ok) {
-    throw new Error(`Failed to fetch APY`)
-  }
+//   if (!response?.ok) {
+//     throw new Error(`Failed to fetch APY`)
+//   }
 
-  const json = await response?.json()
+//   const json = await response?.json()
 
-  const price: number = json[priceId][base]
-  const priceExp = price * baoPriceExponent
-  return BigNumber.from(priceExp)
-}
+//   const price: number = json[priceId][base]
+//   const priceExp = price * baoPriceExponent
+//   return BigNumber.from(priceExp)
+// }
 
 function useForeignReserveOf(
   farmablePool: FarmablePool,
@@ -188,7 +190,7 @@ export function useStakedTVL(
 // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
 export function useAPY(
   farmablePool: FarmablePool | undefined,
-  baoPriceUsd: BigNumber,
+  baoPriceUsd: BigNumber | undefined | null,
   tvlUsd: Fraction | undefined
 ): Fraction | undefined {
   const rewardToken = useRewardToken()
@@ -199,6 +201,9 @@ export function useAPY(
   ]).result?.[0]
 
   return useMemo(() => {
+    if (!baoPriceUsd) {
+      return undefined
+    }
     const blocksPerYear = JSBI.BigInt(6311390) // (31556952 (seconds / year)) / (5 blocks/second) = 6311390.4
     const rawRewardPerBlock = JSBI.BigInt(rewardPerBlockResult?.toString() ?? '0')
 

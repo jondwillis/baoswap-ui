@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { ThemeContext } from 'styled-components'
 import { Pair } from 'uniswap-xdai-sdk'
 import { Link } from 'react-router-dom'
@@ -25,14 +25,11 @@ import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 import { useAllFarmablePools } from '../../bao/lib/constants'
 import { FarmSuggestionCard } from '../../components/FarmSuggestionCard'
-import { fetchPrice } from '../../hooks/Price'
-import { BigNumber } from '@ethersproject/bignumber'
-import { useBlockNumber } from '../../state/application/hooks'
+import { useFetchPrice } from '../../hooks/Price'
 
 export default function Pool() {
   const theme = useContext(ThemeContext)
   const { account } = useActiveWeb3React()
-  const block = useBlockNumber()
 
   // fetch the user's balances of all tracked V2 LP tokens
   const trackedTokenPairs = useTrackedTokenPairs()
@@ -88,12 +85,7 @@ export default function Pool() {
     [pairCandidates, allFarmablePools]
   )
 
-  const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
-  useEffect(() => {
-    fetchPrice('bao-finance', 'usd')
-      .then(apy => setBaoPriceUsd(apy))
-      .catch(() => setBaoPriceUsd(BigNumber.from(0)))
-  }, [block])
+  const baoPriceUsd = useFetchPrice('bao-finance', 'usd').response
 
   return (
     <>

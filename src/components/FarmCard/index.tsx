@@ -16,7 +16,7 @@ import { useAPY, useStakedTVL } from '../../hooks/Price'
 
 interface FarmCardProps {
   farmablePool: PoolInfoFarmablePool
-  baoPriceUsd: BigNumber
+  baoPriceUsd?: BigNumber | null | undefined
   border?: string
   defaultShowMore: boolean
 }

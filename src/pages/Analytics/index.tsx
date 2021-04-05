@@ -1,4 +1,4 @@
-import React, { RefObject, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { RefObject, useCallback, useContext, useMemo, useRef, useState } from 'react'
 import { ThemeContext } from 'styled-components'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
@@ -17,16 +17,13 @@ import { useAllFarmablePools } from '../../bao/lib/constants'
 import { FarmCard } from '../../components/FarmCard'
 import { usePoolInfoFarmablePools } from '../../data/Reserves'
 import { useTranslation } from 'react-i18next'
-import { useBlockNumber } from '../../state/application/hooks'
-import { BigNumber } from '@ethersproject/bignumber'
-import { fetchPrice } from '../../hooks/Price'
+import { useFetchPrice } from '../../hooks/Price'
 import useDebounce from '../../hooks/useDebounce'
 
 export default function Analytics() {
   const { t } = useTranslation()
   const theme = useContext(ThemeContext)
   const { account } = useActiveWeb3React()
-  const block = useBlockNumber()
 
   const allFarmablePools = useAllFarmablePools()
   const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools)
@@ -54,12 +51,7 @@ export default function Analytics() {
     setSearchQuery(input)
   }, [])
 
-  const [baoPriceUsd, setBaoPriceUsd] = useState<BigNumber>(BigNumber.from(0))
-  useEffect(() => {
-    fetchPrice('bao-finance', 'usd')
-      .then(apy => setBaoPriceUsd(apy))
-      .catch(() => setBaoPriceUsd(BigNumber.from(0)))
-  }, [block])
+  const baoPriceUsd = useFetchPrice('bao-finance', 'usd').response
 
   const isLoading = fetchingPoolInfo
   return (

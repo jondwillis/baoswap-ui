@@ -42,7 +42,7 @@ export const BalanceText = styled(Text)`
 interface PositionCardProps {
   pair: Pair
   farmablePool: FarmablePool
-  baoPriceUsd: BigNumber
+  baoPriceUsd: BigNumber | undefined | null
   unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
