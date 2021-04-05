@@ -179,7 +179,7 @@ export function useStakedTVL(
     const fetchedFraction = fetchedBI ? new Fraction(fetchedBI, JSBI.BigInt(baoPriceExponent)) : undefined
     const chainFraction = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
     const priceInUsd = fetchedFraction ? fetchedFraction : chainFraction
-    const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve)
+    const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply('2')
     const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
     return stakedTVL
   }, [decimals, isUsingFetchPrice, fetchPrice, priceRaw, pricedInReserve, ratioStaked, isSushi])
