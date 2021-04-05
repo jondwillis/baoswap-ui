@@ -119,7 +119,10 @@ export function useStakedTVL(
   // console.log(tokenDescriptor0, `token0Descriptor for ${farmablePool.symbol}`)
   // console.log(token0, `token0 for ${farmablePool.symbol}`)
 
-  const ratioStaked = totalSupply ? stakedAmount?.divide(totalSupply) : undefined
+  const ratioStaked = useMemo(() => (totalSupply ? stakedAmount?.divide(totalSupply) : undefined), [
+    totalSupply,
+    stakedAmount
+  ])
 
   const priceOraclesForChain = useMemo(() => chainIdNumber && priceOracles[chainIdNumber], [chainIdNumber])
 
