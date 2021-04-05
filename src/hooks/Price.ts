@@ -10,7 +10,6 @@ import { BigNumber } from '@ethersproject/bignumber'
 const ten = JSBI.BigInt(10)
 // WARN: this could break if bao price changes dramatically and breaks out of js number size
 const baoPriceExponent = 100000000
-const disableSushiAPY = true
 
 const useFetchPrice = (
   priceId?: string | string,
@@ -170,9 +169,6 @@ export function useStakedTVL(
   const decimals: string | undefined = useSingleCallResult(priceOracleContract, 'decimals').result?.[0]
 
   return useMemo(() => {
-    if (isSushi && disableSushiAPY) {
-      return undefined
-    }
     const decimated = decimals ? JSBI.exponentiate(ten, JSBI.BigInt(decimals.toString())) : undefined
     const fetchedPriceInUsd = isUsingFetchPrice && !fetchPrice.error ? fetchPrice.response : undefined
     const fetchedBI = fetchedPriceInUsd ? JSBI.BigInt(fetchedPriceInUsd?.toString()) : undefined
@@ -182,7 +178,7 @@ export function useStakedTVL(
     const tvl = priceInUsd && pricedInReserve && priceInUsd.multiply(pricedInReserve).multiply('2')
     const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
     return stakedTVL
-  }, [decimals, isUsingFetchPrice, fetchPrice, priceRaw, pricedInReserve, ratioStaked, isSushi])
+  }, [decimals, isUsingFetchPrice, fetchPrice, priceRaw, pricedInReserve, ratioStaked])
 }
 
 // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
