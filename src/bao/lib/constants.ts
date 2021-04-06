@@ -2155,11 +2155,11 @@ export const supportedPools = [
       100: '0x3802C6e89cFe9a30B11557a13BeFD7e5849Ea1e2'
     },
     tokenAddresses: {
-      100: [tokenMap.GRT, tokenMap.WETH]
+      100: [tokenMap.WETH, tokenMap.GRT]
     },
     tokenDecimals: 18,
     name: 'GRT Gummies',
-    symbol: 'GRT-ETH SUSHILP',
+    symbol: 'ETH-GRT SUSHILP',
     tokenSymbol: 'GRT',
     poolType: 'sushi',
     icon: '/gummy-bear.png',
