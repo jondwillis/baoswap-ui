@@ -568,7 +568,7 @@ export const supportedPools = [
       100: '0xcf076d7663cc16109f3879b3C60A60CdD2ef31DB'
     },
     tokenAddresses: {
-      100: [tokenMap.BAO, tokenMap.YFI]
+      100: [tokenMap.YFI, tokenMap.BAO]
     },
     tokenDecimals: 18,
     name: 'BAO YFI',
@@ -2062,6 +2062,7 @@ export const supportedPools = [
   {
     pid: 102,
     lpAddresses: {
+      1: '0x088ee5007c98a9677165d78dd2109ae4a3d04d0c',
       100: '0x4b2c191198ACd5F1C941fa1ba0C870b38470F331'
     },
     tokenAddresses: {
