@@ -28,7 +28,7 @@ export default function Analytics() {
   const allFarmablePools = useAllFarmablePools()
   const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools)
 
-  const [searchQuery, setSearchQuery] = useState('BAO')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const queriedPools = useDebounce(
     useMemo(() => {
