@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { ChainId, Token } from 'uniswap-xdai-sdk'
 
 export const contractAddresses = {
@@ -2679,35 +2680,37 @@ export interface FarmablePool {
 }
 
 // this could use EternalStorageProxy.foreignAddress instead
-export function sidechainFarmablePool(
+export function useSidechainFarmablePool(
   chainId: ChainId.XDAI | ChainId.MAINNET = ChainId.MAINNET,
   farmablePool: FarmablePool
 ): FarmablePool | undefined {
-  if (!farmablePool.isSushi) {
-    return undefined
-  }
-  const foreignAddress = farmablePool.lpAddresses[chainId]
-  if (!foreignAddress) {
-    return undefined
-  }
-  return {
-    pid: farmablePool.pid,
-    address: foreignAddress,
-    lpAddresses: farmablePool.lpAddresses,
-    tokenAddresses: farmablePool.tokenAddresses,
-    token: new Token(
-      chainId,
-      foreignAddress,
-      farmablePool.token.decimals,
-      farmablePool.token.symbol,
-      farmablePool.token.name
-    ),
-    symbol: farmablePool.symbol,
-    name: farmablePool.name,
-    isSushi: farmablePool.isSushi,
-    icon: farmablePool.icon,
-    refUrl: farmablePool.refUrl
-  }
+  return useMemo(() => {
+    if (!farmablePool.isSushi) {
+      return undefined
+    }
+    const foreignAddress = farmablePool.lpAddresses[chainId]
+    if (!foreignAddress) {
+      return undefined
+    }
+    return {
+      pid: farmablePool.pid,
+      address: foreignAddress,
+      lpAddresses: farmablePool.lpAddresses,
+      tokenAddresses: farmablePool.tokenAddresses,
+      token: new Token(
+        chainId,
+        foreignAddress,
+        farmablePool.token.decimals,
+        farmablePool.token.symbol,
+        farmablePool.token.name
+      ),
+      symbol: farmablePool.symbol,
+      name: farmablePool.name,
+      isSushi: farmablePool.isSushi,
+      icon: farmablePool.icon,
+      refUrl: farmablePool.refUrl
+    }
+  }, [farmablePool, chainId])
 }
 
 export function useAllFarmablePools(chainId: ChainId.XDAI | ChainId.MAINNET = ChainId.XDAI): FarmablePool[] {
