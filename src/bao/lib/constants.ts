@@ -363,6 +363,7 @@ class TokenDescriptor implements DescribesToken {
 }
 
 const tokenMap = {
+  NULL: new TokenDescriptor('0x0000000000000000000000000000000000000000', 'Missing', 18),
   XDAI: new TokenDescriptor(addressMap[ChainId.XDAI].XDAI, 'XDAI', 18),
   BAO: new TokenDescriptor(addressMap[ChainId.XDAI].BAO, 'BAO', 18),
   'BAO.cx': new TokenDescriptor(addressMap[ChainId.XDAI]['BAO.cx'], 'BAO.cx', 18),
@@ -571,8 +572,8 @@ export const supportedPools = [
       100: [tokenMap.YFI, tokenMap.BAO]
     },
     tokenDecimals: 18,
-    name: 'BAO YFI',
-    symbol: 'BAO-YFI SushiLP',
+    name: 'YFI BAO',
+    symbol: 'YFI-BAO SushiLP',
     tokenSymbol: 'BAO',
     poolType: 'sushi',
     icon: '/bao.png',
@@ -615,6 +616,7 @@ export const supportedPools = [
   {
     pid: 107,
     lpAddresses: {
+      1: '0x795065dcc9f64b5614c407a6efdc400da6221fb0',
       100: '0xf2F9Ff5Cb8E2B21117715B2E3B5C6285349da498'
     },
     tokenAddresses: {
@@ -1385,6 +1387,7 @@ export const supportedPools = [
   {
     pid: 57,
     lpAddresses: {
+      1: '0x9fc5b87b74b9bd239879491056752eb90188106d',
       100: '0x3CFd76aF96be1491dc58c76458791763D354f275'
     },
     tokenAddresses: {
@@ -1401,6 +1404,7 @@ export const supportedPools = [
   {
     pid: 58,
     lpAddresses: {
+      1: '0xa30911e072a0c88d55b5d0a0984b66b0d04569d0',
       100: '0x7cC121D777C4322fb1DaaB5d511236e682d83512'
     },
     tokenAddresses: {
@@ -2079,6 +2083,7 @@ export const supportedPools = [
   {
     pid: 103,
     lpAddresses: {
+      1: '0xdafd66636e2561b0284edde37e42d192f2844d40',
       100: '0x43BC76493dEa7c82116A38e9C012B9a03127132c'
     },
     tokenAddresses: {
@@ -2095,6 +2100,7 @@ export const supportedPools = [
   {
     pid: 108,
     lpAddresses: {
+      1: '0x397ff1542f962076d0bfe58ea045ffa2d347aca0',
       100: '0x110961C70E6C745cCEdA58FfAF9Ab09f53b5aF14'
     },
     tokenAddresses: {
@@ -2111,6 +2117,7 @@ export const supportedPools = [
   {
     pid: 109,
     lpAddresses: {
+      1: '0x760166fa4f227da29ecac3bec348f5fa853a1f3c',
       100: '0x11a79faa23B045af86B5a319ae33d82FF38379b5'
     },
     tokenAddresses: {
@@ -2127,6 +2134,7 @@ export const supportedPools = [
   {
     pid: 110,
     lpAddresses: {
+      1: '0xf13eef1c6485348b9c9fa0d5df2d89accc5b0147',
       100: '0x743335D8EC69b176AC5AF20B523258254e1D686a'
     },
     tokenAddresses: {
@@ -2143,6 +2151,7 @@ export const supportedPools = [
   {
     pid: 111,
     lpAddresses: {
+      1: '0x7b504a15ef05f4eed1c07208c5815c49022a0c19',
       100: '0x3802C6e89cFe9a30B11557a13BeFD7e5849Ea1e2'
     },
     tokenAddresses: {
@@ -2159,6 +2168,7 @@ export const supportedPools = [
   {
     pid: 112,
     lpAddresses: {
+      1: '0xceff51756c56ceffca006cd410b03ffc46dd3a58',
       100: '0xdEE4e0b8f9A0d3AA253EAC11E4C5C7AcBFb466aE'
     },
     tokenAddresses: {
@@ -2175,6 +2185,7 @@ export const supportedPools = [
   {
     pid: 113,
     lpAddresses: {
+      1: '0x53aabccae8c1713a6a150d9981d2ee867d0720e8',
       100: '0xB656d7B1632c713c5F3C3B6ABd71B94022Dc0f62'
     },
     tokenAddresses: {
@@ -2191,10 +2202,11 @@ export const supportedPools = [
   {
     pid: 114,
     lpAddresses: {
+      1: '0x20c009ac5ce819652f2332c9c62f27f41b8de320',
       100: '0x10cF0409A5F11073ccDF8Df6f94B9df324445603'
     },
     tokenAddresses: {
-      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no Leverj on XDAI?
+      100: [tokenMap.NULL, tokenMap.WETH] // FIXME: no Leverj on XDAI?
     },
     tokenDecimals: 18,
     name: 'Leverj Gluon Lucky Cookie',
@@ -2207,6 +2219,7 @@ export const supportedPools = [
   {
     pid: 115,
     lpAddresses: {
+      1: '0xc40d16476380e4037e6b1a2594caf6a6cc8da967',
       100: '0x5D83eA923D62066f2547DFAd7ff662e41FB961b4'
     },
     tokenAddresses: {
@@ -2223,6 +2236,7 @@ export const supportedPools = [
   {
     pid: 116,
     lpAddresses: {
+      1: '0x6f58a1aa0248a9f794d13dc78e74fc75140956d7',
       100: '0xc4265D14Eff50179771D65345f0814B3d852CCfC'
     },
     tokenAddresses: {
@@ -2239,6 +2253,7 @@ export const supportedPools = [
   {
     pid: 117,
     lpAddresses: {
+      1: '0x35a0d9579b1e886702375364fe9c540f97e4517b',
       100: '0xde9f126eb737f2aa480527992d18266f5261e0a5'
     },
     tokenAddresses: {
@@ -2255,6 +2270,7 @@ export const supportedPools = [
   {
     pid: 118,
     lpAddresses: {
+      1: '0x7825de5586e4d2fd04459091bbe783fa243e1bf3',
       100: '0x8c60b82dd2861F06B7E49E37A990edCa94044470'
     },
     tokenAddresses: {
@@ -2271,6 +2287,7 @@ export const supportedPools = [
   {
     pid: 119,
     lpAddresses: {
+      1: '0x117d4288b3635021a3d612fe05a3cbf5c717fef2',
       100: '0x9411991Cd3Ec8745597658434C49970Fa2654480'
     },
     tokenAddresses: {
@@ -2287,6 +2304,7 @@ export const supportedPools = [
   {
     pid: 120,
     lpAddresses: {
+      1: '0xcc39592f5cb193a70f262aa301f54db1d600e6da',
       100: '0x71a25ca8f3554ee518474d9ab1f2c9380ec04c90'
     },
     tokenAddresses: {
@@ -2303,10 +2321,11 @@ export const supportedPools = [
   {
     pid: 121,
     lpAddresses: {
+      1: '0x382c4a5147fd4090f7be3a9ff398f95638f5d39e',
       100: '0x58D145532d4faA53A3a21ea5b262cE0F29afdd42'
     },
     tokenAddresses: {
-      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no yUSD on xDAI
+      100: [tokenMap.NULL, tokenMap.WETH] // FIXME: no yUSD on xDAI
     },
     tokenDecimals: 18,
     name: 'yVault Youtiao',
@@ -2319,6 +2338,7 @@ export const supportedPools = [
   {
     pid: 122,
     lpAddresses: {
+      1: '0x31d64f9403e82243e71c2af9d8f56c7dbe10c178',
       100: '0xab68e00e5d402005fad284c8e0d48766650ddd2b'
     },
     tokenAddresses: {
@@ -2335,10 +2355,11 @@ export const supportedPools = [
   {
     pid: 123,
     lpAddresses: {
+      1: '0xb670373863ce64f040b7c10bee79c40ce12cacba',
       100: '0x5ADDec6b4F6a79a13EaCAeE24F08b317d6EA99A0'
     },
     tokenAddresses: {
-      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no QSP on xDAI
+      100: [tokenMap.NULL, tokenMap.WETH] // FIXME: no QSP on xDAI
     },
     tokenDecimals: 18,
     name: 'QSP Quail Eggs',
@@ -2351,6 +2372,7 @@ export const supportedPools = [
   {
     pid: 124,
     lpAddresses: {
+      1: '0x86f518368e0d49d5916e2bd9eb162e9952b7b04d',
       100: '0x4e52D29d591E64DDE67977078ed3182f1aC8A8C3'
     },
     tokenAddresses: {
@@ -2367,6 +2389,7 @@ export const supportedPools = [
   {
     pid: 125,
     lpAddresses: {
+      1: '0x364248b2f1f57c5402d244b2d469a35b4c0e9dab',
       100: '0xA700Cf3775C747762426C223A293C9C505a71D44'
     },
     tokenAddresses: {
@@ -2383,10 +2406,11 @@ export const supportedPools = [
   {
     pid: 126,
     lpAddresses: {
+      1: '0x2007815bd299786a117dda62566d6dbaa416926c',
       100: '0x614d04630faf994187b7AA19C7B5d2E6BC3336E7'
     },
     tokenAddresses: {
-      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no cUNI on xDAI
+      100: [tokenMap.NULL, tokenMap.WETH] // FIXME: no cUNI on xDAI
     },
     tokenDecimals: 18,
     name: 'cUNI Clams',
@@ -2399,6 +2423,7 @@ export const supportedPools = [
   {
     pid: 127,
     lpAddresses: {
+      1: '0x34b13f8cd184f55d0bd4dd1fe6c07d46f245c7ed',
       100: '0x54f10fd56a4990c96735c5dd8ca746538be97199'
     },
     tokenAddresses: {
@@ -2415,6 +2440,7 @@ export const supportedPools = [
   {
     pid: 128,
     lpAddresses: {
+      1: '0x998bf04788c1c631c0e02bd1eed3d945308bf0a3',
       100: '0x60bd77d5988c0676d4644ee7f0dd07f42ff2edc7'
     },
     tokenAddresses: {
@@ -2431,10 +2457,11 @@ export const supportedPools = [
   {
     pid: 129,
     lpAddresses: {
+      1: '0x9323161faf56dd09cb32ace72c20dbd96b96d386',
       100: '0xDD11aEc1FF78b06F73528D7Ce0216F1890D7b45c'
     },
     tokenAddresses: {
-      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no aETH on xDAI
+      100: [tokenMap.NULL, tokenMap.WETH] // FIXME: no aETH on xDAI
     },
     tokenDecimals: 18,
     name: 'Aave ETH Aperitif',
@@ -2447,6 +2474,7 @@ export const supportedPools = [
   {
     pid: 130,
     lpAddresses: {
+      1: '0xaf988aff99d3d0cb870812c325c588d8d8cb7de8',
       100: '0xb7E7FE460b00d8Bc3ceB728F72652B82f433322B'
     },
     tokenAddresses: {
@@ -2463,6 +2491,7 @@ export const supportedPools = [
   {
     pid: 131,
     lpAddresses: {
+      1: '0xb2c29e311916a346304f83aa44527092d5bd4f0f',
       100: '0xaBc2E2b87fEC5d79b8143F82f4c4ac1Dcecfe7ef'
     },
     tokenAddresses: {
@@ -2479,10 +2508,11 @@ export const supportedPools = [
   {
     pid: 132,
     lpAddresses: {
+      1: '0x033ecd066376afec5e6383bc9f1f15be4c62dc89',
       100: '0xBdb9B0D78854db895b5D28F67Aed04EF761D2780'
     },
     tokenAddresses: {
-      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no YAX on xDAI
+      100: [tokenMap.NULL, tokenMap.WETH] // FIXME: no YAX on xDAI
     },
     tokenDecimals: 18,
     name: 'YAX Yellowfin',
@@ -2495,6 +2525,7 @@ export const supportedPools = [
   {
     pid: 133,
     lpAddresses: {
+      1: '0x7f47f6f695ddf8316f368a8a99122a081e118bd0',
       100: '0xe8E8937b92259adb26d510aa2f6aD6cA65243d9e'
     },
     tokenAddresses: {
@@ -2511,10 +2542,11 @@ export const supportedPools = [
   {
     pid: 134,
     lpAddresses: {
+      1: '0xf55c33d94150d93c2cfb833bcca30be388b14964',
       100: '0x89920B17e1753ad2c51a567d6f4e1f3ebB29fEDe'
     },
     tokenAddresses: {
-      100: [tokenMap.WETH, tokenMap.WETH] // FIXME: no ALPHA on xDAI
+      100: [tokenMap.NULL, tokenMap.WETH] // FIXME: no ALPHA on xDAI
     },
     tokenDecimals: 18,
     name: 'Alpha Apple Pie',
@@ -2527,6 +2559,7 @@ export const supportedPools = [
   {
     pid: 135,
     lpAddresses: {
+      1: '0x7f8f7dd53d1f3ac1052565e3ff451d7fe666a311',
       100: '0xb2129038a6Ef37945306b0d1194Cc4b8952E55E8'
     },
     tokenAddresses: {
@@ -2543,6 +2576,7 @@ export const supportedPools = [
   {
     pid: 136,
     lpAddresses: {
+      1: '0xba13afecda9beb75de5c56bbaf696b880a5a50dd',
       100: '0x40fD32644304577da2f70b7135F9573163B7702D'
     },
     tokenAddresses: {
@@ -2559,6 +2593,7 @@ export const supportedPools = [
   {
     pid: 137,
     lpAddresses: {
+      1: '0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f',
       100: '0xbc1a3f219f14e0fa86e3a301fba0cf52b32dc77e'
     },
     tokenAddresses: {
@@ -2575,14 +2610,15 @@ export const supportedPools = [
   {
     pid: 138,
     lpAddresses: {
+      1: '0x58dc5a51fe44589beb22e8ce67720b5bc5378009',
       100: '0x1a48e8aae834e3dad8471b507cab07b083040215'
     },
     tokenAddresses: {
-      100: [tokenMap.CRV, tokenMap.WETH]
+      100: [tokenMap.WETH, tokenMap.CRV]
     },
     tokenDecimals: 18,
     name: 'Curve Custard',
-    symbol: 'CRV-ETH SUSHILP',
+    symbol: 'ETH-CRV SUSHILP',
     tokenSymbol: 'CRV',
     poolType: 'sushi',
     icon: '/custard.png',
@@ -2608,6 +2644,7 @@ export const supportedPools = [
   {
     pid: 140,
     lpAddresses: {
+      1: '0xa1d7b2d891e3a1f9ef4bbc5be20630c2feb1c470',
       100: '0x4c3887963bd62200f5304aadaa84dbd0bab1e3ad'
     },
     tokenAddresses: {
@@ -2624,6 +2661,7 @@ export const supportedPools = [
   {
     pid: 141,
     lpAddresses: {
+      1: '0x9bffa3ce3e56d0d26447a45771fec76bd4173022',
       100: '0xDA7712b5959499629a9f6B4cAE2F22910FB894fD'
     },
     tokenAddresses: {
@@ -2640,10 +2678,11 @@ export const supportedPools = [
   {
     pid: 142,
     lpAddresses: {
+      1: '0x20c009ac5ce819652f2332c9c62f27f41b8de320',
       100: '0xa53c15D225558698d3903ABF1482e3ea0FeADA65'
     },
     tokenAddresses: {
-      100: [tokenMap.NEXO, tokenMap.WETH]
+      100: [tokenMap.WETH, tokenMap.NEXO]
     },
     tokenDecimals: 18,
     name: 'Nexo Noodles',
