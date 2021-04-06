@@ -2257,11 +2257,11 @@ export const supportedPools = [
       100: '0xde9f126eb737f2aa480527992d18266f5261e0a5'
     },
     tokenAddresses: {
-      100: [tokenMap.AXS, tokenMap.WETH]
+      100: [tokenMap.WETH, tokenMap.AXS]
     },
     tokenDecimals: 18,
     name: 'AXS Ahi Tuna',
-    symbol: 'AXS-ETH SUSHILP',
+    symbol: 'ETH-AXS SUSHILP',
     tokenSymbol: 'AXS',
     poolType: 'sushi',
     icon: '/salmon.png',
