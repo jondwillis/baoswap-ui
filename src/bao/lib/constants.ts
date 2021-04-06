@@ -2189,11 +2189,11 @@ export const supportedPools = [
       100: '0xB656d7B1632c713c5F3C3B6ABd71B94022Dc0f62'
     },
     tokenAddresses: {
-      100: [tokenMap.RARI, tokenMap.WETH]
+      100: [tokenMap.WETH, tokenMap.RARI]
     },
     tokenDecimals: 18,
     name: 'Rari Riceballs',
-    symbol: 'RARI-ETH SUSHILP',
+    symbol: 'ETH-RARI SUSHILP',
     tokenSymbol: 'RARI',
     poolType: 'sushi',
     icon: '/rice-ball-with-seaweed.png',
