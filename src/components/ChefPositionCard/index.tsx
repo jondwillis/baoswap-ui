@@ -19,12 +19,13 @@ import { Text } from 'rebass'
 import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { ExternalLink } from '../../theme'
 import Logo from '../Logo'
-import { useAPY, useFetchPrice, useStakedTVL } from '../../hooks/Price'
+import { useAPY, useStakedTVL } from '../../hooks/Price'
 import { useTotalSupply } from '../../data/TotalSupply'
 
 interface ChefCardProps {
   farmablePool: UserInfoFarmablePool
   unstakedLPAmount?: TokenAmount | undefined | null
+  baoPriceUsd: Fraction | undefined | null
   showUnwrapped?: boolean
   border?: string
   defaultShowMore: boolean
@@ -33,6 +34,7 @@ interface ChefCardProps {
 export function ChefPositionCard({
   farmablePool,
   unstakedLPAmount,
+  baoPriceUsd,
   border,
   defaultShowMore
 }: ChefCardProps): JSX.Element {
@@ -97,10 +99,8 @@ export function ChefPositionCard({
   const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
   `
-  const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount, totalSupply)
-  const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount, totalSupply)
-
-  const baoPriceUsd = useFetchPrice('bao-finance', 'usd').response
+  const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount, totalSupply, baoPriceUsd)
+  const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount, totalSupply, baoPriceUsd)
 
   const apy = useAPY(farmablePool, baoPriceUsd, allStakedTVL)
 

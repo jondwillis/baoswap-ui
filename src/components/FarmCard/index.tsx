@@ -10,13 +10,12 @@ import { Text } from 'rebass'
 import { ExternalLink } from '../../theme'
 import { PoolInfoFarmablePool } from '../../data/Reserves'
 import Logo from '../Logo'
-import { BigNumber } from '@ethersproject/bignumber'
-import { Percent } from 'uniswap-xdai-sdk'
+import { Fraction, Percent } from 'uniswap-xdai-sdk'
 import { useAPY, useStakedTVL } from '../../hooks/Price'
 
 interface FarmCardProps {
   farmablePool: PoolInfoFarmablePool
-  baoPriceUsd?: BigNumber | null | undefined
+  baoPriceUsd?: Fraction | null | undefined
   border?: string
   defaultShowMore: boolean
 }
@@ -27,7 +26,7 @@ export function FarmCard({ farmablePool, baoPriceUsd, border, defaultShowMore }:
 
   const { accBaoPerShare, stakedAmount, totalSupply, icon, name, poolWeight, pid } = farmablePool
 
-  const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply)
+  const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply, baoPriceUsd)
 
   const apy = useAPY(farmablePool, baoPriceUsd, allStakedTVL)
 

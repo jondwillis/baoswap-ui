@@ -25,7 +25,7 @@ import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 import { useAllFarmablePools } from '../../bao/lib/constants'
 import { FarmSuggestionCard } from '../../components/FarmSuggestionCard'
-import { useFetchPrice } from '../../hooks/Price'
+import { useBaoUsdPrice } from '../../hooks/Price'
 
 export default function Pool() {
   const theme = useContext(ThemeContext)
@@ -85,7 +85,7 @@ export default function Pool() {
     [pairCandidates, allFarmablePools]
   )
 
-  const baoPriceUsd = useFetchPrice('bao-finance', 'usd').response
+  const baoPriceUsd = useBaoUsdPrice()
 
   return (
     <>

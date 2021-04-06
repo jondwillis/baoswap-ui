@@ -17,7 +17,7 @@ import { useAllFarmablePools } from '../../bao/lib/constants'
 import { FarmCard } from '../../components/FarmCard'
 import { usePoolInfoFarmablePools } from '../../data/Reserves'
 import { useTranslation } from 'react-i18next'
-import { useFetchPrice } from '../../hooks/Price'
+import { useBaoUsdPrice } from '../../hooks/Price'
 import useDebounce from '../../hooks/useDebounce'
 
 export default function Analytics() {
@@ -51,7 +51,7 @@ export default function Analytics() {
     setSearchQuery(input)
   }, [])
 
-  const baoPriceUsd = useFetchPrice('bao-finance', 'usd').response
+  const baoPriceUsd = useBaoUsdPrice()
 
   const isLoading = fetchingPoolInfo
   return (

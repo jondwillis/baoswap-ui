@@ -1,4 +1,4 @@
-import { Pair, TokenAmount } from 'uniswap-xdai-sdk'
+import { Fraction, Pair, TokenAmount } from 'uniswap-xdai-sdk'
 import { darken } from 'polished'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -20,7 +20,6 @@ import { useAPY, useStakedTVL } from '../../hooks/Price'
 import { useStakedAmount } from '../../data/Staked'
 import { useTotalSupply } from '../../data/TotalSupply'
 import { FarmablePool } from '../../bao/lib/constants'
-import { BigNumber } from '@ethersproject/bignumber'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -42,7 +41,7 @@ export const BalanceText = styled(Text)`
 interface PositionCardProps {
   pair: Pair
   farmablePool: FarmablePool
-  baoPriceUsd: BigNumber | undefined | null
+  baoPriceUsd: Fraction | undefined | null
   unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
@@ -70,7 +69,7 @@ export function FarmSuggestionCard({
   const stakedAmount = useStakedAmount(farmablePool.token)
   const totalSupply = useTotalSupply(pair.liquidityToken)
 
-  const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply)
+  const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply, baoPriceUsd)
 
   const apy = useAPY(farmablePool, baoPriceUsd, allStakedTVL)
 
