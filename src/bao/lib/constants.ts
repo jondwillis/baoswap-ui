@@ -451,7 +451,7 @@ const tokenMap = {
   HNY: new TokenDescriptor(addressMap[ChainId.XDAI].HNY, 'HNY', 18),
   AGVE: new TokenDescriptor(addressMap[ChainId.XDAI].AGVE, 'AGVE', 18),
   sETH: new TokenDescriptor(addressMap[ChainId.XDAI].sETH, 'sETH', 18),
-  NEXO: new TokenDescriptor(addressMap[ChainId.XDAI].NEXO, 'NEXT', 18)
+  NEXO: new TokenDescriptor(addressMap[ChainId.XDAI].NEXO, 'NEXO', 18)
 }
 
 // non-address looksups can be used to fetchPrice
