@@ -1,6 +1,7 @@
 {
-  "short_name": "Baoswap",
-  "name": "Baoswap",
+  "short_name": "xdai.farm",
+  "name": "xDai Farm",
+  "description": "Baoswap fork w/ Quality of Life improvements",
   "icons": [
       {
         "src": "favicon.ico",
