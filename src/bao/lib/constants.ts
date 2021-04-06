@@ -467,7 +467,6 @@ export const priceOracles = {
   [ChainId.XDAI]: {
     // all XXX-USD
     [addressMap[ChainId.XDAI].BAO]: 'bao-finance',
-    [addressMap[ChainId.XDAI]['BAO.cx']]: 'bao-finance',
     [addressMap[ChainId.XDAI].AAVE]: '0x2b481Dc923Aa050E009113Dca8dcb0daB4B68cDF',
     [addressMap[ChainId.XDAI].BAL]: '0x1b723C855F7D2c2785F99486973271355e782d77',
     [addressMap[ChainId.XDAI].wBTC]: '0x6C1d7e76EF7304a40e8456ce883BC56d3dEA3F7d',
