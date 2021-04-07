@@ -200,7 +200,7 @@ export function usePoolInfoFarmablePools(
         ...mergeObject
       }
     })
-  }, [pairFarmablePools, results, pairResults, baoRewardToken, stakedAmounts])
+  }, [pairFarmablePools, results, pairResults, stakedAmounts, allNewRewardPerBlock, baoRewardToken])
 
   return [userInfoFarmablePool, anyLoading]
 }
