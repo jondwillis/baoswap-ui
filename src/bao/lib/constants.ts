@@ -33,7 +33,7 @@ export const addressMap = {
     'BAO.cx': '0xe0d0b1DBbCF3dd5CAc67edaf9243863Fd70745DA',
     WETH: '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1',
     YFI: '0xbf65bfcb5da067446CeE6A706ba3Fe2fB1a9fdFd',
-    SUSHI: '0x2995D1317DcD4f0aB89f4AE60F3f020A4F17C7CE',
+    SUSHI: '0x6B1A2E64403F9a175eEedAdbc88A81e12DA0f864',
     XSUSHI: '0x726f66BBdaf5DC0D66CADdc24dA13C3E9301Fc2A',
     GRT: '0xFAdc59D012Ba3c110B08A15B7755A5cb7Cbe77D7',
     RUNE: '0x4c68041898bfEfbfCc4253fbE8eD30830E6eb767',
@@ -2753,33 +2753,37 @@ export function useSidechainFarmablePool(
 }
 
 export function useAllFarmablePools(chainId: ChainId.XDAI | ChainId.MAINNET = ChainId.XDAI): FarmablePool[] {
-  return supportedPools.flatMap(poolInfo => {
-    if (!chainId) {
-      return []
-    }
-    const address = poolInfo.lpAddresses[chainId]
-    if (!address) {
-      return []
-    }
-    const isSushi = poolInfo.poolType === 'sushi'
-    const tokenAddresses = poolInfo.tokenAddresses[100] // TODO: need token addresses for mainnet?
-    if (!tokenAddresses) {
-      return []
-    }
-    const farmablePool: FarmablePool = {
-      pid: poolInfo.pid,
-      address,
-      lpAddresses: poolInfo.lpAddresses,
-      tokenAddresses: tokenAddresses,
-      token: new Token(chainId, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
-      symbol: poolInfo.symbol,
-      name: poolInfo.name,
-      isSushi,
-      icon: poolInfo.icon,
-      refUrl: poolInfo.refUrl
-    }
-    return farmablePool
-  })
+  return useMemo(
+    () =>
+      supportedPools.flatMap(poolInfo => {
+        if (!chainId) {
+          return []
+        }
+        const address = poolInfo.lpAddresses[chainId]
+        if (!address) {
+          return []
+        }
+        const isSushi = poolInfo.poolType === 'sushi'
+        const tokenAddresses = poolInfo.tokenAddresses[100] // TODO: need token addresses for mainnet?
+        if (!tokenAddresses) {
+          return []
+        }
+        const farmablePool: FarmablePool = {
+          pid: poolInfo.pid,
+          address,
+          lpAddresses: poolInfo.lpAddresses,
+          tokenAddresses: tokenAddresses,
+          token: new Token(chainId, address, poolInfo.tokenDecimals, poolInfo.symbol, poolInfo.name),
+          symbol: poolInfo.symbol,
+          name: poolInfo.name,
+          isSushi,
+          icon: poolInfo.icon,
+          refUrl: poolInfo.refUrl
+        }
+        return farmablePool
+      }),
+    [chainId]
+  )
 }
 
 const supportedLpTokenEntries = supportedPools.map(poolInfo => {
