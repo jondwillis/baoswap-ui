@@ -140,10 +140,14 @@ export interface PoolInfoFarmablePool extends FarmablePool {
   stakedAmount: TokenAmount
   totalSupply: TokenAmount
   accBaoPerShare: TokenAmount
+  newRewardPerBlock: JSBI
   poolWeight: JSBI
 }
 
-export function usePoolInfoFarmablePools(pairFarmablePools: FarmablePool[]): [PoolInfoFarmablePool[], boolean] {
+export function usePoolInfoFarmablePools(
+  pairFarmablePools: FarmablePool[],
+  allNewRewardPerBlock: JSBI[]
+): [PoolInfoFarmablePool[], boolean] {
   const masterChefContract = useMasterChefContract()
 
   const baoRewardToken = useRewardToken()
@@ -172,6 +176,7 @@ export function usePoolInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Po
       const totalSupply = pairResults?.[i]?.result?.[0]
       const stakedAmount = stakedAmounts?.[i]?.result?.[0]
       const poolWeight = results?.[i]?.result?.[1]
+      const newRewardPerBlock = allNewRewardPerBlock[i]
 
       const mergeObject =
         accBaoPerShare && totalSupply && stakedAmount
@@ -179,12 +184,14 @@ export function usePoolInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Po
               totalSupply: new TokenAmount(farmablePool.token, totalSupply),
               stakedAmount: new TokenAmount(farmablePool.token, stakedAmount),
               accBaoPerShare: new TokenAmount(baoRewardToken, accBaoPerShare),
+              newRewardPerBlock,
               poolWeight: JSBI.BigInt(poolWeight)
             }
           : {
               stakedAmount: new TokenAmount(farmablePool.token, '0'),
               totalSupply: new TokenAmount(farmablePool.token, '1'),
               accBaoPerShare: new TokenAmount(baoRewardToken, '0'),
+              newRewardPerBlock,
               poolWeight: JSBI.BigInt(0)
             }
 

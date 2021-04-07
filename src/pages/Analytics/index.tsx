@@ -25,7 +25,8 @@ export default function Analytics() {
   const { account } = useActiveWeb3React()
 
   const allFarmablePools = useAllFarmablePools()
-  const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools)
+  const allNewRewardPerBlock = useAllNewRewardPerBlock(allFarmablePools)
+  const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools, allNewRewardPerBlock)
 
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -40,7 +41,7 @@ export default function Analytics() {
             .includes(query) || p.name.toLowerCase().includes(query)
       )
     }, [poolInfo, searchQuery]),
-    500
+    250
   )
 
   // manage focus on modal show
@@ -51,8 +52,6 @@ export default function Analytics() {
   }, [])
 
   const baoPriceUsd = useBaoUsdPrice()
-
-  const allNewRewardPerBlock = useAllNewRewardPerBlock(poolInfo)
 
   const isLoading = fetchingPoolInfo
   return (
@@ -89,11 +88,11 @@ export default function Analytics() {
             </LightCard>
           ) : queriedPools?.length > 0 ? (
             <>
-              {queriedPools.map((farm, i) => (
+              {queriedPools.map(farm => (
                 <FarmCard
-                  key={farm.address}
+                  key={`analytics-${farm.address}`}
                   farmablePool={farm}
-                  newRewardPerBlock={allNewRewardPerBlock[i]}
+                  newRewardPerBlock={farm.newRewardPerBlock}
                   baoPriceUsd={baoPriceUsd}
                   defaultShowMore={false}
                 />
