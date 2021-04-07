@@ -32,7 +32,7 @@ import CurrencySearchModal from '../../components/SearchModal/CurrencySearchModa
 import { useSelectedListUrl } from '../../state/lists/hooks'
 import { useAllFarmablePools } from '../../bao/lib/constants'
 import { BAO, BAOCX } from '../../constants'
-import { useBaoUsdPrice } from '../../hooks/Price'
+import { useAllNewRewardPerBlock, useBaoUsdPrice } from '../../hooks/Price'
 
 export default function Chef() {
   const theme = useContext(ThemeContext)
@@ -104,6 +104,8 @@ export default function Chef() {
 
   const selectedListUrl = useSelectedListUrl()
   const noListSelected = !selectedListUrl
+
+  const allNewRewardPerBlock = useAllNewRewardPerBlock(userInfo)
 
   return (
     <>
@@ -199,10 +201,11 @@ export default function Chef() {
               </LightCard>
             ) : userInfo?.length > 0 ? (
               <>
-                {userInfo.map(farmablePool => (
+                {userInfo.map((farmablePool, i) => (
                   <ChefPositionCard
                     key={farmablePool.address}
                     farmablePool={farmablePool}
+                    newRewardPerBlock={allNewRewardPerBlock[i]}
                     baoPriceUsd={baoPriceUsd}
                     unstakedLPAmount={tokenBalanceMap[farmablePool.address]}
                     defaultShowMore={false}

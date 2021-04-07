@@ -25,6 +25,7 @@ import { useTotalSupply } from '../../data/TotalSupply'
 interface ChefCardProps {
   farmablePool: UserInfoFarmablePool
   unstakedLPAmount?: TokenAmount | undefined | null
+  newRewardPerBlock?: JSBI | undefined
   baoPriceUsd: Fraction | undefined | null
   showUnwrapped?: boolean
   border?: string
@@ -34,6 +35,7 @@ interface ChefCardProps {
 export function ChefPositionCard({
   farmablePool,
   unstakedLPAmount,
+  newRewardPerBlock,
   baoPriceUsd,
   border,
   defaultShowMore
@@ -102,7 +104,7 @@ export function ChefPositionCard({
   const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount, totalSupply, baoPriceUsd)
   const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount, totalSupply, baoPriceUsd)
 
-  const apy = useAPY(farmablePool, baoPriceUsd, allStakedTVL)
+  const apy = useAPY(farmablePool, baoPriceUsd, newRewardPerBlock, allStakedTVL)
 
   return (
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>

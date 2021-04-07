@@ -3,9 +3,10 @@ import { ChainId, Fraction, JSBI, Token, TokenAmount, WETH } from 'uniswap-xdai-
 import { useActiveWeb3React, useMainWeb3React } from '.'
 import { FarmablePool, priceOracles, useSidechainFarmablePool } from '../bao/lib/constants'
 import { usePair, useRewardToken } from '../data/Reserves'
-import { useSingleCallResult } from '../state/multicall/hooks'
+import { useSingleCallResult, useSingleContractMultipleData } from '../state/multicall/hooks'
 import { useLPContract, useMasterChefContract, usePriceOracleContract } from './useContract'
 import { BAO } from '../constants'
+import { BigNumber } from '@ethersproject/bignumber'
 
 const ten = JSBI.BigInt(10)
 
@@ -162,31 +163,38 @@ export function useStakedTVL(
   }, [decimals, isUsingBaoUsdPrice, baoPriceUsd, priceRaw, pricedInReserve, isSushi, foreign, ratioStaked])
 }
 
+export const useAllNewRewardPerBlock = (farmablePools: FarmablePool[]): JSBI[] => {
+  const masterChef = useMasterChefContract()
+  const pids = useMemo(() => farmablePools.map(f => [f.pid + 1]), [farmablePools])
+
+  const rewardPerBlockResults = useSingleContractMultipleData(masterChef, 'getNewRewardPerBlock', pids)
+
+  return useMemo(() => {
+    return rewardPerBlockResults.map(r => {
+      const result: BigNumber | undefined = r.result?.[0]
+      return JSBI.BigInt(result?.toString() ?? '0')
+    })
+  }, [rewardPerBlockResults])
+}
+
 // ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
 export function useAPY(
   farmablePool: FarmablePool | undefined,
   baoPriceUsd: Fraction | undefined | null,
+  newRewardPerBlock: JSBI | undefined,
   tvlUsd: Fraction | undefined
 ): Fraction | undefined {
   const rewardToken = useRewardToken()
 
-  const masterChef = useMasterChefContract()
-  const rewardPerBlockResult: string = useSingleCallResult(masterChef, 'getNewRewardPerBlock', [
-    farmablePool?.pid ? farmablePool.pid + 1 : undefined
-  ]).result?.[0]
-
   return useMemo(() => {
-    if (!baoPriceUsd || !tvlUsd || !tvlUsd.greaterThan('0')) {
+    if (!baoPriceUsd || !tvlUsd || !tvlUsd.greaterThan('0') || !newRewardPerBlock) {
       return undefined
     }
     const blocksPerYear = JSBI.BigInt(6311390) // (31556952 (seconds / year)) / (5 blocks/second) = 6311390.4
-    const rawRewardPerBlock = JSBI.BigInt(rewardPerBlockResult?.toString() ?? '0')
 
     const decimated = JSBI.exponentiate(ten, JSBI.BigInt((rewardToken.decimals - 1).toString()))
 
-    // const baoPriceBI = JSBI.BigInt(baoPriceUsd.toString())
-    // const baoPriceFraction = new Fraction(baoPriceBI, JSBI.BigInt(baoPriceExponent / 10)) // uhhh
-    const rewardPerBlock = new Fraction(rawRewardPerBlock, decimated)
+    const rewardPerBlock = new Fraction(newRewardPerBlock, decimated)
 
     return (
       tvlUsd &&
@@ -195,5 +203,5 @@ export function useAPY(
         .multiply(blocksPerYear)
         .divide(tvlUsd)
     )
-  }, [rewardPerBlockResult, baoPriceUsd, rewardToken.decimals, tvlUsd])
+  }, [newRewardPerBlock, baoPriceUsd, rewardToken.decimals, tvlUsd])
 }

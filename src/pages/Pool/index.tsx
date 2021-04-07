@@ -25,7 +25,7 @@ import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 import { useAllFarmablePools } from '../../bao/lib/constants'
 import { FarmSuggestionCard } from '../../components/FarmSuggestionCard'
-import { useBaoUsdPrice } from '../../hooks/Price'
+import { useAllNewRewardPerBlock, useBaoUsdPrice } from '../../hooks/Price'
 
 export default function Pool() {
   const theme = useContext(ThemeContext)
@@ -86,6 +86,8 @@ export default function Pool() {
   )
 
   const baoPriceUsd = useBaoUsdPrice()
+
+  const allNewRewardPerBlock = useAllNewRewardPerBlock(allFarmablePools)
 
   return (
     <>
@@ -159,12 +161,13 @@ export default function Pool() {
               </LightCard>
             ) : allPairCandidatesWithLiquidity?.length > 0 ? (
               <>
-                {allPairCandidatesWithLiquidity.map(pfp => {
+                {allPairCandidatesWithLiquidity.map((pfp, i) => {
                   return pfp ? (
                     <FarmSuggestionCard
                       key={`suggest- ${pfp.pair.liquidityToken.address}`}
                       pair={pfp.pair}
                       farmablePool={pfp.farmablePool}
+                      newRewardPerBlock={allNewRewardPerBlock[i]}
                       baoPriceUsd={baoPriceUsd}
                       unstakedLPAmount={v2PairsBalances[pfp.pair.liquidityToken.address]}
                     />

@@ -1,4 +1,4 @@
-import { Fraction, Pair, TokenAmount } from 'uniswap-xdai-sdk'
+import { Fraction, JSBI, Pair, TokenAmount } from 'uniswap-xdai-sdk'
 import { darken } from 'polished'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -42,6 +42,7 @@ interface PositionCardProps {
   pair: Pair
   farmablePool: FarmablePool
   baoPriceUsd: Fraction | undefined | null
+  newRewardPerBlock: JSBI | undefined
   unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
@@ -51,6 +52,7 @@ export function FarmSuggestionCard({
   pair,
   farmablePool,
   baoPriceUsd,
+  newRewardPerBlock,
   showUnwrapped = true,
   border
 }: PositionCardProps) {
@@ -71,7 +73,7 @@ export function FarmSuggestionCard({
 
   const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply, baoPriceUsd)
 
-  const apy = useAPY(farmablePool, baoPriceUsd, allStakedTVL)
+  const apy = useAPY(farmablePool, baoPriceUsd, newRewardPerBlock, allStakedTVL)
 
   return (
     <>

@@ -17,7 +17,7 @@ import { useAllFarmablePools } from '../../bao/lib/constants'
 import { FarmCard } from '../../components/FarmCard'
 import { usePoolInfoFarmablePools } from '../../data/Reserves'
 import { useTranslation } from 'react-i18next'
-import { useBaoUsdPrice } from '../../hooks/Price'
+import { useAllNewRewardPerBlock, useBaoUsdPrice } from '../../hooks/Price'
 import useDebounce from '../../hooks/useDebounce'
 
 export default function Analytics() {
@@ -52,6 +52,8 @@ export default function Analytics() {
   }, [])
 
   const baoPriceUsd = useBaoUsdPrice()
+
+  const allNewRewardPerBlock = useAllNewRewardPerBlock(poolInfo)
 
   const isLoading = fetchingPoolInfo
   return (
@@ -89,8 +91,14 @@ export default function Analytics() {
               </LightCard>
             ) : queriedPools?.length > 0 ? (
               <>
-                {queriedPools.map((farm: any) => (
-                  <FarmCard key={farm.address} farmablePool={farm} baoPriceUsd={baoPriceUsd} defaultShowMore={false} />
+                {queriedPools.map((farm, i) => (
+                  <FarmCard
+                    key={farm.address}
+                    farmablePool={farm}
+                    newRewardPerBlock={allNewRewardPerBlock[i]}
+                    baoPriceUsd={baoPriceUsd}
+                    defaultShowMore={false}
+                  />
                 ))}
               </>
             ) : (
