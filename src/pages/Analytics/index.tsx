@@ -11,7 +11,6 @@ import { AutoColumn } from '../../components/Column'
 import { SearchInput } from './styleds'
 
 import { useActiveWeb3React } from '../../hooks'
-import AppBody from '../AppBody'
 import { Dots } from '../../components/swap/styleds'
 import { useAllFarmablePools } from '../../bao/lib/constants'
 import { FarmCard } from '../../components/FarmCard'
@@ -58,59 +57,57 @@ export default function Analytics() {
   const isLoading = fetchingPoolInfo
   return (
     <>
-      <AppBody>
-        <SwapPoolTabs active={'analytics'} />
-        <AutoColumn gap="lg" justify="center">
-          <AutoColumn gap="12px" style={{ width: '100%' }}>
-            <RowBetween padding={'0 8px'}>
-              <Text color={theme.text1} fontWeight={500}>
-                All Farmable Pools (Work in Progress)
-              </Text>
-              <Question text="Analytics about all farmable pools" />
-            </RowBetween>
-            <SearchInput
-              type="text"
-              id="pool-search-input"
-              placeholder={t('poolSearchPlaceholder')}
-              value={searchQuery}
-              ref={inputRef as RefObject<HTMLInputElement>}
-              onChange={handleInput}
-              disabled={fetchingPoolInfo}
-            />
-            {!account ? (
-              <LightCard padding="40px">
-                <TYPE.body color={theme.text3} textAlign="center">
-                  Connect to a wallet to view farmable pools.
-                </TYPE.body>
-              </LightCard>
-            ) : isLoading ? (
-              <LightCard padding="40px">
-                <TYPE.body color={theme.text3} textAlign="center">
-                  <Dots>Loading</Dots>
-                </TYPE.body>
-              </LightCard>
-            ) : queriedPools?.length > 0 ? (
-              <>
-                {queriedPools.map((farm, i) => (
-                  <FarmCard
-                    key={farm.address}
-                    farmablePool={farm}
-                    newRewardPerBlock={allNewRewardPerBlock[i]}
-                    baoPriceUsd={baoPriceUsd}
-                    defaultShowMore={false}
-                  />
-                ))}
-              </>
-            ) : (
-              <LightCard padding="40px">
-                <TYPE.body color={theme.text3} textAlign="center">
-                  No unstaked liquidity found.
-                </TYPE.body>
-              </LightCard>
-            )}
-          </AutoColumn>
+      <SwapPoolTabs active={'analytics'} />
+      <AutoColumn gap="lg" justify="center">
+        <AutoColumn gap="12px" style={{ width: '100%' }}>
+          <RowBetween padding={'0 8px'}>
+            <Text color={theme.text1} fontWeight={500}>
+              All Farmable Pools (Work in Progress)
+            </Text>
+            <Question text="Analytics about all farmable pools" />
+          </RowBetween>
+          <SearchInput
+            type="text"
+            id="pool-search-input"
+            placeholder={t('poolSearchPlaceholder')}
+            value={searchQuery}
+            ref={inputRef as RefObject<HTMLInputElement>}
+            onChange={handleInput}
+            disabled={fetchingPoolInfo}
+          />
+          {!account ? (
+            <LightCard padding="40px">
+              <TYPE.body color={theme.text3} textAlign="center">
+                Connect to a wallet to view farmable pools.
+              </TYPE.body>
+            </LightCard>
+          ) : isLoading ? (
+            <LightCard padding="40px">
+              <TYPE.body color={theme.text3} textAlign="center">
+                <Dots>Loading</Dots>
+              </TYPE.body>
+            </LightCard>
+          ) : queriedPools?.length > 0 ? (
+            <>
+              {queriedPools.map((farm, i) => (
+                <FarmCard
+                  key={farm.address}
+                  farmablePool={farm}
+                  newRewardPerBlock={allNewRewardPerBlock[i]}
+                  baoPriceUsd={baoPriceUsd}
+                  defaultShowMore={false}
+                />
+              ))}
+            </>
+          ) : (
+            <LightCard padding="40px">
+              <TYPE.body color={theme.text3} textAlign="center">
+                No unstaked liquidity found.
+              </TYPE.body>
+            </LightCard>
+          )}
         </AutoColumn>
-      </AppBody>
+      </AutoColumn>
     </>
   )
 }
