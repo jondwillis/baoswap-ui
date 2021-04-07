@@ -11,7 +11,6 @@ import { ButtonSecondary } from '../Button'
 
 import Card, { GreyCard } from '../Card'
 import { AutoColumn } from '../Column'
-import DoubleCurrencyLogo from '../DoubleLogo'
 import { RowBetween, RowFixed } from '../Row'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { useActiveWeb3React } from '../../hooks'
@@ -20,6 +19,7 @@ import { useAPY, useStakedTVL } from '../../hooks/Price'
 import { useStakedAmount } from '../../data/Staked'
 import { useTotalSupply } from '../../data/TotalSupply'
 import { FarmablePool } from '../../bao/lib/constants'
+import Logo from '../Logo'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -81,10 +81,23 @@ export function FarmSuggestionCard({
         <AutoColumn gap="12px">
           <FixedHeightRow onClick={() => setShowMore(!showMore)}>
             <RowFixed>
-              <DoubleCurrencyLogo currency0={currency0} currency1={currency1} margin={true} size={20} />
-              <Text fontWeight={500} fontSize={20}>
-                {currency0.symbol}/{currency1.symbol}
-              </Text>
+              <Logo
+                srcs={[`chef-logos/${farmablePool.icon}`]}
+                alt={farmablePool.name}
+                style={{ width: 40, height: 40, objectFit: 'contain', margin: 10, marginLeft: 0 }}
+              />
+              <AutoColumn>
+                <RowFixed>
+                  <Text fontWeight={600} fontSize={18}>
+                    {farmablePool.name}
+                  </Text>
+                </RowFixed>
+                <RowFixed>
+                  <Text fontWeight={300} fontSize={12}>
+                    {farmablePool.symbol}
+                  </Text>
+                </RowFixed>
+              </AutoColumn>
             </RowFixed>
             <RowFixed>
               {apy?.greaterThan('0') && (
@@ -92,10 +105,14 @@ export function FarmSuggestionCard({
                   {apy.toFixed(0, {})}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
                 </ExternalLink>
               )}
-            </RowFixed>
-            <RowFixed>
-              <ButtonSecondary as={Link} to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`}>
-                +Liquidity
+              &nbsp;&nbsp;
+              <ButtonSecondary
+                width="4.5rem"
+                padding="0.1rem"
+                as={Link}
+                to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`}
+              >
+                <Text fontSize={14}>+Liquidity</Text>
               </ButtonSecondary>
             </RowFixed>
           </FixedHeightRow>

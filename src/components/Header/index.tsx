@@ -120,8 +120,8 @@ const NETWORK_LABELS: { [chainId in ChainId]: string | null } = {
 
 export default function Header() {
   const theme = useContext(ThemeContext)
-  const { account, chainId, active } = useActiveWeb3React()
-  const { chainId: mainChainId, active: mainActive } = useMainWeb3React()
+  const { account, chainId, active, error } = useActiveWeb3React()
+  const { chainId: mainChainId, active: mainActive, error: mainError } = useMainWeb3React()
 
   const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
 
@@ -140,7 +140,7 @@ export default function Header() {
                 <NetworkCard>
                   <Column style={{ padding: 0, margin: 0 }}>
                     <RowBetween>
-                      {active ? (
+                      {active && !error ? (
                         <Zap size="10pt" style={{ color: theme.primary1 }} />
                       ) : (
                         <ZapOff size="10pt" style={{ color: theme.red1 }} />
@@ -163,7 +163,7 @@ export default function Header() {
                 <NetworkCard>
                   <Column style={{ padding: 0, margin: 0 }}>
                     <RowBetween>
-                      {mainActive ? (
+                      {mainActive && !mainError ? (
                         <Zap size="10pt" style={{ color: theme.primary1 }} />
                       ) : (
                         <ZapOff size="10pt" style={{ color: theme.red1 }} />
@@ -174,7 +174,7 @@ export default function Header() {
                     </RowBetween>
                     <RowFixed>
                       <Text fontWeight={300} fontSize={9}>
-                        NETWORK LOOKUP
+                        FOREIGN
                       </Text>
                     </RowFixed>
                   </Column>
@@ -184,7 +184,7 @@ export default function Header() {
             <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
               {account && userEthBalance ? (
                 <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
-                  {userEthBalance?.toSignificant(4)} {chainId === 100 ? 'DAI' : 'ETH'}
+                  {userEthBalance?.toSignificant(4)} {chainId === 100 ? 'XDAI' : 'ETH'}
                 </BalanceText>
               ) : null}
               <Web3Status />

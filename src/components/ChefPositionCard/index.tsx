@@ -114,11 +114,11 @@ export function ChefPositionCard({
             <Logo
               srcs={[`chef-logos/${icon}`]}
               alt={name}
-              style={{ width: 40, height: 40, objectFit: 'contain', margin: 10, marginLeft: 2 }}
+              style={{ width: 40, height: 40, objectFit: 'contain', margin: 10, marginLeft: 0 }}
             />
             <AutoColumn>
               <RowFixed>
-                <Text fontWeight={500} fontSize={20}>
+                <Text fontWeight={600} fontSize={18}>
                   {name}
                 </Text>
               </RowFixed>

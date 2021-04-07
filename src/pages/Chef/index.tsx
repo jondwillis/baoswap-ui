@@ -172,7 +172,7 @@ export default function Chef() {
             <RowFixed>
               {lockedEarnedAmount ? (
                 <TYPE.body>
-                  <b>{lockedEarnedAmount.toFixed(2, { })}</b>
+                  <b>{lockedEarnedAmount.toFixed(2, {})}</b>
                 </TYPE.body>
               ) : (
                 '-'
