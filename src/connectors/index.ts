@@ -26,7 +26,7 @@ export const mainnet = new NetworkConnector({ urls: { 1: NETWORK_URL }, defaultC
 let networkLibrary: Web3Provider | undefined
 export function getNetworkLibrary(): Web3Provider {
   const library = (networkLibrary = networkLibrary ?? new Web3Provider(mainnet.provider as any))
-  library.pollingInterval = 5000
+  library.pollingInterval = 15000
   return library
 }
 
