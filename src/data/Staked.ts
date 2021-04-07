@@ -82,12 +82,12 @@ export interface StakedValue {
   poolWeight: BigNumber
 }
 
-export function useLockedEarned(): TokenAmount {
+export function useLockedEarned(): TokenAmount | undefined {
   const rewardToken = useRewardToken()
   const { account } = useActiveWeb3React()
   const baoContract = useBaoContract()
 
   const result = useSingleCallResult(baoContract, 'lockOf', [account ?? undefined]).result?.[0]
 
-  return useMemo(() => new TokenAmount(rewardToken, result ?? '0'), [rewardToken, result])
+  return useMemo(() => (result ? new TokenAmount(rewardToken, result) : undefined), [rewardToken, result])
 }

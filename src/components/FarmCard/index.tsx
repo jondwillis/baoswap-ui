@@ -41,7 +41,7 @@ export function FarmCard({ farmablePool, baoPriceUsd, newRewardPerBlock, border,
             <Logo
               srcs={[`chef-logos/${icon}`]}
               alt={name}
-              style={{ width: 40, height: 40, objectFit: 'contain', margin: 10 }}
+              style={{ width: 40, height: 40, objectFit: 'contain', margin: 10, marginLeft: 2 }}
             />
             <AutoColumn>
               <RowFixed>
@@ -59,7 +59,7 @@ export function FarmCard({ farmablePool, baoPriceUsd, newRewardPerBlock, border,
           <RowFixed>
             {apy?.greaterThan('0') && (
               <ExternalLink href={`https://baoview.xyz/pool-metrics/${pid}`}>
-                {apy.toFixed(0)}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
+                {apy.toFixed(0, {})}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
               </ExternalLink>
             )}
             {showMore ? (

@@ -89,7 +89,7 @@ export function FarmSuggestionCard({
             <RowFixed>
               {apy?.greaterThan('0') && (
                 <ExternalLink href={`https://baoview.xyz/pool-metrics/${farmablePool.pid}`}>
-                  {apy.toFixed(0)}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
+                  {apy.toFixed(0, {})}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
                 </ExternalLink>
               )}
             </RowFixed>

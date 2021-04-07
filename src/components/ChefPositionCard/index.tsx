@@ -114,7 +114,7 @@ export function ChefPositionCard({
             <Logo
               srcs={[`chef-logos/${icon}`]}
               alt={name}
-              style={{ width: 40, height: 40, objectFit: 'contain', margin: 10 }}
+              style={{ width: 40, height: 40, objectFit: 'contain', margin: 10, marginLeft: 2 }}
             />
             <AutoColumn>
               <RowFixed>
@@ -133,7 +133,7 @@ export function ChefPositionCard({
             {yourStakeTVL && (
               <AutoColumn justify="end" style={{ paddingRight: 8, maxWidth: '4rem' }}>
                 <Text fontSize="8pt">Your Stake</Text>
-                <BalanceText>{`$${yourStakeTVL.toFixed(2)}`}</BalanceText>
+                <BalanceText>{`$${yourStakeTVL.toFixed(2, {})}`}</BalanceText>
               </AutoColumn>
             )}
             <AutoColumn gap="0.1rem">
@@ -143,7 +143,7 @@ export function ChefPositionCard({
                     href={`https://baoview.xyz/pool-metrics/${pid}`}
                     style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end' }}
                   >
-                    {apy.toFixed(0)}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
+                    {apy.toFixed(0, {})}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
                   </ExternalLink>
                 )}
               </RowBetween>
@@ -170,7 +170,7 @@ export function ChefPositionCard({
                           Harvest
                         </Text>
                         <BalanceText style={{ fontSize: '10pt' }} fontWeight={600}>
-                          <UnlockIcon size="12px" /> {unlockedPending?.toFixed(0) || '-'}{' '}
+                          <UnlockIcon size="12px" /> {unlockedPending?.toFixed(0, {}) || '-'}{' '}
                           <span style={{ flexShrink: 1, fontSize: '7pt' }}>{rewardCurrency.symbol}</span>
                         </BalanceText>
                       </span>
@@ -198,7 +198,7 @@ export function ChefPositionCard({
               </RowFixed>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  {allStakedTVL ? `$${allStakedTVL.toFixed(2)}` : '-'}
+                  {allStakedTVL ? `$${allStakedTVL.toFixed(2, {})}` : '-'}
                 </Text>
               </RowFixed>
             </FixedHeightRow>
@@ -211,7 +211,7 @@ export function ChefPositionCard({
               </RowFixed>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  {stakedAmount ? stakedAmount.toFixed(3) : '-'}
+                  {stakedAmount ? stakedAmount.toFixed(3, {}) : '-'}
                 </Text>
               </RowFixed>
             </FixedHeightRow>
@@ -224,7 +224,7 @@ export function ChefPositionCard({
               </RowFixed>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
-                  {allStakedAmount ? allStakedAmount.toFixed(3) : '-'}
+                  {allStakedAmount ? allStakedAmount.toFixed(3, {}) : '-'}
                 </Text>
               </RowFixed>
             </FixedHeightRow>
@@ -234,7 +234,7 @@ export function ChefPositionCard({
                 Your Stake / All Stake:
               </Text>
               <Text fontSize={16} fontWeight={500}>
-                {lpStakedPercentage ? lpStakedPercentage.toFixed(4) + '%' : '-'}
+                {lpStakedPercentage ? lpStakedPercentage.toFixed(4, {}) + '%' : '-'}
               </Text>
             </FixedHeightRow>
 
@@ -248,7 +248,7 @@ export function ChefPositionCard({
                     style={{ fontWeight: 900, backgroundColor: theme.primary3, padding: '0.2rem', marginBottom: 10 }}
                   >
                     +Stake
-                    <QuestionHelper text={`Stakes ALL ${unstakedLPAmount?.toFixed(4)} remaining LP Tokens`} />
+                    <QuestionHelper text={`Stakes ALL ${unstakedLPAmount?.toFixed(4, {})} remaining LP Tokens`} />
                   </ButtonSecondary>
                 </RowBetween>
                 <RowBetween>
@@ -257,7 +257,7 @@ export function ChefPositionCard({
                     style={{ backgroundColor: theme.red2, padding: '0.2rem' }}
                   >
                     -Stake
-                    <QuestionHelper text={`🚨⚠️Unstakes ALL ${stakedAmount.toFixed(4)} staked LP Tokens`} />
+                    <QuestionHelper text={`🚨⚠️Unstakes ALL ${stakedAmount.toFixed(4, {})} staked LP Tokens`} />
                   </ButtonSecondary>
                 </RowBetween>
               </AutoColumn>

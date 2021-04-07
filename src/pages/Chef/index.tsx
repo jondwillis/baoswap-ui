@@ -170,9 +170,13 @@ export default function Chef() {
               </Text>
             </RowFixed>
             <RowFixed>
-              <TYPE.body>
-                <b>{lockedEarnedAmount.toFixed(2)}</b>
-              </TYPE.body>
+              {lockedEarnedAmount ? (
+                <TYPE.body>
+                  <b>{lockedEarnedAmount.toFixed(2, { })}</b>
+                </TYPE.body>
+              ) : (
+                '-'
+              )}
               <Question
                 text={`Every time you Harvest or change your Stake, you instantly earn 5% of your pending rewards, and the remaining 95% will begin unlocking linearly at xDAI block ${unlockBlock}.`}
               />
