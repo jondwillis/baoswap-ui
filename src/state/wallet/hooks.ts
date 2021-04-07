@@ -26,11 +26,8 @@ export function useETHBalances(
     [uncheckedAddresses]
   )
 
-  const results = useSingleContractMultipleData(
-    multicallContract,
-    'getEthBalance',
-    addresses.map(address => [address])
-  )
+  const addressArgs = useMemo(() => addresses.map(address => [address]), [addresses])
+  const results = useSingleContractMultipleData(multicallContract, 'getEthBalance', addressArgs)
 
   return useMemo(
     () =>
