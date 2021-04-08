@@ -64,13 +64,12 @@ export function PoolBody({
         </LightCard>
       ) : allV2PairsWithLiquidity?.length > 0 ? (
         <>
-          {allV2PairsWithLiquidity.map(v2Pair => (
-            <FullPositionCard
-              key={`pool-${v2Pair.liquidityToken.address}`}
-              pair={v2Pair}
-              // unstakedLPAmount={v2PairsBalances[v2Pair.liquidityToken.address]}
-            />
-          ))}
+          {allV2PairsWithLiquidity.map(
+            v2Pair =>
+              v2Pair.liquidityToken.address && (
+                <FullPositionCard key={`pool-${v2Pair.liquidityToken.address}`} pair={v2Pair} />
+              )
+          )}
         </>
       ) : (
         <LightCard padding="40px">
@@ -104,7 +103,7 @@ export function PoolBody({
       ) : allPairCandidatesWithLiquidity?.length > 0 ? (
         <>
           {allPairCandidatesWithLiquidity.map((pfp, i) => {
-            return pfp ? (
+            return pfp && pfp.pair.liquidityToken.address ? (
               <FarmSuggestionCard
                 key={`suggest- ${pfp.pair.liquidityToken.address}`}
                 pair={pfp.pair}
