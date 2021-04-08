@@ -111,6 +111,8 @@ function useAllForeignReserveOf(
     mainnetWeb3
   )
 
+  // console.log(foreignTotalSupplyResults, 'foreignTotalSupplyResults')
+
   const foreignSupplyRatios = useMemo(() => {
     return foreignTotalSupplyResults.map((foreignTotalSupplyResults, i) => {
       const foreignTotalSupplyResult: string | undefined = foreignTotalSupplyResults.result?.[i]?.[0]
@@ -223,10 +225,11 @@ export function useAllStakedTVL(
   priceOracleDescriptors: PriceOracleDescriptor[],
   baoPriceUsd: Fraction | undefined | null
 ): (Fraction | undefined)[] {
+  // const nonSushiTokens = useMemo(() => farmablePools.map(f => (f.isSushi ? undefined : f.token)), [farmablePools])
   const tokens = useMemo(() => farmablePools.map(f => f.token), [farmablePools])
-  const mainnet = useMainWeb3React()
-  const totalSupplies = useAllTotalSupply(tokens)
+  const totalSupplies = useAllTotalSupply(farmablePools)
   const foreignReserves = useAllForeignReserveOf(farmablePools, priceOracleDescriptors, totalSupplies)
+  // console.log(totalSupplies, 'totalSupplyResults')
 
   const priceOracleAddresses = useMemo(() => priceOracleDescriptors.map(pod => pod.priceOracleContract?.address), [
     priceOracleDescriptors
@@ -257,6 +260,8 @@ export function useAllStakedTVL(
     [priceOracleDescriptors]
   )
   const pairs = usePairs(tokenPairs)
+  // console.log(ratiosStaked, 'ratiosStaked')
+  // console.log(pairs)
   return useMemo(() => {
     return priceOracleDescriptors.map((pod, i) => {
       const { priceOracleBaseToken, isUsingBaoUsdPrice } = pod
