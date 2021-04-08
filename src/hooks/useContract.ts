@@ -10,11 +10,19 @@ import UNISOCKS_ABI from '../constants/abis/unisocks.json'
 import WETH_ABI from '../constants/abis/weth.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { getContract } from '../utils'
-import { useActiveWeb3React } from './index'
+import { useActiveWeb3React, useMainWeb3React } from './index'
 
 // returns null on errors
-function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
-  const { library, account } = useActiveWeb3React()
+function useContract(
+  address: string | undefined,
+  ABI: any,
+  withSignerIfPossible = true,
+  overrideChainId?: ChainId
+): Contract | null {
+  const activeWeb3React = useActiveWeb3React()
+  const mainnetWeb3React = useMainWeb3React()
+  const usingWeb3React = overrideChainId === ChainId.MAINNET ? mainnetWeb3React : activeWeb3React
+  const { library, account } = usingWeb3React
 
   return useMemo(() => {
     if (!address || !ABI || !library) return null
@@ -67,9 +75,10 @@ export function usePairContract(pairAddress?: string, withSignerIfPossible?: boo
   return useContract(pairAddress, IUniswapV2PairABI, withSignerIfPossible)
 }
 
-export function useMulticallContract(): Contract | null {
-  const { chainId } = useActiveWeb3React()
-  return useContract(chainId && MULTICALL_NETWORKS[chainId], MULTICALL_ABI, false)
+export function useMulticallContract(overrideChainId?: ChainId): Contract | null {
+  const activeWeb3React = useActiveWeb3React()
+  const chainId = overrideChainId ?? activeWeb3React.chainId
+  return useContract(chainId && MULTICALL_NETWORKS[chainId], MULTICALL_ABI, false, chainId)
 }
 
 export function useSocksController(): Contract | null {

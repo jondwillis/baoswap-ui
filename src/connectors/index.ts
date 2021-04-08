@@ -17,13 +17,13 @@ if (typeof NETWORK_URL === 'undefined') {
   throw new Error(`REACT_APP_NETWORK_URL must be a defined environment variable`)
 }
 
-export const network = new NetworkConnector({
-  urls: { [NETWORK_CHAIN_ID]: NETWORK_URL }
-})
+export const mainnet = new NetworkConnector({ urls: { [NETWORK_CHAIN_ID]: NETWORK_URL }, defaultChainId: 1 })
 
 let networkLibrary: Web3Provider | undefined
 export function getNetworkLibrary(): Web3Provider {
-  return (networkLibrary = networkLibrary ?? new Web3Provider(network.provider as any))
+  const library = (networkLibrary = networkLibrary ?? new Web3Provider(mainnet.provider as any))
+  library.pollingInterval = 15000
+  return library
 }
 
 export const injected = new InjectedConnector({
@@ -34,7 +34,7 @@ export const walletconnect = new WalletConnectConnector({
   rpc: { 100: 'https://dai.poa.network' },
   bridge: 'https://bridge.walletconnect.org',
   qrcode: true,
-  pollingInterval: 15000
+  pollingInterval: 5000
 })
 
 // mainnet only
