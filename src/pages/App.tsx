@@ -69,7 +69,8 @@ export default function App() {
             <Web3ReactManager>
               <Switch>
                 <Route exact strict path="/swap" component={Swap} />
-                <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
+                <Route exact strict path="/swap/:inputCurrency" component={RedirectToSwap} />
+                <Route exact strict path="/swap/:inputCurrency/:outputCurrency" component={RedirectToSwap} />
                 <Route exact strict path="/send" component={RedirectPathToSwapOnly} />
                 <Route exact strict path="/find" component={PoolFinder} />
                 <Route exact strict path="/pool" component={Pool} />
