@@ -1,16 +1,23 @@
 import { Contract } from '@ethersproject/contracts'
-import { ChainId, WETH } from 'uniswap-xdai-sdk'
+import { ChainId, TokenAmount, WETH } from 'uniswap-xdai-sdk'
 import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 import { useMemo } from 'react'
 import ENS_ABI from '../constants/abis/ens-registrar.json'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_ABI from '../constants/abis/erc20.json'
+import MASTERFARMER_ABI from '../constants/abis/masterfarmer.json'
+import BAO from '../constants/abis/bao.json'
+import UNIV2LP from '../constants/abis/uni_v2_lp.json'
 import UNISOCKS_ABI from '../constants/abis/unisocks.json'
 import WETH_ABI from '../constants/abis/weth.json'
+import CHAINLINK_PRICE_ORACLE from '../constants/abis/AggregatorV3Interface.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { getContract } from '../utils'
 import { useActiveWeb3React, useMainWeb3React } from './index'
+import { BAOCX } from '../constants'
+import { useSingleCallResult } from '../state/multicall/hooks'
+import { contractAddresses } from '../constants/bao'
 
 // returns null on errors
 function useContract(
@@ -39,9 +46,53 @@ export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: b
   return useContract(tokenAddress, ERC20_ABI, withSignerIfPossible)
 }
 
+// native wrapped chain currency
 export function useWETHContract(withSignerIfPossible?: boolean): Contract | null {
   const { chainId } = useActiveWeb3React()
   return useContract(chainId ? WETH[chainId].address : undefined, WETH_ABI, withSignerIfPossible)
+}
+
+export function useLPContract(
+  address?: string,
+  withSignerIfPossible?: boolean,
+  overrideChainId?: ChainId
+): Contract | null {
+  return useContract(address, UNIV2LP, withSignerIfPossible, overrideChainId)
+}
+
+export function useMasterChefContract(withSignerIfPossible?: boolean): Contract | null {
+  const { chainId } = useActiveWeb3React()
+
+  return useContract(
+    chainId === ChainId.XDAI ? contractAddresses.masterChef[ChainId.XDAI] : undefined,
+    MASTERFARMER_ABI,
+    withSignerIfPossible
+  )
+}
+
+export function useBaoContract(withSignerIfPossible?: boolean): Contract | null {
+  const { chainId } = useActiveWeb3React()
+
+  return useContract(
+    chainId === ChainId.XDAI ? contractAddresses.bao[ChainId.XDAI] : undefined,
+    BAO,
+    withSignerIfPossible
+  )
+}
+
+export function useBaocxBalance(withSignerIfPossible?: boolean): TokenAmount | undefined {
+  const { account } = useActiveWeb3React()
+  const contract = useContract(BAOCX.address, ERC20_ABI, withSignerIfPossible)
+  const balance = useSingleCallResult(contract, 'balanceOf', [account ?? undefined]).result?.[0]
+
+  return useMemo(() => (contract && balance ? new TokenAmount(BAOCX, balance?.toString()) : undefined), [
+    balance,
+    contract
+  ])
+}
+
+export function usePriceOracleContract(address?: string | undefined): Contract | null {
+  return useContract(address, CHAINLINK_PRICE_ORACLE.compilerOutput.abi)
 }
 
 export function useENSRegistrarContract(withSignerIfPossible?: boolean): Contract | null {
