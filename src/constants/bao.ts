@@ -460,7 +460,7 @@ export const priceOracles = {
     [addressMap[ChainId.MAINNET].BAO]: 'bao-finance',
     [addressMap[ChainId.MAINNET].WETH]: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
     [addressMap[ChainId.MAINNET].wBTC]: '0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c',
-    [addressMap[ChainId.MAINNET].DAI]: '0x678df3415fc31947dA4324eC63212874be5a82f8',
+    [addressMap[ChainId.MAINNET].DAI]: '0xAed0c38402a5d19df6E4c03F4E2DceD6e29c1ee9',
     [addressMap[ChainId.MAINNET].WETH]: '0xa767f745331D267c7751297D982b050c93985627',
     [addressMap[ChainId.MAINNET].SUSHI]: '0xC0a6Bf8d5D408B091D022C3C0653d4056D4B9c01',
     [addressMap[ChainId.MAINNET].USDC]: '0x26C31ac71010aF62E6B486D1132E266D6298857D'
