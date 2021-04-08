@@ -201,18 +201,10 @@ export function useAllPriceOracleDescriptors(farmablePools: FarmablePool[]): Pri
     })
   }, [chainId, priceOraclesForChain, tokenDesciptorPairs])
 
-  // const tokens = useMemo(
-  //   () => tokensAndBaseToken.map(({ token0, token1 }): [Token | undefined, Token | undefined] => [token0, token1]),
-  //   [tokensAndBaseToken]
-  // )
-  // const pairs = usePairs(tokens)
-  // console.log(pairs)
-
   return useMemo(() => {
     return tokensAndBaseToken.map(({ token0, token1, isUsingBaoUsdPrice, priceOracleBaseToken }, i) => {
-      // const [, pair] = pairs[i]
       const priceOracleContract = priceOracleBaseToken
-        ? new Contract(priceOracleBaseToken?.address, CHAINLINK_PRICE_ORACLE.compilerOutput.abi)
+        ? new Contract(priceOracleBaseToken?.address, CHAINLINK_PRICE_ORACLE_INTERFACE)
         : null
 
       return {
@@ -243,18 +235,12 @@ export function useAllStakedTVL(
   const rawPriceResults = useMultipleContractSingleData(
     priceOracleAddresses,
     CHAINLINK_PRICE_ORACLE_INTERFACE,
-    'latestRoundData',
-    [],
-    undefined,
-    mainnet
+    'latestRoundData'
   )
   const decimalsResults = useMultipleContractSingleData(
     priceOracleAddresses,
     CHAINLINK_PRICE_ORACLE_INTERFACE,
-    'decimals',
-    [],
-    undefined,
-    mainnet
+    'decimals'
   )
 
   const stakedAmounts = useAllStakedAmounts(tokens)
@@ -313,6 +299,7 @@ export function useAllStakedTVL(
     decimalsResults,
     farmablePools,
     foreignReserves,
+    pairs,
     priceOracleDescriptors,
     ratiosStaked,
     rawPriceResults
