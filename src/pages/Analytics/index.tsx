@@ -23,7 +23,6 @@ import {
   useAllStakedTVL,
   useBaoUsdPrice
 } from '../../hooks/TVL'
-import useDebounce from '../../hooks/useDebounce'
 import AppBody from '../AppBody'
 
 export default function Analytics() {
@@ -37,19 +36,16 @@ export default function Analytics() {
 
   const [searchQuery, setSearchQuery] = useState('')
 
-  const queriedPools = useDebounce(
-    useMemo(() => {
-      const query = searchQuery.toLowerCase()
-      return poolInfo.filter(
-        p =>
-          p.symbol
-            .split(' ')[0]
-            .toLowerCase()
-            .includes(query) || p.name.toLowerCase().includes(query)
-      )
-    }, [poolInfo, searchQuery]),
-    250
-  )
+  const queriedPools = useMemo(() => {
+    const query = searchQuery.toLowerCase()
+    return poolInfo.filter(
+      p =>
+        p.symbol
+          .split(' ')[0]
+          .toLowerCase()
+          .includes(query) || p.name.toLowerCase().includes(query)
+    )
+  }, [poolInfo, searchQuery])
 
   // manage focus on modal show
   const inputRef = useRef<HTMLInputElement>()
@@ -62,13 +58,9 @@ export default function Analytics() {
 
   const allPriceOracles = useAllPriceOracleDescriptors(queriedPools)
 
-  // console.log(allPriceOracles)
   const allStakedTVL = useAllStakedTVL(queriedPools, allPriceOracles, baoPriceUsd)
-  // console.log(allStakedTVL)
 
   const allAPYs = useAllAPYs(queriedPools, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
-
-  // console.log(allAPYs, 'allAPYs')
 
   const isLoading = fetchingPoolInfo
   return (
