@@ -151,6 +151,9 @@ export default function Swap() {
   }, [approval, approvalSubmitted])
 
   const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
+  const halfAmountInput: CurrencyAmount | undefined = CurrencyAmount.ether(
+    JSBI.divide(currencyBalances[Field.INPUT]?.raw || JSBI.BigInt(0), JSBI.BigInt(2)).toString()
+  )
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
 
   // the callback to execute the swap
@@ -225,6 +228,10 @@ export default function Swap() {
     maxAmountInput && onUserInput(Field.INPUT, maxAmountInput.toExact())
   }, [maxAmountInput, onUserInput])
 
+  const handleHalfInput = useCallback(() => {
+    halfAmountInput && onUserInput(Field.INPUT, halfAmountInput.toExact())
+  }, [halfAmountInput, onUserInput])
+
   const handleOutputSelect = useCallback(outputCurrency => onCurrencySelection(Field.OUTPUT, outputCurrency), [
     onCurrencySelection
   ])
@@ -280,6 +287,7 @@ export default function Swap() {
               currency={currencies[Field.INPUT]}
               onUserInput={handleTypeInput}
               onMax={handleMaxInput}
+              onHalf={handleHalfInput}
               onCurrencySelect={handleInputSelect}
               otherCurrency={currencies[Field.OUTPUT]}
               id="swap-currency-input"
