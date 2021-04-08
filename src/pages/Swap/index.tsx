@@ -18,7 +18,7 @@ import { ArrowWrapper, BottomGrouping, Dots, SwapCallbackError, Wrapper } from '
 import TradePrice from '../../components/swap/TradePrice'
 import TokenWarningModal from '../../components/TokenWarningModal'
 
-import { INITIAL_ALLOWED_SLIPPAGE, HONEY } from '../../constants'
+import { INITIAL_ALLOWED_SLIPPAGE, BAOCX, SUGGESTED_BASES } from '../../constants'
 import { useActiveWeb3React } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
@@ -50,7 +50,10 @@ export default function Swap() {
   ]
   const [dismissTokenWarning, setDismissTokenWarning] = useState<boolean>(false)
   const urlLoadedTokens: Token[] = useMemo(
-    () => [loadedInputCurrency, loadedOutputCurrency]?.filter((c): c is Token => c instanceof Token) ?? [],
+    () =>
+      [loadedInputCurrency, loadedOutputCurrency]?.filter(
+        (c): c is Token => c instanceof Token && !SUGGESTED_BASES[100].map(t => t.address).includes(c.address)
+      ) ?? [],
     [loadedInputCurrency, loadedOutputCurrency]
   )
   const handleConfirmTokenWarning = useCallback(() => {
@@ -237,9 +240,9 @@ export default function Swap() {
   ])
 
   const { ethereum } = window
-  const handleAddHnyToMM = useCallback(() => addTokenToMetamask(ethereum, HONEY), [])
+  const handleAddHnyToMM = useCallback(() => addTokenToMetamask(ethereum, BAOCX), [ethereum])
   const isHnySelected =
-    currencies[Field.INPUT]?.symbol === HONEY.symbol || currencies[Field.OUTPUT]?.symbol === HONEY.symbol
+    currencies[Field.INPUT]?.symbol === BAOCX.symbol || currencies[Field.OUTPUT]?.symbol === BAOCX.symbol
 
   return (
     <>
