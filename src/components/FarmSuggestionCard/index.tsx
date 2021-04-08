@@ -82,7 +82,7 @@ export function FarmSuggestionCard({
           <FixedHeightRow padding="1.5rem 0" onClick={() => setShowMore(!showMore)}>
             <RowFixed>
               <Logo
-                srcs={[`chef-logos/${farmablePool.icon}`]}
+                srcs={[`images/pool-logos/${farmablePool.icon}`]}
                 alt={farmablePool.name}
                 style={{ width: 40, height: 40, objectFit: 'contain', margin: 10, marginLeft: 0 }}
               />
