@@ -3,6 +3,7 @@ import { createAction } from '@reduxjs/toolkit'
 export interface Call {
   address: string
   callData: string
+  chainId?: number | undefined
 }
 
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/
@@ -24,7 +25,8 @@ export function parseCallKey(callKey: string): Call {
   }
   return {
     address: pcs[0],
-    callData: pcs[1]
+    callData: pcs[1],
+    chainId: Number(pcs[2])
   }
 }
 
