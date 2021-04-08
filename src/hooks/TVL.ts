@@ -1,12 +1,21 @@
 import { useMemo } from 'react'
 import { ChainId, Fraction, JSBI, Token, TokenAmount, WETH } from 'uniswap-xdai-sdk'
 import { useActiveWeb3React, useMainWeb3React } from '.'
-import { FarmablePool, priceOracles, useSidechainFarmablePool } from '../constants/bao'
-import { usePair, useRewardToken } from '../data/Reserves'
-import { useSingleCallResult, useSingleContractMultipleData } from '../state/multicall/hooks'
-import { useLPContract, useMasterChefContract, usePriceOracleContract } from './useContract'
+import { FarmablePool, priceOracles, useAllSidechainFarmablePools, useSidechainFarmablePool } from '../constants/bao'
+import { usePair, usePairs, useRewardToken } from '../data/Reserves'
+import {
+  useMultipleContractSingleData,
+  useSingleCallResult,
+  useSingleContractMultipleData
+} from '../state/multicall/hooks'
+import { UNIV2_INTERFACE, useLPContract, useMasterChefContract, usePriceOracleContract } from './useContract'
 import { BAO } from '../constants'
 import { BigNumber } from '@ethersproject/bignumber'
+import { Contract } from '@ethersproject/contracts'
+import CHAINLINK_PRICE_ORACLE from '../constants/abis/AggregatorV3Interface.json'
+import { Interface } from 'ethers/lib/utils'
+import { useAllTotalSupply } from '../data/TotalSupply'
+import { useAllStakedAmounts } from '../data/Staked'
 
 const ten = JSBI.BigInt(10)
 
@@ -72,6 +81,244 @@ function useForeignReserveOf(
   }, [result, token0, token1, reserveToken, foreignSupplyRatio, farmablePool.isSushi])
 }
 
+const CHAINLINK_PRICE_ORACLE_INTERFACE = new Interface(CHAINLINK_PRICE_ORACLE.compilerOutput.abi)
+
+function useAllForeignReserveOf(
+  farmablePools: FarmablePool[],
+  priceOracleDescriptors: PriceOracleDescriptor[],
+  totalSupplies: (TokenAmount | undefined)[]
+): ([TokenAmount | undefined, Fraction | undefined] | undefined)[] {
+  const mainnetWeb3 = useMainWeb3React()
+  const allForeignTokens = useAllSidechainFarmablePools(ChainId.MAINNET, farmablePools)
+
+  const allForeignTokenAddresses = useMemo(() => allForeignTokens.map(ft => ft?.token.address), [allForeignTokens])
+
+  const getReservesResults = useMultipleContractSingleData(
+    allForeignTokenAddresses,
+    UNIV2_INTERFACE,
+    'getReserves',
+    undefined,
+    undefined,
+    mainnetWeb3
+  )
+
+  const foreignTotalSupplyResults = useMultipleContractSingleData(
+    allForeignTokenAddresses,
+    UNIV2_INTERFACE,
+    'totalSupply',
+    undefined,
+    undefined,
+    mainnetWeb3
+  )
+
+  const foreignSupplyRatios = useMemo(() => {
+    return foreignTotalSupplyResults.map((foreignTotalSupplyResults, i) => {
+      const foreignTotalSupplyResult: string | undefined = foreignTotalSupplyResults.result?.[i]?.[0]
+      const totalSupply = totalSupplies[i]
+      const foreignSupplyTokenAmount = foreignTotalSupplyResult
+        ? new TokenAmount(farmablePools[i].token, foreignTotalSupplyResult)
+        : undefined
+      const foreignSupplyRatio =
+        totalSupply && foreignSupplyTokenAmount ? totalSupply.divide(foreignSupplyTokenAmount) : undefined
+      return foreignSupplyRatio
+    })
+  }, [farmablePools, foreignTotalSupplyResults, totalSupplies])
+
+  return useMemo(() => {
+    return priceOracleDescriptors.map((pod, i) => {
+      const { token0, token1, priceOracleBaseToken: reserveToken } = pod
+      const foreignSupplyRatio = foreignSupplyRatios[i]
+      const farmablePool = farmablePools[i]
+      const reserve0Result = getReservesResults[i].result?.[0]
+      const reserve1Result = getReservesResults[i].result?.[1]
+      if (!token0 || !token1 || !reserveToken || !farmablePool.isSushi) {
+        return undefined
+      }
+
+      const reserve: string | undefined = token0 === reserveToken ? reserve0Result : reserve1Result
+
+      return reserve && foreignSupplyRatio ? [new TokenAmount(reserveToken, reserve), foreignSupplyRatio] : undefined
+    })
+  }, [farmablePools, foreignSupplyRatios, getReservesResults, priceOracleDescriptors])
+}
+
+export interface PriceOracleDescriptor {
+  token0: Token | undefined
+  token1: Token | undefined
+  priceOracleBaseToken: Token | undefined
+  isUsingBaoUsdPrice: boolean
+  priceOracleContract: Contract | null
+}
+
+export function useAllPriceOracleDescriptors(farmablePools: FarmablePool[]): PriceOracleDescriptor[] {
+  const { chainId } = useActiveWeb3React()
+  const chainIdNumber = useMemo(() => (chainId === ChainId.XDAI ? 100 : chainId === ChainId.MAINNET ? 1 : undefined), [
+    chainId
+  ])
+
+  const tokenDesciptorPairs = useMemo(() => farmablePools.map(f => f.tokenAddresses), [farmablePools])
+  const priceOraclesForChain = useMemo(() => chainIdNumber && priceOracles[chainIdNumber], [chainIdNumber])
+
+  const tokensAndBaseToken = useMemo(() => {
+    return tokenDesciptorPairs.map(tokenDescriptorPair => {
+      const [tokenDescriptor0, tokenDescriptor1] = tokenDescriptorPair
+
+      const token0 =
+        chainId && new Token(chainId, tokenDescriptor0.address, tokenDescriptor0.decimals, tokenDescriptor0.symbol)
+      const token1 =
+        chainId && new Token(chainId, tokenDescriptor1.address, tokenDescriptor1.decimals, tokenDescriptor1.symbol)
+
+      const denomination = () => {
+        if (!priceOraclesForChain || !token0 || !token1) {
+          return { priceOracleToken: undefined, priceOracleAddress: undefined }
+        }
+        const token0Oracle = priceOraclesForChain[tokenDescriptor0.address]
+        const token1Oracle = priceOraclesForChain[tokenDescriptor1.address]
+
+        if (token0Oracle && token0Oracle.startsWith('0x')) {
+          return { priceOracleBaseToken: token0, priceOracleAddress: token0Oracle }
+        } else if (token1Oracle && token1Oracle.startsWith('0x')) {
+          return { priceOracleBaseToken: token1, priceOracleAddress: token1Oracle }
+        } else if (token0Oracle) {
+          return { priceOracleBaseToken: token0, priceOracleAddress: token0Oracle }
+        } else if (token1Oracle) {
+          return { priceOracleBaseToken: token1, priceOracleAddress: token1Oracle }
+        } else {
+          return { priceOracleBaseToken: undefined, priceOracleAddress: undefined }
+        }
+      }
+
+      const { priceOracleBaseToken, priceOracleAddress } = denomination()
+
+      const isUsingBaoUsdPrice = !priceOracleAddress || !priceOracleAddress?.startsWith('0x')
+
+      return {
+        token0,
+        token1,
+        priceOracleBaseToken,
+        isUsingBaoUsdPrice
+      }
+    })
+  }, [chainId, priceOraclesForChain, tokenDesciptorPairs])
+
+  // const tokens = useMemo(
+  //   () => tokensAndBaseToken.map(({ token0, token1 }): [Token | undefined, Token | undefined] => [token0, token1]),
+  //   [tokensAndBaseToken]
+  // )
+  // const pairs = usePairs(tokens)
+  // console.log(pairs)
+
+  return useMemo(() => {
+    return tokensAndBaseToken.map(({ token0, token1, isUsingBaoUsdPrice, priceOracleBaseToken }, i) => {
+      // const [, pair] = pairs[i]
+      const priceOracleContract = priceOracleBaseToken
+        ? new Contract(priceOracleBaseToken?.address, CHAINLINK_PRICE_ORACLE.compilerOutput.abi)
+        : null
+
+      return {
+        token0,
+        token1,
+        priceOracleBaseToken,
+        isUsingBaoUsdPrice,
+        priceOracleContract
+      }
+    })
+  }, [tokensAndBaseToken])
+}
+
+export function useAllStakedTVL(
+  farmablePools: FarmablePool[],
+  priceOracleDescriptors: PriceOracleDescriptor[],
+  baoPriceUsd: Fraction | undefined | null
+): (Fraction | undefined)[] {
+  const tokens = useMemo(() => farmablePools.map(f => f.token), [farmablePools])
+  const mainnet = useMainWeb3React()
+  const totalSupplies = useAllTotalSupply(tokens)
+  const foreignReserves = useAllForeignReserveOf(farmablePools, priceOracleDescriptors, totalSupplies)
+
+  const priceOracleAddresses = useMemo(() => priceOracleDescriptors.map(pod => pod.priceOracleContract?.address), [
+    priceOracleDescriptors
+  ])
+
+  const rawPriceResults = useMultipleContractSingleData(
+    priceOracleAddresses,
+    CHAINLINK_PRICE_ORACLE_INTERFACE,
+    'latestRoundData',
+    [],
+    undefined,
+    mainnet
+  )
+  const decimalsResults = useMultipleContractSingleData(
+    priceOracleAddresses,
+    CHAINLINK_PRICE_ORACLE_INTERFACE,
+    'decimals',
+    [],
+    undefined,
+    mainnet
+  )
+
+  const stakedAmounts = useAllStakedAmounts(tokens)
+
+  const ratiosStaked = useMemo(() => {
+    return stakedAmounts.map((stakedAmount, i) => {
+      const totalSupply = totalSupplies[i]
+      return totalSupply ? stakedAmount?.divide(totalSupply) : undefined
+    })
+  }, [stakedAmounts, totalSupplies])
+
+  const tokenPairs: [Token | undefined, Token | undefined][] = useMemo(
+    () => priceOracleDescriptors.map((pod): [Token | undefined, Token | undefined] => [pod.token0, pod.token1]),
+    [priceOracleDescriptors]
+  )
+  const pairs = usePairs(tokenPairs)
+  return useMemo(() => {
+    return priceOracleDescriptors.map((pod, i) => {
+      const { priceOracleBaseToken, isUsingBaoUsdPrice } = pod
+      const { isSushi } = farmablePools[i]
+      const foreign = foreignReserves[i]
+      const [, pair] = pairs[i]
+
+      const pricedInReserveFn = () => {
+        if (!priceOracleBaseToken) {
+          return null
+        }
+        const usingReserve =
+          isSushi && foreign ? foreign[0] : pair?.reserveOf(!isUsingBaoUsdPrice ? priceOracleBaseToken : BAO)
+        return usingReserve
+      }
+
+      const pricedInReserve = pricedInReserveFn()
+
+      const ratioStaked = ratiosStaked[i]
+      const priceRaw: string | undefined = rawPriceResults[i].result?.[1]
+      const decimals: string | undefined = decimalsResults[i].result?.[0]
+
+      const decimated = decimals ? JSBI.exponentiate(ten, JSBI.BigInt(decimals.toString())) : undefined
+      const fetchedPriceInUsd = isUsingBaoUsdPrice ? baoPriceUsd?.divide(JSBI.BigInt(10)) : undefined
+
+      const chainFraction = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
+      const priceInUsd = fetchedPriceInUsd ? fetchedPriceInUsd : chainFraction
+      const tvl =
+        priceInUsd &&
+        pricedInReserve &&
+        priceInUsd
+          .multiply(pricedInReserve)
+          .multiply(isSushi ? (foreign && foreign[1] ? foreign[1] : JSBI.BigInt(0)) : JSBI.BigInt(1))
+          .multiply('2')
+      const stakedTVL = tvl ? ratioStaked?.multiply(tvl) : undefined
+      return stakedTVL
+    })
+  }, [
+    baoPriceUsd,
+    decimalsResults,
+    farmablePools,
+    foreignReserves,
+    priceOracleDescriptors,
+    ratiosStaked,
+    rawPriceResults
+  ])
+}
+
 export function useStakedTVL(
   farmablePool: FarmablePool,
   stakedAmount: TokenAmount | undefined,
@@ -94,9 +341,6 @@ export function useStakedTVL(
     [chainId, tokenDescriptor1]
   )
 
-  // console.log(tokenDescriptor0, `token0Descriptor for ${farmablePool.symbol}`)
-  // console.log(token0, `token0 for ${farmablePool.symbol}`)
-
   const ratioStaked = useMemo(() => (totalSupply ? stakedAmount?.divide(totalSupply) : undefined), [
     totalSupply,
     stakedAmount
@@ -110,8 +354,7 @@ export function useStakedTVL(
     }
     const token0Oracle = priceOraclesForChain[tokenDescriptor0.address]
     const token1Oracle = priceOraclesForChain[tokenDescriptor1.address]
-    // console.log(token0Oracle, `token0Oracle`)
-    // console.log(token1Oracle, `token1Oracle for ${farmablePool.symbol}`)
+
     if (token0Oracle && token0Oracle.startsWith('0x')) {
       return { priceOracleBaseToken: token0, priceOracleAddress: token0Oracle }
     } else if (token1Oracle && token1Oracle.startsWith('0x')) {
@@ -204,4 +447,38 @@ export function useAPY(
         .divide(tvlUsd)
     )
   }, [newRewardPerBlock, baoPriceUsd, rewardToken.decimals, tvlUsd])
+}
+
+// ((bao_price_usd * bao_per_block * blocks_per_year * pool_weight) / (total_pool_value_usd)) * 100.0
+export function useAllAPYs(
+  poolInfoFarmablePools: (FarmablePool | undefined)[],
+  baoPriceUsd: Fraction | undefined | null,
+  newRewardPerBlocks: (JSBI | undefined)[],
+  tvlUsds: (Fraction | undefined)[]
+): (Fraction | undefined)[] {
+  const rewardToken = useRewardToken()
+
+  return useMemo(() => {
+    return poolInfoFarmablePools.map((_, i) => {
+      const tvlUsd = tvlUsds[i]
+      // console.log(tvlUsd, 'tvlUsd')
+      const newRewardPerBlock = newRewardPerBlocks[i]
+      if (!baoPriceUsd || !tvlUsd || !tvlUsd.greaterThan('0') || !newRewardPerBlock) {
+        return undefined
+      }
+      const blocksPerYear = JSBI.BigInt(6311390) // (31556952 (seconds / year)) / (5 blocks/second) = 6311390.4
+
+      const decimated = JSBI.exponentiate(ten, JSBI.BigInt((rewardToken.decimals - 1).toString()))
+
+      const rewardPerBlock = new Fraction(newRewardPerBlock, decimated)
+
+      return (
+        tvlUsd &&
+        baoPriceUsd
+          .multiply(rewardPerBlock)
+          .multiply(blocksPerYear)
+          .divide(tvlUsd)
+      )
+    })
+  }, [poolInfoFarmablePools, tvlUsds, newRewardPerBlocks, baoPriceUsd, rewardToken.decimals])
 }

@@ -202,8 +202,11 @@ export function useMultipleContractSingleData(
   contractInterface: Interface,
   methodName: string,
   callInputs?: OptionalMethodInputs,
-  options?: ListenerOptions
+  options?: ListenerOptions,
+  overrideWeb3?: (Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId }) | undefined
 ): CallState[] {
+  const web3 = overrideWeb3 ?? useActiveWeb3React()
+  const chainId = web3.chainId
   const fragment = useMemo(() => contractInterface.getFunction(methodName), [contractInterface, methodName])
   const callData: string | undefined = useMemo(
     () =>
@@ -220,17 +223,18 @@ export function useMultipleContractSingleData(
             return address && callData
               ? {
                   address,
-                  callData
+                  callData,
+                  chainId
                 }
               : undefined
           })
         : [],
-    [addresses, callData, fragment]
+    [addresses, callData, chainId, fragment]
   )
 
-  const results = useCallsData(calls, options)
+  const results = useCallsData(calls, options, chainId)
 
-  const latestBlockNumber = useBlockNumber()
+  const latestBlockNumber = useBlockNumber(chainId)
 
   return useMemo(() => {
     return results.map(result => toCallState(result, contractInterface, fragment, latestBlockNumber))

@@ -18,6 +18,9 @@ import { useActiveWeb3React, useMainWeb3React } from './index'
 import { BAOCX } from '../constants'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { contractAddresses } from '../constants/bao'
+import { Interface } from '@ethersproject/abi'
+
+export const UNIV2_INTERFACE = new Interface(UNIV2LP)
 
 // returns null on errors
 function useContract(
@@ -42,6 +45,30 @@ function useContract(
   }, [address, ABI, library, withSignerIfPossible, account])
 }
 
+function useAllContracts(
+  addresses: (string | undefined)[],
+  ABI: any,
+  withSignerIfPossible = true,
+  overrideChainId?: ChainId
+): (Contract | null)[] {
+  const activeWeb3React = useActiveWeb3React()
+  const mainnetWeb3React = useMainWeb3React()
+  const usingWeb3React = overrideChainId === ChainId.MAINNET ? mainnetWeb3React : activeWeb3React
+  const { library, account } = usingWeb3React
+
+  return useMemo(() => {
+    return addresses.map(address => {
+      if (!address || !ABI || !library) return null
+      try {
+        return getContract(address, ABI, library, withSignerIfPossible && account ? account : undefined)
+      } catch (error) {
+        console.error('Failed to get contract', error)
+        return null
+      }
+    })
+  }, [addresses, ABI, library, withSignerIfPossible, account])
+}
+
 export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Contract | null {
   return useContract(tokenAddress, ERC20_ABI, withSignerIfPossible)
 }
@@ -58,6 +85,14 @@ export function useLPContract(
   overrideChainId?: ChainId
 ): Contract | null {
   return useContract(address, UNIV2LP, withSignerIfPossible, overrideChainId)
+}
+
+export function useLPContracts(
+  addresses: string[],
+  withSignerIfPossible?: boolean,
+  overrideChainId?: ChainId
+): (Contract | null)[] {
+  return useAllContracts(addresses, UNIV2LP, withSignerIfPossible, overrideChainId)
 }
 
 export function useMasterChefContract(withSignerIfPossible?: boolean): Contract | null {

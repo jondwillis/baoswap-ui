@@ -2751,6 +2751,41 @@ export function useSidechainFarmablePool(
     }
   }, [farmablePool, chainId])
 }
+// this could use EternalStorageProxy.foreignAddress instead
+export function useAllSidechainFarmablePools(
+  chainId: ChainId.XDAI | ChainId.MAINNET = ChainId.MAINNET,
+  farmablePools: FarmablePool[]
+): (FarmablePool | undefined)[] {
+  return useMemo(() => {
+    return farmablePools.map(farmablePool => {
+      if (!farmablePool.isSushi) {
+        return undefined
+      }
+      const foreignAddress = farmablePool.lpAddresses[chainId]
+      if (!foreignAddress) {
+        return undefined
+      }
+      return {
+        pid: farmablePool.pid,
+        address: foreignAddress,
+        lpAddresses: farmablePool.lpAddresses,
+        tokenAddresses: farmablePool.tokenAddresses,
+        token: new Token(
+          chainId,
+          foreignAddress,
+          farmablePool.token.decimals,
+          farmablePool.token.symbol,
+          farmablePool.token.name
+        ),
+        symbol: farmablePool.symbol,
+        name: farmablePool.name,
+        isSushi: farmablePool.isSushi,
+        icon: farmablePool.icon,
+        refUrl: farmablePool.refUrl
+      }
+    })
+  }, [farmablePools, chainId])
+}
 
 export function useAllFarmablePools(chainId: ChainId.XDAI | ChainId.MAINNET = ChainId.XDAI): FarmablePool[] {
   return useMemo(

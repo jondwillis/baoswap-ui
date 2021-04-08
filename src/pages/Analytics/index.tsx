@@ -16,7 +16,13 @@ import { useAllFarmablePools } from '../../constants/bao'
 import { FarmAnalyticsCard } from '../../components/FarmAnalyticsCard'
 import { usePoolInfoFarmablePools } from '../../data/Reserves'
 import { useTranslation } from 'react-i18next'
-import { useAllNewRewardPerBlock, useBaoUsdPrice } from '../../hooks/TVL'
+import {
+  useAllAPYs,
+  useAllNewRewardPerBlock,
+  useAllPriceOracleDescriptors,
+  useAllStakedTVL,
+  useBaoUsdPrice
+} from '../../hooks/TVL'
 import useDebounce from '../../hooks/useDebounce'
 import AppBody from '../AppBody'
 
@@ -54,6 +60,16 @@ export default function Analytics() {
 
   const baoPriceUsd = useBaoUsdPrice()
 
+  const allPriceOracles = useAllPriceOracleDescriptors(queriedPools)
+
+  // console.log(allPriceOracles)
+  const allStakedTVL = useAllStakedTVL(queriedPools, allPriceOracles, baoPriceUsd)
+  // console.log(allStakedTVL)
+
+  const allAPYs = useAllAPYs(queriedPools, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
+
+  // console.log(allAPYs, 'allAPYs')
+
   const isLoading = fetchingPoolInfo
   return (
     <AppBody>
@@ -89,12 +105,11 @@ export default function Analytics() {
             </LightCard>
           ) : queriedPools?.length > 0 ? (
             <>
-              {queriedPools.map(farm => (
+              {queriedPools.map((farm, i) => (
                 <FarmAnalyticsCard
                   key={`analytics-${farm.address}`}
                   farmablePool={farm}
-                  newRewardPerBlock={farm.newRewardPerBlock}
-                  baoPriceUsd={baoPriceUsd}
+                  apy={allAPYs[i]}
                   defaultShowMore={false}
                 />
               ))}

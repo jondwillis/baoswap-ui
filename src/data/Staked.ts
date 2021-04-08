@@ -4,11 +4,13 @@ import { Contract } from '@ethersproject/contracts'
 import { useMemo } from 'react'
 
 import { useBaoContract, useLPContract, useMasterChefContract, useWETHContract } from '../hooks/useContract'
-import { useSingleCallResult } from '../state/multicall/hooks'
+import { useMultipleContractSingleData, useSingleCallResult } from '../state/multicall/hooks'
 import { FarmablePool } from '../constants/bao'
 import { XDAI_WETH } from '../constants'
 import { useActiveWeb3React } from '../hooks'
 import { useRewardToken } from './Reserves'
+import { Interface } from '@ethersproject/abi'
+import { ERC20_ABI } from '../constants/abis/erc20'
 
 export function useTotalLiquidityAmount(token?: Token, contract?: Contract): TokenAmount | undefined {
   const balance = useSingleCallResult(contract, 'balanceOf', [contract?.address]).result?.[0]
@@ -30,6 +32,24 @@ export function useStakedAmount(token: Token | undefined): TokenAmount | undefin
     balance,
     contract
   ])
+}
+
+const ERC20_INTERFACE = new Interface(ERC20_ABI)
+export function useAllStakedAmounts(tokens: Token[] | undefined): (TokenAmount | undefined)[] {
+  const masterChefContract = useMasterChefContract()
+  const tokenAddresses = useMemo(() => tokens?.map(t => t?.address), [tokens])
+  // const contracts = useLPContracts(tokenAddresses ?? []) || null
+  const balanceResults = useMultipleContractSingleData(tokenAddresses ?? [], ERC20_INTERFACE, 'balanceOf', [
+    masterChefContract?.address
+  ])
+
+  return useMemo(() => {
+    return balanceResults?.map((balanceResult, i) => {
+      const token = tokens && tokens[i]
+      const balance = balanceResult.result?.[0]
+      return token && balance ? new TokenAmount(token, balance?.toString()) : undefined
+    })
+  }, [balanceResults, tokens])
 }
 
 export function useUserStakedBalance(lpToken?: Token, farmablePool?: FarmablePool): TokenAmount | undefined {

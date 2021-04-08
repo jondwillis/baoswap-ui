@@ -10,32 +10,20 @@ import { Text } from 'rebass'
 import { ExternalLink } from '../../theme'
 import { PoolInfoFarmablePool } from '../../data/Reserves'
 import Logo from '../Logo'
-import { Fraction, JSBI, Percent } from 'uniswap-xdai-sdk'
-import { useAPY, useStakedTVL } from '../../hooks/TVL'
+import { Fraction, Percent } from 'uniswap-xdai-sdk'
 
 interface FarmAnalyticsCardProps {
   farmablePool: PoolInfoFarmablePool
-  baoPriceUsd?: Fraction | null | undefined
-  newRewardPerBlock?: JSBI | undefined
+  apy?: Fraction | undefined
   border?: string
   defaultShowMore: boolean
 }
 
-export function FarmAnalyticsCard({
-  farmablePool,
-  baoPriceUsd,
-  newRewardPerBlock,
-  border,
-  defaultShowMore
-}: FarmAnalyticsCardProps) {
+export function FarmAnalyticsCard({ farmablePool, apy, border, defaultShowMore }: FarmAnalyticsCardProps) {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
 
   const { accBaoPerShare, stakedAmount, totalSupply, icon, name, poolWeight } = farmablePool
-
-  const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply, baoPriceUsd)
-
-  const apy = useAPY(farmablePool, baoPriceUsd, newRewardPerBlock, allStakedTVL)
 
   const [showMore, setShowMore] = useState(defaultShowMore)
 
