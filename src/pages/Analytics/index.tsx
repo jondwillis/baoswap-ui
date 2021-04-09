@@ -24,6 +24,7 @@ import {
   useBaoUsdPrice
 } from '../../hooks/TVL'
 import AppBody from '../AppBody'
+import useDebounce from '../../hooks/useDebounce'
 
 export default function Analytics() {
   const { t } = useTranslation()
@@ -36,16 +37,10 @@ export default function Analytics() {
 
   const [searchQuery, setSearchQuery] = useState('')
 
-  const queriedPools = useMemo(() => {
-    const query = searchQuery.toLowerCase()
-    return poolInfo.filter(
-      p =>
-        p.symbol
-          .split(' ')[0]
-          .toLowerCase()
-          .includes(query) || p.name.toLowerCase().includes(query)
-    )
-  }, [poolInfo, searchQuery])
+  const query = useDebounce(
+    useMemo(() => searchQuery.toLowerCase(), [searchQuery]),
+    200
+  )
 
   // manage focus on modal show
   const inputRef = useRef<HTMLInputElement>()
@@ -56,11 +51,11 @@ export default function Analytics() {
 
   const baoPriceUsd = useBaoUsdPrice()
 
-  const allPriceOracles = useAllPriceOracleDescriptors(queriedPools)
+  const allPriceOracles = useAllPriceOracleDescriptors(poolInfo)
 
-  const allStakedTVL = useAllStakedTVL(queriedPools, allPriceOracles, baoPriceUsd)
+  const allStakedTVL = useAllStakedTVL(poolInfo, allPriceOracles, baoPriceUsd)
 
-  const allAPYs = useAllAPYs(queriedPools, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
+  const allAPYs = useAllAPYs(poolInfo, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
 
   const isLoading = fetchingPoolInfo
   return (
@@ -95,16 +90,25 @@ export default function Analytics() {
                 <Dots>Loading</Dots>
               </TYPE.body>
             </LightCard>
-          ) : queriedPools?.length > 0 ? (
+          ) : poolInfo.length > 0 ? (
             <>
-              {queriedPools.map((farm, i) => (
-                <FarmAnalyticsCard
-                  key={`analytics-${farm.address}`}
-                  farmablePool={farm}
-                  apy={allAPYs[i]}
-                  defaultShowMore={false}
-                />
-              ))}
+              {poolInfo.map((farm, i) => {
+                const included =
+                  farm.symbol
+                    .split(' ')[0]
+                    .toLowerCase()
+                    .includes(query) || farm.name.toLowerCase().includes(query)
+                return included ? (
+                  <FarmAnalyticsCard
+                    key={`analytics-${farm.address}`}
+                    farmablePool={farm}
+                    apy={allAPYs[i]}
+                    defaultShowMore={false}
+                  />
+                ) : (
+                  ''
+                )
+              })}
             </>
           ) : (
             <LightCard padding="40px">
