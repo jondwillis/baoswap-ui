@@ -60,8 +60,12 @@ export function useStake(
         amount &&
         async function onStake(): Promise<any> {
           const pid = farmablePool.pid
-          const txReceipt = await masterChefContract.deposit(pid, `0x${amount.raw.toString(16)}`, '')
-          addTransaction(txReceipt, { summary: `Stake ${amount.toFixed(4)} in ${farmablePool.name} (Pool ID: ${pid})` })
+          const txReceipt = await masterChefContract.deposit(
+            pid,
+            `0x${amount.raw.toString(16)}`,
+            '0x0000000000000000000000000000000000000000'
+          )
+          addTransaction(txReceipt, { summary: `Stake ${amount.toFixed(4)} in ${farmablePool.name}` })
           const txHash = txReceipt.hash
           return txHash
         }
@@ -83,9 +87,13 @@ export function useUnstake(
         amount &&
         async function onUnstake(): Promise<any> {
           const pid = farmablePool.pid
-          const txReceipt = await masterChefContract.withdraw(pid, `0x${amount.raw.toString(16)}`, '')
+          const txReceipt = await masterChefContract.withdraw(
+            pid,
+            `0x${amount.raw.toString(16)}`,
+            '0x0000000000000000000000000000000000000000'
+          )
           addTransaction(txReceipt, {
-            summary: `Unstake ${amount.toFixed(4)} from ${farmablePool.name} (Pool ID: ${pid})`
+            summary: `Unstake ${amount.toFixed(4)} from ${farmablePool.name}`
           })
           const txHash = txReceipt.hash
           return txHash
