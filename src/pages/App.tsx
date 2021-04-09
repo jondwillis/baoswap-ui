@@ -1,5 +1,5 @@
-import React, { Suspense } from 'react'
-import { HashRouter, Route, Switch } from 'react-router-dom'
+import React, { Suspense, useEffect, useState } from 'react'
+import { HashRouter, Link, Route, Switch } from 'react-router-dom'
 import { isMobile } from 'react-device-detect'
 import styled from 'styled-components'
 import Header from '../components/Header'
@@ -20,6 +20,7 @@ import Swap from './Swap'
 import { RedirectPathToSwapOnly, RedirectToSwap } from './Swap/redirects'
 import Analytics from './Analytics'
 import Farm from './Farm'
+import { ButtonPrimary } from '../components/Button'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -71,6 +72,15 @@ const Marginer = styled.div`
 `
 
 export default function App() {
+  const [isCatchAllReloadShown, setIsCatchAllReloadShown] = useState(false)
+  useEffect(() => {
+    const timeout = setTimeout(() => setIsCatchAllReloadShown(true), 2000)
+
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [])
+
   return (
     <Suspense fallback={null}>
       <HashRouter>
@@ -100,6 +110,16 @@ export default function App() {
                 <Route component={RedirectPathToSwapOnly} />
               </Switch>
             </Web3ReactManager>
+            {isCatchAllReloadShown && (
+              <ButtonPrimary
+                as={Link}
+                to="/"
+                onClick={() => window.location.reload(false)}
+                style={{ transition: 'fadein 2s', maxWidth: 320, zIndex: -1, position: 'absolute' }}
+              >
+                Reload
+              </ButtonPrimary>
+            )}
             <Marginer />
           </BodyWrapper>
         </AppWrapper>
