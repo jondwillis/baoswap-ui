@@ -59,9 +59,9 @@ export function colors(darkMode: boolean): Colors {
     black,
 
     // gradient colors
-    grd1: darkMode ? '#FFC3AB' : '#FED8B1',
-    grd2: darkMode ? '#FFC3AB' : '#FFC3AB',
-    grd3: darkMode ? '#FFC3AB' : '#FDD9B5',
+    grd1: darkMode ? '#FFC3AB' : '#FFC3AB',
+    grd2: darkMode ? '#fff8ee' : '#fff8ee',
+    grd3: darkMode ? '#FFC3AB' : '#FFC3AB',
 
     // text
     text1: darkMode ? '#FFFFFF' : '#000000',
@@ -71,8 +71,8 @@ export function colors(darkMode: boolean): Colors {
     text5: darkMode ? '#2C2F36' : '#EDEEF2',
 
     // backgrounds / greys
-    bg1: darkMode ? '#212429' : '#FFFFFF',
-    bg2: darkMode ? '#2C2F36' : '#F7F8FA',
+    bg1: darkMode ? '#212429' : '#FFF8EE',
+    bg2: darkMode ? '#2C2F36' : '#FFFCF5',
     bg3: darkMode ? '#40444F' : '#EDEEF2',
     bg4: darkMode ? '#565A69' : '#CED0D9',
     bg5: darkMode ? '#6C7284' : '#888D9B',
@@ -82,11 +82,11 @@ export function colors(darkMode: boolean): Colors {
     advancedBG: darkMode ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.6)',
 
     //primary colors
-    primary1: darkMode ? '#26a697' : '#1974D2',
-    primary2: darkMode ? '#45d3c5' : '#1974D2',
-    primary3: darkMode ? '#97e7de' : '#1974D2',
-    primary4: darkMode ? '#CBF3EF' : '#1974D2',
-    primary5: darkMode ? '#CBF3EF' : '#1974D2',
+    primary1: darkMode ? '#f0b4a0' : '#D16C02',
+    primary2: darkMode ? '#D16C02' : '#D16C02',
+    primary3: darkMode ? '#AB9585' : '#D16C02',
+    primary4: darkMode ? '#AB9585' : '#D16C02',
+    primary5: darkMode ? '#FFF8EE' : '#D16C02',
 
     // color text
     primaryText1: darkMode ? 'rgba(44, 52, 55, 0.8)' : '#ffff',
@@ -234,11 +234,6 @@ html {
   background: linear-gradient(111.63deg, ${({ theme }) => theme.grd1} 0%, ${({ theme }) => theme.grd2} 49.48%, ${({
   theme
 }) => theme.grd3} 100%);
-}
-
-html, body {
-  height: 100%;
-}
 
 body {
   min-height: 100vh;
