@@ -89,7 +89,7 @@ export function useUserInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Us
   const masterChefContract = useMasterChefContract()
 
   const baoRewardToken = useRewardToken()
-  const accountAddress = account || '0x0'
+  const accountAddress = account || '0x0000000000000000000000000000000000000000'
 
   const poolIdsAndLpTokens = useMemo(() => {
     const matrix = pairFarmablePools.map(farmablePool => {

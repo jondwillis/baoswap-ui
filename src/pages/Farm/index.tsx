@@ -56,7 +56,7 @@ export default function Farm() {
     liquidityTokens
   )
 
-  const [userInfo, fetchingUserInfo] = useUserInfoFarmablePools(allFarmablePools) || []
+  const [userInfo, fetchingUserInfo] = useUserInfoFarmablePools(allFarmablePools)
 
   const rewardToken = useRewardToken()
   const allPendingRewards = useMemo(

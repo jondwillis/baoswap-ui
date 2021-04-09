@@ -20,7 +20,7 @@ if (typeof NETWORK_URL === 'undefined') {
 }
 
 if (typeof FOREIGN_NETWORK_URL === 'undefined') {
-  throw new Error(`REACT_APP_MAIN_NETWORK_URL must be a defined environment variable`)
+  throw new Error(`REACT_APP_FOREIGN_NETWORK_URL must be a defined environment variable`)
 }
 
 export const network = new NetworkConnector({
