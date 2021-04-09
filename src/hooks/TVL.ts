@@ -111,38 +111,30 @@ function useAllForeignReserveOf(
   )
 
   return useMemo(() => {
-    return foreignTotalSupplyResults.length == getReservesResults.length &&
-      getReservesResults.length == priceOracleDescriptors.length
-      ? priceOracleDescriptors.map((pod, i) => {
-          const { token0, token1, priceOracleBaseToken: reserveToken } = pod
-          const foreignTotalSupply: BigNumber | undefined = foreignTotalSupplyResults[i].result?.[0]
-          const totalSupply = totalSupplies[i]
-          const reserves = getReservesResults[i].result
-          const token = allForeignTokens[i]?.token
+    return priceOracleDescriptors.map((pod, i) => {
+      const { token0, token1, priceOracleBaseToken: reserveToken } = pod
+      const foreignTotalSupplyResult = foreignTotalSupplyResults[i].result
+      const foreignTotalSupply: BigNumber | undefined = foreignTotalSupplyResult?.[0]
+      const reserves = getReservesResults[i].result
+      const reserve0Result: BigNumber | undefined = reserves?.[0]
+      const reserve1Result: BigNumber | undefined = reserves?.[1]
+      const totalSupply = totalSupplies[i]
+      const token = allForeignTokens[i]?.token
 
-          // console.log(reserves, 'reserves')
-          const foreignSupplyTokenAmount =
-            foreignTotalSupply && token ? new TokenAmount(token, foreignTotalSupply.toString()) : undefined
-          const foreignSupplyRatio =
-            totalSupply && foreignSupplyTokenAmount ? totalSupply.divide(foreignSupplyTokenAmount) : undefined
+      const foreignSupplyTokenAmount =
+        foreignTotalSupply && token ? new TokenAmount(token, foreignTotalSupply.toString()) : undefined
+      const foreignSupplyRatio = foreignSupplyTokenAmount ? totalSupply?.divide(foreignSupplyTokenAmount) : undefined
 
-          // const farmablePool = farmablePools[i]
-          const reserve0Result: BigNumber | undefined = reserves?.[0]
-          const reserve1Result: BigNumber | undefined = reserves?.[1]
-          if (!token0 || !token1 || !reserveToken || !reserve0Result || !reserve1Result) {
-            return undefined
-          }
+      // const farmablePool = farmablePools[i]
+      if (!token0 || !token1 || !reserveToken || !reserve0Result || !reserve1Result) {
+        return undefined
+      }
 
-          const reserve: string | undefined =
-            token0 === reserveToken ? reserve0Result.toString() : reserve1Result.toString()
+      const reserve: string | undefined =
+        token0 === reserveToken ? reserve0Result.toString() : reserve1Result.toString()
 
-          console.log(foreignSupplyRatio, 'foreignSupplyRatio')
-          // console.log(reserve, 'reserve')
-          return reserve && foreignSupplyRatio
-            ? [new TokenAmount(reserveToken, reserve), foreignSupplyRatio]
-            : undefined
-        })
-      : []
+      return reserve && foreignSupplyRatio ? [new TokenAmount(reserveToken, reserve), foreignSupplyRatio] : undefined
+    })
   }, [allForeignTokens, foreignTotalSupplyResults, getReservesResults, priceOracleDescriptors, totalSupplies])
 }
 
@@ -222,7 +214,6 @@ export function useAllStakedTVL(
   const totalSupplies = useAllTotalSupply(farmablePools)
   const foreignReserves = useAllForeignReserveOf(farmablePools, priceOracleDescriptors, totalSupplies)
 
-  console.log(foreignReserves, 'foreignReserves')
   const priceOracleAddresses = useMemo(
     () => priceOracleDescriptors.map(pod => (!pod.isUsingBaoUsdPrice ? pod.priceOracleAddress : undefined)),
     [priceOracleDescriptors]
@@ -274,14 +265,6 @@ export function useAllStakedTVL(
 
       const priceRaw: string | undefined = rawPriceResults[i].result?.[1]
       const decimals: string | undefined = decimalsResults[i].result?.[0]
-
-      // console.log(
-      //   `${farmablePools[i].symbol}`,
-      //   `priceRaw: ${priceRaw}`,
-      //   `decimals: ${decimals}`,
-      //   `pricedInReserve: ${pricedInReserve?.toFixed(4)}`,
-      //   `ratioStaked: ${ratioStaked?.toFixed(4)}`
-      // )
 
       const decimated = decimals ? JSBI.exponentiate(ten, JSBI.BigInt(decimals.toString())) : undefined
       const fetchedPriceInUsd = isUsingBaoUsdPrice ? baoPriceUsd?.divide(JSBI.BigInt(10)) : undefined

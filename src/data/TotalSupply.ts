@@ -17,20 +17,14 @@ export function useTotalSupply(token?: Token): TokenAmount | undefined {
 }
 
 export function useAllTotalSupply(farmablePools: FarmablePool[]): (TokenAmount | undefined)[] {
-  const tokenAddresses = useMemo(() => farmablePools && farmablePools.map(f => (f.isSushi ? undefined : f.address)), [
-    farmablePools
-  ])
+  const tokenAddresses = useMemo(() => farmablePools && farmablePools.map(f => f.address), [farmablePools])
 
   const totalSupplyResults = useMultipleContractSingleData(tokenAddresses, ERC20_INTERFACE, 'totalSupply')
 
   return useMemo(() => {
-    // console.log(totalSupplyResults, 'totalSupplyResults')
     return totalSupplyResults.map((totalSupplyResult, i) => {
       const token = farmablePools && farmablePools[i].token
-      // console.log(totalSupplyResult)
       const totalSupply: BigNumber | undefined = totalSupplyResult.result?.[0]
-      // console.log(token, 'token')
-      // console.log(totalSupply?.toString(), 'totalSupply')
       return token && totalSupply ? new TokenAmount(token, totalSupply.toString()) : undefined
     })
   }, [farmablePools, totalSupplyResults])
