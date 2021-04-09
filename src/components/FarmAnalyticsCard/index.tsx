@@ -7,7 +7,7 @@ import { AutoColumn } from '../Column'
 import { HoverCard, FixedHeightRow } from '../PositionCard'
 import { RowFixed, AutoRow } from '../Row'
 import { Text } from 'rebass'
-import { ExternalLink } from '../../theme'
+import { ExternalLink, StyledInternalLink } from '../../theme'
 import { PoolInfoFarmablePool } from '../../data/Reserves'
 import Logo from '../Logo'
 import { Fraction, Percent } from 'uniswap-xdai-sdk'
@@ -52,9 +52,9 @@ export function FarmAnalyticsCard({ farmablePool, apy, border, defaultShowMore }
           </RowFixed>
           <RowFixed>
             {apy?.greaterThan('0') && (
-              <ExternalLink href={``}>
+              <StyledInternalLink to="/analytics">
                 {apy.toFixed(0, {})}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY</span>
-              </ExternalLink>
+              </StyledInternalLink>
             )}
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '10px' }} />

@@ -67,7 +67,11 @@ export function PoolBody({
           {allV2PairsWithLiquidity.map(
             v2Pair =>
               v2Pair.liquidityToken.address && (
-                <FullPositionCard key={`pool-${v2Pair.liquidityToken.address}`} pair={v2Pair} />
+                <FullPositionCard
+                  key={`pool-${v2Pair.liquidityToken.address}`}
+                  unstakedLPAmount={v2PairsBalances[v2Pair.liquidityToken.address]}
+                  pair={v2Pair}
+                />
               )
           )}
         </>

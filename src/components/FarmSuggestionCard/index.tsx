@@ -14,7 +14,7 @@ import { AutoColumn } from '../Column'
 import { RowBetween, RowFixed } from '../Row'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { useActiveWeb3React } from '../../hooks'
-import { ExternalLink } from '../../theme'
+import { StyledInternalLink } from '../../theme'
 import { useAPY, useStakedTVL } from '../../hooks/TVL'
 import { useStakedAmount } from '../../data/Staked'
 import { useTotalSupply } from '../../data/TotalSupply'
@@ -102,9 +102,9 @@ export function FarmSuggestionCard({
             <RowFixed>
               <AutoColumn gap="4px">
                 {apy?.greaterThan('0') && (
-                  <ExternalLink href={`https://baoview.xyz/pool-metrics/${farmablePool.pid}`}>
+                  <StyledInternalLink to="/analytics">
                     {apy.toFixed(0, {})}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY</span>
-                  </ExternalLink>
+                  </StyledInternalLink>
                 )}
                 <ButtonSecondary
                   width="4.5rem"
