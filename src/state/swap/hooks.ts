@@ -15,6 +15,7 @@ import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies
 import { SwapState } from './reducer'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
+import { useTranslation } from 'react-i18next'
 
 export function useSwapState(): AppState['swap'] {
   return useSelector<AppState, AppState['swap']>(state => state.swap)
@@ -112,6 +113,7 @@ export function useDerivedSwapInfo(): {
   inputError?: string | undefined
 } {
   const { account } = useActiveWeb3React()
+  const { t } = useTranslation()
 
   const {
     independentField,
@@ -159,7 +161,7 @@ export function useDerivedSwapInfo(): {
   }
 
   if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
-    inputError = inputError ?? 'Select a token'
+    inputError = inputError ?? t('selectToken')
   }
 
   const formattedTo = isAddress(to)

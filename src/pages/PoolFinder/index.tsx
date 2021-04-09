@@ -18,6 +18,7 @@ import { StyledInternalLink } from '../../theme'
 import { currencyId } from '../../utils/currencyId'
 import AppBody from '../AppBody'
 import { Dots } from '../Pool/styleds'
+import { useTranslation } from 'react-i18next'
 
 enum Fields {
   TOKEN0 = 0,
@@ -25,6 +26,7 @@ enum Fields {
 }
 
 export default function PoolFinder() {
+  const { t } = useTranslation()
   const { account } = useActiveWeb3React()
 
   const [showSearch, setShowSearch] = useState<boolean>(false)
@@ -95,7 +97,7 @@ export default function PoolFinder() {
             </Row>
           ) : (
             <Text fontWeight={500} fontSize={20} marginLeft={'12px'}>
-              Select a Token
+              {t('selectToken')}
             </Text>
           )}
         </ButtonDropdownLight>
@@ -119,7 +121,7 @@ export default function PoolFinder() {
             </Row>
           ) : (
             <Text fontWeight={500} fontSize={20} marginLeft={'12px'}>
-              Select a Token
+              {t('selectToken')}
             </Text>
           )}
         </ButtonDropdownLight>
