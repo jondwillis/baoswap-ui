@@ -16,7 +16,7 @@ import { RowFixed, RowBetween, AutoRow } from '../Row'
 import { Dots } from '../swap/styleds'
 import { Text } from 'rebass'
 import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
-import { ExternalLink } from '../../theme'
+import { ExternalLink, StyledInternalLink } from '../../theme'
 import Logo from '../Logo'
 import { useAPY, useStakedTVL } from '../../hooks/TVL'
 import { useTotalSupply } from '../../data/TotalSupply'
@@ -42,7 +42,7 @@ export function FarmPositionCard({
 }: FarmCardProps): JSX.Element {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
-  const { stakedAmount, pendingReward, icon, name, pid } = farmablePool
+  const { stakedAmount, pendingReward, icon, name } = farmablePool
 
   const rewardCurrency = unwrappedToken(pendingReward.token)
 
@@ -130,56 +130,22 @@ export function FarmPositionCard({
             </AutoColumn>
           </RowFixed>
           <RowFixed>
-            {yourStakeTVL && (
-              <AutoColumn justify="end" style={{ paddingRight: 8, maxWidth: '4rem' }}>
-                <Text fontSize="8pt">Your Stake</Text>
-                <BalanceText>{`$${yourStakeTVL.toFixed(2, {})}`}</BalanceText>
-              </AutoColumn>
-            )}
-            <AutoColumn gap="0.1rem">
-              <RowBetween>
-                {apy?.greaterThan('0') && (
-                  <ExternalLink
-                    href={`https://baoview.xyz/pool-metrics/${pid}`}
-                    style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end' }}
-                  >
-                    {apy.toFixed(0, {})}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY ↗</span>
-                  </ExternalLink>
-                )}
-              </RowBetween>
-              <RowFixed>
-                {!showMore ? (
-                  <ButtonSecondary
-                    padding="0.2rem"
-                    style={{ minWidth: '5rem' }}
-                    // paddingLeft="0.5rem"
-                    // paddingRight="0.5rem"
-                    margin="0"
-                    onClick={() => handleHarvestAll()}
-                  >
-                    {attemptingHarvest ? (
-                      <span>
-                        <Dots>Harvesting</Dots>
-                        <IconWrapper pending={attemptingHarvest} success={!attemptingHarvest}>
-                          <Loader />
-                        </IconWrapper>
-                      </span>
-                    ) : (
-                      <span>
-                        <Text color={theme.text5} fontWeight={600}>
-                          Harvest
-                        </Text>
-                        <BalanceText style={{ fontSize: '10pt' }} fontWeight={600}>
-                          <UnlockIcon size="12px" /> {unlockedPending?.toFixed(0, {}) || '-'}{' '}
-                          <span style={{ flexShrink: 1, fontSize: '7pt' }}>{rewardCurrency.symbol}</span>
-                        </BalanceText>
-                      </span>
-                    )}
-                  </ButtonSecondary>
-                ) : (
-                  ''
-                )}
-              </RowFixed>
+            <AutoColumn
+              gap="0.1rem"
+              justify="end"
+              style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end', paddingRight: '0.5rem' }}
+            >
+              {apy?.greaterThan('0') && (
+                <StyledInternalLink to="/analytics">
+                  {apy.toFixed(0, {})}% <span style={{ flexShrink: 1, fontSize: '7pt' }}> APY</span>
+                </StyledInternalLink>
+              )}
+              {yourStakeTVL && (
+                <AutoColumn justify="end">
+                  <Text fontSize="8pt">Your Stake</Text>
+                  <BalanceText>{`$${yourStakeTVL.toFixed(2, {})}`}</BalanceText>
+                </AutoColumn>
+              )}
             </AutoColumn>
             {showMore ? (
               <ChevronUp size="20" style={{ marginLeft: '2px' }} />
@@ -190,7 +156,7 @@ export function FarmPositionCard({
         </FixedHeightRow>
         {showMore && (
           <AutoColumn gap="8px">
-            <FixedHeightRow>
+            <FixedHeightRow style={{ marginTop: '0.5rem' }}>
               <RowFixed>
                 <Text fontSize={16} fontWeight={500}>
                   All Staked TVL (LP):
