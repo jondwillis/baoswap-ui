@@ -4,17 +4,17 @@ import { Web3ReactContextInterface } from '@web3-react/core/dist/types'
 import { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { injected } from '../connectors'
-import { MainNetworkContextName } from '../constants'
+import { ForeignNetworkContextName, NetworkContextName } from '../constants'
 import { useWeb3React } from '@web3-react/core'
 
 export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId } {
-  return useWeb3React<Web3Provider>()
-  // const contextNetwork = useWeb3React<Web3Provider>(NetworkContextName)
-  // return context.active ? context : contextNetwork
+  const context = useWeb3React<Web3Provider>()
+  const contextNetwork = useWeb3React<Web3Provider>(NetworkContextName)
+  return context.active ? context : contextNetwork
 }
 
-export function useMainWeb3React(): Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId } {
-  return useWeb3React<Web3Provider>(MainNetworkContextName)
+export function useForeignWeb3React(): Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId } {
+  return useWeb3React<Web3Provider>(ForeignNetworkContextName)
 }
 
 export function useEagerConnect() {

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { ChainId, Fraction, JSBI, Token, TokenAmount, WETH } from 'uniswap-xdai-sdk'
-import { useActiveWeb3React, useMainWeb3React } from '.'
+import { useActiveWeb3React, useForeignWeb3React } from '.'
 import { FarmablePool, priceOracles, useAllSidechainFarmablePools, useSidechainFarmablePool } from '../constants/bao'
 import { usePair, usePairs, useRewardToken } from '../data/Reserves'
 import {
@@ -83,7 +83,7 @@ function useForeignReserveOf(
   reserveToken: Token | undefined,
   totalSupply: TokenAmount | undefined
 ): [TokenAmount | undefined, Fraction | undefined] | undefined {
-  const mainnetWeb3 = useMainWeb3React()
+  const mainnetWeb3 = useForeignWeb3React()
   const foreignToken = useSidechainFarmablePool(ChainId.MAINNET, farmablePool)?.token
   const foreignTokenContract = useLPContract(foreignToken?.address, false, mainnetWeb3.chainId)
 
@@ -122,7 +122,7 @@ function useAllForeignReserveOf(
   priceOracleDescriptors: PriceOracleDescriptor[],
   totalSupplies: (TokenAmount | undefined)[]
 ): ([TokenAmount | undefined, Fraction | undefined] | undefined)[] {
-  const mainnetWeb3 = useMainWeb3React()
+  const mainnetWeb3 = useForeignWeb3React()
   const allForeignTokens = useAllSidechainFarmablePools(ChainId.MAINNET, farmablePools)
 
   const allForeignTokenAddresses = useMemo(() => allForeignTokens.map(ft => ft?.token.address), [allForeignTokens])

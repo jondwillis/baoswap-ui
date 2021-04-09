@@ -13,7 +13,7 @@ import UNISOCKS_ABI from '../constants/abis/unisocks.json'
 import WETH_ABI from '../constants/abis/weth.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { getContract } from '../utils'
-import { useActiveWeb3React, useMainWeb3React } from './index'
+import { useActiveWeb3React, useForeignWeb3React } from './index'
 import { BAOCX } from '../constants'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { contractAddresses } from '../constants/bao'
@@ -29,7 +29,7 @@ export function useContract(
   overrideChainId?: ChainId
 ): Contract | null {
   const activeWeb3React = useActiveWeb3React()
-  const mainnetWeb3React = useMainWeb3React()
+  const mainnetWeb3React = useForeignWeb3React()
   const usingWeb3React = overrideChainId === ChainId.MAINNET ? mainnetWeb3React : activeWeb3React
   const { library, account } = usingWeb3React
 
@@ -51,7 +51,7 @@ function useAllContracts(
   overrideChainId?: ChainId
 ): (Contract | null)[] {
   const activeWeb3React = useActiveWeb3React()
-  const mainnetWeb3React = useMainWeb3React()
+  const mainnetWeb3React = useForeignWeb3React()
   const usingWeb3React = overrideChainId === ChainId.MAINNET ? mainnetWeb3React : activeWeb3React
   const { library, account } = usingWeb3React
 

@@ -3,9 +3,9 @@ import { useWeb3React } from '@web3-react/core'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
-import { mainnet } from '../../connectors'
+import { foreignNetwork, network } from '../../connectors'
 import { useEagerConnect, useInactiveListener } from '../../hooks'
-import { MainNetworkContextName } from '../../constants'
+import { ForeignNetworkContextName, NetworkContextName } from '../../constants'
 import Loader from '../Loader'
 import { ButtonLight } from '../Button'
 import { useWalletModalToggle } from '../../state/application/hooks'
@@ -24,19 +24,34 @@ const Message = styled.h2`
 export default function Web3ReactManager({ children }: { children: JSX.Element }) {
   const { t } = useTranslation()
   const { active } = useWeb3React()
-  const { active: mainnetworkActive, error: mainnetworkError, activate: mainactivateNetwork } = useWeb3React(
-    MainNetworkContextName
+  const { active: networkActive, error: networkError, activate: activateNetwork } = useWeb3React(NetworkContextName)
+  const { active: foreignNetworkActive, error: foreignNetworkError, activate: foreignActivateNetwork } = useWeb3React(
+    ForeignNetworkContextName
   )
+
   // try to eagerly connect to an injected provider, if it exists and has granted access already
   const triedEager = useEagerConnect()
   const toggleWalletModal = useWalletModalToggle() // toggle wallet when disconnected
 
   // after eagerly trying injected, if the network connect ever isn't active or in an error state, activate itd
   useEffect(() => {
-    if (!mainnetworkActive && !mainnetworkError) {
-      mainactivateNetwork(mainnet)
+    if (triedEager && !networkActive && !networkError && !active) {
+      activateNetwork(network)
     }
-  }, [triedEager, mainnetworkActive, mainnetworkError, mainactivateNetwork, active])
+    if (!foreignNetworkActive && !foreignNetworkError) {
+      foreignActivateNetwork(foreignNetwork)
+    }
+  }, [
+    triedEager,
+    networkActive,
+    networkError,
+    activateNetwork,
+    active,
+    foreignNetworkActive,
+    foreignNetworkError,
+    foreignActivateNetwork
+  ])
+
   // when there's no account connected, react to logins (broadly speaking) on the injected provider, if it exists
   useInactiveListener(!triedEager)
 
@@ -58,7 +73,7 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
   }
 
   // if the account context isn't active, and there's an error on the network context, it's an irrecoverable error
-  if (!active && mainnetworkError) {
+  if (!active && networkError) {
     return (
       <MessageWrapper>
         <Message>{t('unknownError')}</Message>
@@ -68,7 +83,7 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
   }
 
   // if neither context is active, spin
-  if (!active && !mainnetworkActive) {
+  if (!active && !networkActive) {
     return showLoader ? (
       <MessageWrapper>
         <Loader />

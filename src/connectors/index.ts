@@ -8,20 +8,34 @@ import { FortmaticConnector } from './Fortmatic'
 import { NetworkConnector } from './NetworkConnector'
 
 const NETWORK_URL = process.env.REACT_APP_NETWORK_URL
+const FOREIGN_NETWORK_URL = process.env.REACT_APP_FOREIGN_NETWORK_URL
 const FORMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
 const PORTIS_ID = process.env.REACT_APP_PORTIS_ID
 
-export const NETWORK_CHAIN_ID: number = parseInt(process.env.REACT_APP_CHAIN_ID ?? '1')
+export const NETWORK_CHAIN_ID: number = parseInt(process.env.REACT_APP_NETWORK_ID ?? '100')
+export const FOREIGN_NETWORK_CHAIN_ID: number = parseInt(process.env.REACT_APP_FOREIGN_NETWORK_ID ?? '1')
 
 if (typeof NETWORK_URL === 'undefined') {
   throw new Error(`REACT_APP_NETWORK_URL must be a defined environment variable`)
 }
 
-export const mainnet = new NetworkConnector({ urls: { [NETWORK_CHAIN_ID]: NETWORK_URL }, defaultChainId: 1 })
+if (typeof FOREIGN_NETWORK_URL === 'undefined') {
+  throw new Error(`REACT_APP_MAIN_NETWORK_URL must be a defined environment variable`)
+}
+
+export const network = new NetworkConnector({
+  urls: { [NETWORK_CHAIN_ID]: NETWORK_URL },
+  defaultChainId: NETWORK_CHAIN_ID
+})
+
+export const foreignNetwork = new NetworkConnector({
+  urls: { [FOREIGN_NETWORK_CHAIN_ID]: FOREIGN_NETWORK_URL },
+  defaultChainId: FOREIGN_NETWORK_CHAIN_ID
+})
 
 let networkLibrary: Web3Provider | undefined
 export function getNetworkLibrary(): Web3Provider {
-  const library = (networkLibrary = networkLibrary ?? new Web3Provider(mainnet.provider as any))
+  const library = (networkLibrary = networkLibrary ?? new Web3Provider(foreignNetwork.provider as any))
   library.pollingInterval = 15000
   return library
 }

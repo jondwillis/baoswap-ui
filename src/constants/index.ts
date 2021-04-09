@@ -106,8 +106,8 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     mobile: true
   }
 }
-
-export const MainNetworkContextName = 'MAINNET'
+export const NetworkContextName = 'NETWORK'
+export const ForeignNetworkContextName = 'FOREIGN'
 
 // default allowed slippage, in bips
 export const INITIAL_ALLOWED_SLIPPAGE = 50
