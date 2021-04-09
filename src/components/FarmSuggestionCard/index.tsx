@@ -1,4 +1,4 @@
-import { Fraction, Pair, TokenAmount } from 'uniswap-xdai-sdk'
+import { Fraction, Pair } from 'uniswap-xdai-sdk'
 import { darken } from 'polished'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -40,19 +40,11 @@ interface PositionCardProps {
   farmablePool: FarmablePool
   baoPriceUsd: Fraction | undefined | null
   apy: Fraction | undefined
-  unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
 }
 
-export function FarmSuggestionCard({
-  pair,
-  farmablePool,
-  apy,
-  unstakedLPAmount,
-  showUnwrapped = true,
-  border
-}: PositionCardProps) {
+export function FarmSuggestionCard({ pair, farmablePool, apy, showUnwrapped = true, border }: PositionCardProps) {
   const { account } = useActiveWeb3React()
 
   const currency0 = showUnwrapped ? pair.token0 : unwrappedToken(pair.token0)
