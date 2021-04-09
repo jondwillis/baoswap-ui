@@ -19,6 +19,7 @@ import { RedirectOldRemoveLiquidityPathStructure } from './RemoveLiquidity/redir
 import Swap from './Swap'
 import { RedirectPathToSwapOnly, RedirectToSwap } from './Swap/redirects'
 import Analytics from './Analytics'
+import Farm from './Farm'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -75,7 +76,8 @@ export default function App() {
                 <Route exact strict path="/send" component={RedirectPathToSwapOnly} />
                 <Route exact strict path="/find" component={PoolFinder} />
                 <Route exact strict path="/pool" component={Pool} />
-                <Route exact strict path="/create" component={RedirectToAddLiquidity} />    
+                <Route exact strict path="/farm" component={Farm} />
+                <Route exact strict path="/create" component={RedirectToAddLiquidity} />
                 <Route exact strict path="/analytics" component={Analytics} />
                 <Route exact path="/add" component={AddLiquidity} />
                 <Route exact path="/add/:currencyIdA" component={RedirectOldAddLiquidityPathStructure} />

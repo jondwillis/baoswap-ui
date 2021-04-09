@@ -32,6 +32,12 @@ export const HoverCard = styled(Card)`
   }
 `
 
+export const BalanceText = styled(Text)`
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    flex-shrink: 0;
+  `};
+`
+
 interface PositionCardProps {
   pair: Pair
   showUnwrapped?: boolean
