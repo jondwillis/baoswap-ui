@@ -11,7 +11,6 @@ import { unwrappedToken } from '../../utils/wrappedCurrency'
 import { ButtonSecondary, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import { HoverCard, FixedHeightRow, BalanceText } from '../PositionCard'
-import QuestionHelper from '../QuestionHelper'
 import { RowFixed, RowBetween, AutoRow } from '../Row'
 import { Dots } from '../swap/styleds'
 import { Text } from 'rebass'
@@ -131,7 +130,7 @@ export function FarmPositionCard({
           </RowFixed>
           <RowFixed>
             <AutoColumn
-              gap="0.1rem"
+              gap="0.2rem"
               justify="end"
               style={{ minWidth: '5rem', alignContent: 'baseline', textAlign: 'end', paddingRight: '0.5rem' }}
             >
@@ -206,24 +205,36 @@ export function FarmPositionCard({
 
             <RowBetween paddingTop="0.5rem" paddingBottom="0.5rem">
               <AutoColumn style={{ alignContent: 'end', marginRight: 20 }}>
-                <RowBetween>
-                  <ButtonSecondary
-                    onClick={() => handleStake()}
-                    disabled={!(unstakedLPAmount && unstakedLPAmount.greaterThan('0'))}
-                    padding="0.5rem"
-                    style={{ fontWeight: 900, backgroundColor: theme.primary3, padding: '0.2rem', marginBottom: 10 }}
-                  >
-                    +Stake
-                    <QuestionHelper text={`Stakes ALL ${unstakedLPAmount?.toFixed(4, {})} remaining LP Tokens`} />
-                  </ButtonSecondary>
-                </RowBetween>
+                {unstakedLPAmount && unstakedLPAmount.greaterThan('0') ? (
+                  <RowBetween>
+                    <ButtonSecondary
+                      onClick={() => handleStake()}
+                      padding="0.5rem"
+                      style={{
+                        fontWeight: 900,
+                        backgroundColor: theme.primary3,
+                        padding: '0.25rem',
+                        marginBottom: 10,
+                        width: '7rem'
+                      }}
+                    >
+                      + Stake All
+                    </ButtonSecondary>
+                  </RowBetween>
+                ) : (
+                  ''
+                )}
                 <RowBetween>
                   <ButtonSecondary
                     onClick={() => handleUnstake()}
-                    style={{ backgroundColor: theme.red2, padding: '0.2rem' }}
+                    style={{
+                      fontWeight: 700,
+                      backgroundColor: theme.red2,
+                      padding: '0.25rem',
+                      width: '7rem'
+                    }}
                   >
-                    -Stake
-                    <QuestionHelper text={`🚨⚠️Unstakes ALL ${stakedAmount.toFixed(4, {})} staked LP Tokens`} />
+                    - Unstake All
                   </ButtonSecondary>
                 </RowBetween>
               </AutoColumn>

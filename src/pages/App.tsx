@@ -26,6 +26,10 @@ const AppWrapper = styled.div`
   flex-flow: column;
   align-items: flex-start;
   overflow-x: hidden;
+  height: 100%;
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    margin: 0;
+  `};
 `
 
 const HeaderWrapper = styled.div`
@@ -46,15 +50,24 @@ const BodyWrapper = styled.div`
   z-index: 10;
   margin-top: ${isMobile ? '20px' : ''};
 
+  ${({ theme }) => theme.mediaMinWidth.downToExtraSmall`
+    padding: 160px 16px;
+  `};
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-      padding: 16px;
+    padding: 16px 0 0;
   `};
 
+  height: 100%;
   z-index: 1;
 `
 
 const Marginer = styled.div`
-  margin-top: 5rem;
+  ${({ theme }) => theme.mediaMinWidth.downToExtraSmall`
+    margin-top: 5rem;
+  `};
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    margin-top: 1rem;
+  `};
 `
 
 export default function App() {
