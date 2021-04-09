@@ -7,7 +7,7 @@ import { foreignNetwork, network } from '../../connectors'
 import { useEagerConnect, useInactiveListener } from '../../hooks'
 import { ForeignNetworkContextName, NetworkContextName } from '../../constants'
 import Loader from '../Loader'
-import { ButtonLight } from '../Button'
+import { ButtonPrimary } from '../Button'
 import { useWalletModalToggle } from '../../state/application/hooks'
 
 const MessageWrapper = styled.div`
@@ -77,7 +77,7 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
     return (
       <MessageWrapper>
         <Message>{t('unknownError')}</Message>
-        <ButtonLight onClick={toggleWalletModal}>Connect Wallet</ButtonLight>
+        <ButtonPrimary onClick={toggleWalletModal}>Connect Wallet</ButtonPrimary>
       </MessageWrapper>
     )
   }
@@ -87,7 +87,7 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
     return showLoader ? (
       <MessageWrapper>
         <Loader />
-        <ButtonLight onClick={toggleWalletModal}>Connect Wallet</ButtonLight>
+        <ButtonPrimary onClick={toggleWalletModal}>Connect Wallet</ButtonPrimary>
       </MessageWrapper>
     ) : null
   }

@@ -11,7 +11,7 @@ import { ExternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
 import { RowBetween, RowFixed } from '../../components/Row'
-import { ButtonLight, ButtonPrimary, ButtonSecondary } from '../../components/Button'
+import { ButtonPrimary, ButtonSecondary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
 
 import { useActiveWeb3React } from '../../hooks'
@@ -206,7 +206,7 @@ export default function Farm() {
 
           {!account ? (
             <LightCard padding="40px">
-              <ButtonLight onClick={toggleWalletModal}>Connect Wallet</ButtonLight>
+              <ButtonPrimary onClick={toggleWalletModal}>Connect Wallet</ButtonPrimary>
             </LightCard>
           ) : v2IsLoading ? (
             <LightCard padding="40px">
