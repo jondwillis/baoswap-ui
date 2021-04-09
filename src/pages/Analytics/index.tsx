@@ -29,7 +29,7 @@ import useDebounce from '../../hooks/useDebounce'
 export default function Analytics() {
   const { t } = useTranslation()
   const theme = useContext(ThemeContext)
-  const { account } = useActiveWeb3React()
+  const { active } = useActiveWeb3React()
 
   const allFarmablePools = useAllFarmablePools()
   const allNewRewardPerBlock = useAllNewRewardPerBlock(allFarmablePools)
@@ -78,7 +78,7 @@ export default function Analytics() {
             onChange={handleInput}
             disabled={fetchingPoolInfo}
           />
-          {!account ? (
+          {!active ? (
             <LightCard padding="40px">
               <TYPE.body color={theme.text3} textAlign="center">
                 Connect to a wallet to view farmable pools.
