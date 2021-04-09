@@ -218,7 +218,7 @@ export function FarmPositionCard({
                         width: '7rem'
                       }}
                     >
-                      + Stake All
+                      +Stake All
                     </ButtonSecondary>
                   </RowBetween>
                 ) : (
@@ -234,7 +234,7 @@ export function FarmPositionCard({
                       width: '7rem'
                     }}
                   >
-                    - Unstake All
+                    -Unstake All
                   </ButtonSecondary>
                 </RowBetween>
               </AutoColumn>

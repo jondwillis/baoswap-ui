@@ -203,11 +203,11 @@ export default function FullPositionCard({ pair, unstakedLPAmount, border }: Pos
                   <Dots>Approving</Dots>
                 ) : stakeApproval === ApprovalState.NOT_APPROVED ? (
                   <AutoColumn>
-                    <Text>+Stake</Text>
+                    <Text>+Stake All</Text>
                     <Text style={{ fontSize: 10, fontWeight: 700 }}>(needs approval)</Text>
                   </AutoColumn>
                 ) : (
-                  '+Stake'
+                  '+Stake All'
                 )}
                 <QuestionHelper text={`Stakes ALL ${unstakedLPAmount?.toExact()} LP Tokens`} />
               </ButtonSecondary>
