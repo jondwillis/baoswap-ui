@@ -30,7 +30,13 @@ import CurrencySearchModal from '../../components/SearchModal/CurrencySearchModa
 import { useSelectedListUrl } from '../../state/lists/hooks'
 import { useAllFarmablePools } from '../../constants/bao'
 import { BAO, BAOCX } from '../../constants'
-import { useAllNewRewardPerBlock, useBaoUsdPrice } from '../../hooks/TVL'
+import {
+  useAllAPYs,
+  useAllNewRewardPerBlock,
+  useAllPriceOracleDescriptors,
+  useAllStakedTVL,
+  useBaoUsdPrice
+} from '../../hooks/TVL'
 import { FarmState, initialFarmState } from '../../state/farm/reducer'
 import AppBody from '../AppBody'
 
@@ -106,6 +112,12 @@ export default function Farm() {
   const noListSelected = !selectedListUrl
 
   const allNewRewardPerBlock = useAllNewRewardPerBlock(userInfo)
+
+  const allPriceOracles = useAllPriceOracleDescriptors(userInfo)
+
+  const allStakedTVL = useAllStakedTVL(userInfo, allPriceOracles, baoPriceUsd)
+
+  const allAPYs = useAllAPYs(userInfo, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
 
   return (
     <AppBody>
@@ -208,8 +220,9 @@ export default function Farm() {
                 <FarmPositionCard
                   key={farmablePool.address}
                   farmablePool={farmablePool}
-                  newRewardPerBlock={allNewRewardPerBlock[i]}
                   baoPriceUsd={baoPriceUsd}
+                  apy={allAPYs[i]}
+                  allStakedTVL={allStakedTVL[i]}
                   unstakedLPAmount={tokenBalanceMap[farmablePool.address]}
                   defaultShowMore={false}
                 />

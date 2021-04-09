@@ -17,15 +17,16 @@ import { Text } from 'rebass'
 import { Lock as LockIcon, Unlock as UnlockIcon } from 'react-feather'
 import { ExternalLink, StyledInternalLink } from '../../theme'
 import Logo from '../Logo'
-import { useAPY, useStakedTVL } from '../../hooks/TVL'
+import { useStakedTVL } from '../../hooks/TVL'
 import { useTotalSupply } from '../../data/TotalSupply'
 import { FarmState, initialFarmState } from '../../state/farm/reducer'
 
 interface FarmCardProps {
   farmablePool: UserInfoFarmablePool
   unstakedLPAmount?: TokenAmount | undefined | null
-  newRewardPerBlock?: JSBI | undefined
   baoPriceUsd: Fraction | undefined | null
+  apy?: Fraction | undefined
+  allStakedTVL?: Fraction | undefined
   showUnwrapped?: boolean
   border?: string
   defaultShowMore: boolean
@@ -34,8 +35,9 @@ interface FarmCardProps {
 export function FarmPositionCard({
   farmablePool,
   unstakedLPAmount,
-  newRewardPerBlock,
   baoPriceUsd,
+  apy,
+  allStakedTVL,
   border,
   defaultShowMore
 }: FarmCardProps): JSX.Element {
@@ -100,10 +102,7 @@ export function FarmPositionCard({
   const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
     color: ${({ pending, success, theme }) => (pending ? theme.primary1 : success ? theme.green1 : theme.red1)};
   `
-  const allStakedTVL = useStakedTVL(farmablePool, allStakedAmount, totalSupply, baoPriceUsd)
   const yourStakeTVL = useStakedTVL(farmablePool, farmablePool.stakedAmount, totalSupply, baoPriceUsd)
-
-  const apy = useAPY(farmablePool, baoPriceUsd, newRewardPerBlock, allStakedTVL)
 
   return (
     <HoverCard border={border} style={{ backgroundColor: theme.bg2 }}>
