@@ -8,35 +8,72 @@ import {
   useSingleCallResult,
   useSingleContractMultipleData
 } from '../state/multicall/hooks'
-import { UNIV2_INTERFACE, useLPContract, useMasterChefContract, usePriceOracleContract } from './useContract'
-import { BAO } from '../constants'
+import { UNIV2_INTERFACE, useLPContract, useMasterChefContract } from './useContract'
+import { BAO, SUSHI, XDAI_WETH } from '../constants'
 import { BigNumber } from '@ethersproject/bignumber'
-import CHAINLINK_PRICE_ORACLE from '../constants/abis/AggregatorV3Interface.json'
-import { Interface } from 'ethers/lib/utils'
 import { useAllTotalSupply } from '../data/TotalSupply'
 import { useAllStakedAmounts } from '../data/Staked'
+import { CHAINLINK_PRICE_ORACLE_INTERFACE, usePriceOracleContract } from '../constants/abis/Chainlink'
 
 const ten = JSBI.BigInt(10)
 
 export const useBaoUsdPrice = (): Fraction | undefined => {
+  // BAO-XDAI
   const XDAI = WETH[100]
-  const [, pair] = usePair(BAO, XDAI)
+  const [, pair1] = usePair(BAO, XDAI)
   const xDaiUsdOracleAddress = useMemo(() => priceOracles[100][XDAI.address], [XDAI.address])
-  const xDaiUsdOracleContract = usePriceOracleContract(xDaiUsdOracleAddress)
-  const priceRaw: string | undefined = useSingleCallResult(xDaiUsdOracleContract, 'latestRoundData').result?.[1]
-  const decimals: string | undefined = useSingleCallResult(xDaiUsdOracleContract, 'decimals').result?.[0]
+
+  // BAO-WETH
+  const [, pair2] = usePair(BAO, XDAI_WETH)
+  const wethUsdOracleAddress = useMemo(() => priceOracles[100][XDAI_WETH.address], [])
+
+  // BAO-USDC
+  // const [, pair3] = usePair(BAO, USDC)
+  // const usdcUsdOracleAddress = useMemo(() => priceOracles[100][USDC.address], [])
+
+  // BAO-SUSHI
+  const [, pair4] = usePair(BAO, SUSHI)
+  const sushiUsdOracleAddress = useMemo(() => priceOracles[100][SUSHI.address], [])
+
+  const allPriceOracles = [xDaiUsdOracleAddress, wethUsdOracleAddress, sushiUsdOracleAddress]
+
+  const allPairs = useMemo(() => [pair1, pair2, pair4], [pair1, pair2, pair4])
+
+  const priceRawResults = useMultipleContractSingleData(
+    allPriceOracles,
+    CHAINLINK_PRICE_ORACLE_INTERFACE,
+    'latestRoundData',
+    []
+  )
+  const decimalsResults = useMultipleContractSingleData(
+    allPriceOracles,
+    CHAINLINK_PRICE_ORACLE_INTERFACE,
+    'decimals',
+    []
+  )
 
   return useMemo(() => {
-    if (!pair) {
-      return undefined
-    }
-    const priceOfBaoXdai = pair.priceOf(BAO)
-    const decimated = decimals
-      ? JSBI.exponentiate(ten, JSBI.subtract(JSBI.BigInt(decimals.toString()), JSBI.BigInt(1)))
-      : undefined
-    const chainFraction = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
-    return chainFraction ? chainFraction.multiply(priceOfBaoXdai) : undefined
-  }, [pair, decimals, priceRaw])
+    const allPrices = allPairs.map((pair, i) => {
+      if (!pair) {
+        return undefined
+      }
+      const priceOfBao = pair.priceOf(BAO)
+      const priceRaw: BigNumber | undefined = priceRawResults[i].result?.[1]
+      const decimals: BigNumber | undefined = decimalsResults[i].result?.[0]
+      const decimated = decimals
+        ? JSBI.exponentiate(ten, JSBI.subtract(JSBI.BigInt(decimals.toString()), JSBI.BigInt(1)))
+        : undefined
+      const chainFraction = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
+      return chainFraction ? chainFraction.multiply(priceOfBao) : undefined
+    })
+
+    const validPrices = allPrices.flatMap(p => (p instanceof Fraction ? [p] : []))
+    const averagePrice = validPrices
+      .reduce((sum, current) => sum.add(current), new Fraction(JSBI.BigInt(0)))
+      .divide(JSBI.BigInt(validPrices.length))
+
+    return averagePrice
+  }, [allPairs, decimalsResults, priceRawResults])
 }
 
 function useForeignReserveOf(
@@ -79,8 +116,6 @@ function useForeignReserveOf(
     return reserve && foreignSupplyRatio ? [new TokenAmount(reserveToken, reserve), foreignSupplyRatio] : undefined
   }, [result, token0, token1, reserveToken, foreignSupplyRatio, farmablePool.isSushi])
 }
-
-const CHAINLINK_PRICE_ORACLE_INTERFACE = new Interface(CHAINLINK_PRICE_ORACLE.compilerOutput.abi)
 
 function useAllForeignReserveOf(
   farmablePools: FarmablePool[],

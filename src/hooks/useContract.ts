@@ -11,7 +11,6 @@ import BAO from '../constants/abis/bao.json'
 import UNIV2LP from '../constants/abis/uni_v2_lp.json'
 import UNISOCKS_ABI from '../constants/abis/unisocks.json'
 import WETH_ABI from '../constants/abis/weth.json'
-import CHAINLINK_PRICE_ORACLE from '../constants/abis/AggregatorV3Interface.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { getContract } from '../utils'
 import { useActiveWeb3React, useMainWeb3React } from './index'
@@ -23,7 +22,7 @@ import { Interface } from '@ethersproject/abi'
 export const UNIV2_INTERFACE = new Interface(UNIV2LP)
 
 // returns null on errors
-function useContract(
+export function useContract(
   address: string | undefined,
   ABI: any,
   withSignerIfPossible = true,
@@ -124,10 +123,6 @@ export function useBaocxBalance(withSignerIfPossible?: boolean): TokenAmount | u
     balance,
     contract
   ])
-}
-
-export function usePriceOracleContract(address?: string | undefined): Contract | null {
-  return useContract(address, CHAINLINK_PRICE_ORACLE.compilerOutput.abi)
 }
 
 export function useENSRegistrarContract(withSignerIfPossible?: boolean): Contract | null {

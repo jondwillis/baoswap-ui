@@ -11,7 +11,8 @@ type ChainTokenList = {
 }
 
 export const USDC = new Token(ChainId.XDAI, '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83', 6, 'USDC', 'USDC on xDai')
-export const BAO = new Token(ChainId.XDAI, '0x82dFe19164729949fD66Da1a37BC70dD6c4746ce', 18, 'BAO', 'BAO')
+export const SUSHI = new Token(ChainId.XDAI, '0x6B1A2E64403F9a175eEedAdbc88A81e12DA0f864', 18, 'SUSHI', 'SUSHI on xDai')
+export const BAO = new Token(ChainId.XDAI, '0x82dFe19164729949fD66Da1a37BC70dD6c4746ce', 18, 'BAO', 'BAO on xDai')
 export const XDAI_WETH = new Token(
   ChainId.XDAI,
   '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1',
@@ -26,7 +27,7 @@ export const BAOCX = new Token(
   'BAO.cx',
   'BAO Coupon on xDai'
 )
-export const WBTC = new Token(ChainId.XDAI, '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252', 8, 'WBTC', 'WBTC')
+export const WBTC = new Token(ChainId.XDAI, '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252', 8, 'WBTC', 'WBTC on xDai')
 
 const WETH_ONLY: ChainTokenList = {
   [ChainId.MAINNET]: [WETH[ChainId.MAINNET]],
