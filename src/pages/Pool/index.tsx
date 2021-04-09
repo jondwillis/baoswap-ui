@@ -114,7 +114,6 @@ export function PoolBody({
                 farmablePool={pfp.farmablePool}
                 apy={allAPYs[i]}
                 baoPriceUsd={baoPriceUsd}
-                unstakedLPAmount={v2PairsBalances[pfp.pair.liquidityToken.address]}
               />
             ) : (
               <></>
