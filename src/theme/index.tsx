@@ -73,23 +73,23 @@ export function colors(darkMode: boolean): Colors {
     // backgrounds / greys
     bg1: darkMode ? '#212429' : '#FFF8EE',
     bg2: darkMode ? '#2C2F36' : '#FFFCF5',
-    bg3: darkMode ? '#40444F' : '#EDEEF2',
+    bg3: darkMode ? '#363a46' : '#EDEEF2',
     bg4: darkMode ? '#565A69' : '#CED0D9',
     bg5: darkMode ? '#6C7284' : '#888D9B',
 
     //specialty colors
-    modalBG: darkMode ? 'rgba(0,0,0,.425)' : 'rgba(0,0,0,0.3)',
-    advancedBG: darkMode ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.6)',
+    modalBG: darkMode ? '#212429aa' : 'rgba(0,0,0,0.3)',
+    advancedBG: darkMode ? '212429aa' : 'rgba(255,255,255,0.6)',
 
     //primary colors
-    primary1: darkMode ? '#fAa478' : '#AB9585',
-    primary2: darkMode ? '#F07C12' : '#F2E2D7',
-    primary3: darkMode ? '#cF9895' : '#F2E2D7',
-    primary4: darkMode ? '#AB9585' : '#F2E2D7',
-    primary5: darkMode ? '#AB9585' : '#F2E2D7',
+    primary1: darkMode ? '#f2BfAc' : '#c8a991',
+    primary2: darkMode ? '#F07C12' : '#FF8884',
+    primary3: darkMode ? '#F2E2D7' : '#F2E2D7',
+    primary4: darkMode ? '#F2E2D7' : '#F2E2D7',
+    primary5: darkMode ? '#F2E2D7' : '#F2E2D7',
 
     // color text
-    primaryText1: darkMode ? 'rgba(44, 52, 55, 0.8)' : '#5B3A26',
+    primaryText1: darkMode ? '#5B3A26' : '#5B3A26',
 
     // secondary colors
     secondary1: darkMode ? '#30cfbf' : '#1974D2',
@@ -230,6 +230,7 @@ html {
 export const ThemedGlobalStyle = createGlobalStyle`
 html {
   color: ${({ theme }) => theme.text1};
+  background-position: 0 -30vh;
   background-color: ${({ theme }) => theme.grd1};
   background: linear-gradient(111.63deg, ${({ theme }) => theme.grd1} 0%, ${({ theme }) => theme.grd2} 49.48%, ${({
   theme

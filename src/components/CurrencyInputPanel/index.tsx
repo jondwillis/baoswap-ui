@@ -66,7 +66,7 @@ const StyledDropDown = styled(DropDown)<{ selected: boolean }>`
   height: 35%;
 
   path {
-    stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
+    stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.primaryText1)};
     stroke-width: 1.5px;
   }
 `
@@ -88,7 +88,7 @@ const Container = styled.div<{ hideInput: boolean }>`
 const StyledTokenName = styled.span<{ active?: boolean }>`
   ${({ active }) => (active ? '  margin: 0 0.25rem 0 0.75rem;' : '  margin: 0 0.25rem 0 0.25rem;')}
   font-size:  ${({ active }) => (active ? '20px' : '16px')};
-
+  ${({ active, theme }) => (!active ? ` color: ${theme.primaryText1};` : '')}
 `
 
 const StyledBalanceMax = styled.button`
