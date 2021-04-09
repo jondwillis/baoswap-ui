@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { ThemeContext } from 'styled-components'
-import { Fraction, JSBI, Pair, TokenAmount } from 'uniswap-xdai-sdk'
+import { Fraction, Pair, TokenAmount } from 'uniswap-xdai-sdk'
 import { Link } from 'react-router-dom'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
@@ -27,7 +27,7 @@ export interface PoolProps {
     [tokenAddress: string]: TokenAmount | undefined
   }
   allPairCandidatesWithLiquidity: ({ pair: Pair; farmablePool: FarmablePool } | undefined)[]
-  allNewRewardPerBlock: JSBI[]
+  allAPYs: (Fraction | undefined)[]
   baoPriceUsd: Fraction | undefined
 }
 
@@ -36,7 +36,7 @@ export function PoolBody({
   allV2PairsWithLiquidity,
   v2PairsBalances,
   allPairCandidatesWithLiquidity,
-  allNewRewardPerBlock,
+  allAPYs,
   baoPriceUsd
 }: PoolProps) {
   const theme = useContext(ThemeContext)
@@ -112,7 +112,7 @@ export function PoolBody({
                 key={`suggest- ${pfp.pair.liquidityToken.address}`}
                 pair={pfp.pair}
                 farmablePool={pfp.farmablePool}
-                newRewardPerBlock={allNewRewardPerBlock[i]}
+                apy={allAPYs[i]}
                 baoPriceUsd={baoPriceUsd}
                 unstakedLPAmount={v2PairsBalances[pfp.pair.liquidityToken.address]}
               />

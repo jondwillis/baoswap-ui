@@ -1,4 +1,4 @@
-import { Fraction, JSBI, Pair, TokenAmount } from 'uniswap-xdai-sdk'
+import { Fraction, Pair, TokenAmount } from 'uniswap-xdai-sdk'
 import { darken } from 'polished'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -15,9 +15,6 @@ import { RowBetween, RowFixed } from '../Row'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { StyledInternalLink } from '../../theme'
-import { useAPY, useStakedTVL } from '../../hooks/TVL'
-import { useStakedAmount } from '../../data/Staked'
-import { useTotalSupply } from '../../data/TotalSupply'
 import { FarmablePool } from '../../constants/bao'
 import Logo from '../Logo'
 
@@ -42,7 +39,7 @@ interface PositionCardProps {
   pair: Pair
   farmablePool: FarmablePool
   baoPriceUsd: Fraction | undefined | null
-  newRewardPerBlock: JSBI | undefined
+  apy: Fraction | undefined
   unstakedLPAmount?: TokenAmount | undefined | null
   showUnwrapped?: boolean
   border?: string
@@ -51,8 +48,8 @@ interface PositionCardProps {
 export function FarmSuggestionCard({
   pair,
   farmablePool,
-  baoPriceUsd,
-  newRewardPerBlock,
+  apy,
+  unstakedLPAmount,
   showUnwrapped = true,
   border
 }: PositionCardProps) {
@@ -67,13 +64,6 @@ export function FarmSuggestionCard({
 
   const token0Balance = useTokenBalance(account ?? undefined, token0)
   const token1Balance = useTokenBalance(account ?? undefined, token1)
-
-  const stakedAmount = useStakedAmount(farmablePool.token)
-  const totalSupply = useTotalSupply(pair.liquidityToken)
-
-  const allStakedTVL = useStakedTVL(farmablePool, stakedAmount, totalSupply, baoPriceUsd)
-
-  const apy = useAPY(farmablePool, baoPriceUsd, newRewardPerBlock, allStakedTVL)
 
   return (
     <>

@@ -10,7 +10,13 @@ import { useMemo } from 'react'
 import { PoolProps } from '../pages/Pool'
 import { Pair } from 'uniswap-xdai-sdk'
 import { useAllFarmablePools } from '../constants/bao'
-import { useAllNewRewardPerBlock, useBaoUsdPrice } from './TVL'
+import {
+  useAllAPYs,
+  useAllNewRewardPerBlock,
+  useAllPriceOracleDescriptors,
+  useAllStakedTVL,
+  useBaoUsdPrice
+} from './TVL'
 
 export function usePoolProps(): PoolProps {
   const { account } = useActiveWeb3React()
@@ -73,12 +79,18 @@ export function usePoolProps(): PoolProps {
 
   const allNewRewardPerBlock = useAllNewRewardPerBlock(allFarmablePools)
 
+  const allPriceOracles = useAllPriceOracleDescriptors(allFarmablePools)
+
+  const allStakedTVL = useAllStakedTVL(allFarmablePools, allPriceOracles, baoPriceUsd)
+
+  const allAPYs = useAllAPYs(allFarmablePools, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
+
   return {
     v2IsLoading,
     allV2PairsWithLiquidity,
     v2PairsBalances,
     allPairCandidatesWithLiquidity,
-    allNewRewardPerBlock,
+    allAPYs,
     baoPriceUsd
   }
 }
