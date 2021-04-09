@@ -110,35 +110,40 @@ function useAllForeignReserveOf(
     mainnetWeb3
   )
 
-  const foreignSupplyRatios = useMemo(() => {
-    return foreignTotalSupplyResults.map((foreignTotalSupplyResults, i) => {
-      const foreignTotalSupplyResult: string | undefined = foreignTotalSupplyResults.result?.[i]?.[0]
-      const totalSupply = totalSupplies[i]
-      const foreignSupplyTokenAmount = foreignTotalSupplyResult
-        ? new TokenAmount(farmablePools[i].token, foreignTotalSupplyResult)
-        : undefined
-      const foreignSupplyRatio =
-        totalSupply && foreignSupplyTokenAmount ? totalSupply.divide(foreignSupplyTokenAmount) : undefined
-      return foreignSupplyRatio
-    })
-  }, [farmablePools, foreignTotalSupplyResults, totalSupplies])
-
   return useMemo(() => {
-    return priceOracleDescriptors.map((pod, i) => {
-      const { token0, token1, priceOracleBaseToken: reserveToken } = pod
-      const foreignSupplyRatio = foreignSupplyRatios[i]
-      const farmablePool = farmablePools[i]
-      const reserve0Result = getReservesResults[i].result?.[0]
-      const reserve1Result = getReservesResults[i].result?.[1]
-      if (!token0 || !token1 || !reserveToken || !farmablePool.isSushi) {
-        return undefined
-      }
+    return foreignTotalSupplyResults.length == getReservesResults.length &&
+      getReservesResults.length == priceOracleDescriptors.length
+      ? priceOracleDescriptors.map((pod, i) => {
+          const { token0, token1, priceOracleBaseToken: reserveToken } = pod
+          const foreignTotalSupply: BigNumber | undefined = foreignTotalSupplyResults[i].result?.[0]
+          const totalSupply = totalSupplies[i]
+          const reserves = getReservesResults[i].result
+          const token = allForeignTokens[i]?.token
 
-      const reserve: string | undefined = token0 === reserveToken ? reserve0Result : reserve1Result
+          // console.log(reserves, 'reserves')
+          const foreignSupplyTokenAmount =
+            foreignTotalSupply && token ? new TokenAmount(token, foreignTotalSupply.toString()) : undefined
+          const foreignSupplyRatio =
+            totalSupply && foreignSupplyTokenAmount ? totalSupply.divide(foreignSupplyTokenAmount) : undefined
 
-      return reserve && foreignSupplyRatio ? [new TokenAmount(reserveToken, reserve), foreignSupplyRatio] : undefined
-    })
-  }, [farmablePools, foreignSupplyRatios, getReservesResults, priceOracleDescriptors])
+          // const farmablePool = farmablePools[i]
+          const reserve0Result: BigNumber | undefined = reserves?.[0]
+          const reserve1Result: BigNumber | undefined = reserves?.[1]
+          if (!token0 || !token1 || !reserveToken || !reserve0Result || !reserve1Result) {
+            return undefined
+          }
+
+          const reserve: string | undefined =
+            token0 === reserveToken ? reserve0Result.toString() : reserve1Result.toString()
+
+          console.log(foreignSupplyRatio, 'foreignSupplyRatio')
+          // console.log(reserve, 'reserve')
+          return reserve && foreignSupplyRatio
+            ? [new TokenAmount(reserveToken, reserve), foreignSupplyRatio]
+            : undefined
+        })
+      : []
+  }, [allForeignTokens, foreignTotalSupplyResults, getReservesResults, priceOracleDescriptors, totalSupplies])
 }
 
 export interface PriceOracleDescriptor {
@@ -217,6 +222,7 @@ export function useAllStakedTVL(
   const totalSupplies = useAllTotalSupply(farmablePools)
   const foreignReserves = useAllForeignReserveOf(farmablePools, priceOracleDescriptors, totalSupplies)
 
+  console.log(foreignReserves, 'foreignReserves')
   const priceOracleAddresses = useMemo(
     () => priceOracleDescriptors.map(pod => (!pod.isUsingBaoUsdPrice ? pod.priceOracleAddress : undefined)),
     [priceOracleDescriptors]
@@ -282,7 +288,6 @@ export function useAllStakedTVL(
 
       const chainFraction = priceRaw && decimated ? new Fraction(JSBI.BigInt(priceRaw), decimated) : undefined
       const priceInUsd = fetchedPriceInUsd ? fetchedPriceInUsd : chainFraction
-      console.log(priceInUsd?.toFixed(4))
       const tvl =
         priceInUsd &&
         pricedInReserve &&
