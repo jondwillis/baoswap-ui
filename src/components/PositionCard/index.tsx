@@ -20,7 +20,6 @@ import CurrencyLogo from '../CurrencyLogo'
 import DoubleCurrencyLogo from '../DoubleLogo'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
 import { Dots } from '../swap/styleds'
-import QuestionHelper from '../QuestionHelper'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useStake } from '../../hooks/Farm'
 import { useMasterChefContract } from '../../hooks/useContract'
@@ -209,7 +208,6 @@ export default function FullPositionCard({ pair, unstakedLPAmount, border }: Pos
                 ) : (
                   '+Stake All'
                 )}
-                <QuestionHelper text={`Stakes ALL ${unstakedLPAmount?.toExact()} LP Tokens`} />
               </ButtonSecondary>
             ) : (
               <></>
