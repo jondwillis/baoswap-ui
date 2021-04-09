@@ -47,8 +47,7 @@ export function useHarvestAll(
 
 export function useStake(
   farmablePool: FarmablePool | undefined,
-  amount: TokenAmount | null | undefined,
-  ref = '0x2CBb111028393710BFaFe51B2426D0AE496010B9' // TODO: allow users to disable this
+  amount: TokenAmount | null | undefined
 ): { callback?: null | (() => Promise<any>) } {
   const masterChefContract = useMasterChefContract()
   const addTransaction = useTransactionAdder()
@@ -61,19 +60,18 @@ export function useStake(
         amount &&
         async function onStake(): Promise<any> {
           const pid = farmablePool.pid
-          const txReceipt = await masterChefContract.deposit(pid, `0x${amount.raw.toString(16)}`, ref)
+          const txReceipt = await masterChefContract.deposit(pid, `0x${amount.raw.toString(16)}`)
           addTransaction(txReceipt, { summary: `Stake ${amount.toFixed(4)} in ${farmablePool.name} (Pool ID: ${pid})` })
           const txHash = txReceipt.hash
           return txHash
         }
     }
-  }, [addTransaction, masterChefContract, farmablePool, amount, ref])
+  }, [addTransaction, masterChefContract, farmablePool, amount])
 }
 
 export function useUnstake(
   farmablePool: FarmablePool,
-  amount: TokenAmount | null | undefined,
-  ref = '0x2CBb111028393710BFaFe51B2426D0AE496010B9' // TODO: allow users to disable this
+  amount: TokenAmount | null | undefined
 ): { callback?: null | (() => Promise<any>) } {
   const masterChefContract = useMasterChefContract()
   const addTransaction = useTransactionAdder()
@@ -85,7 +83,7 @@ export function useUnstake(
         amount &&
         async function onUnstake(): Promise<any> {
           const pid = farmablePool.pid
-          const txReceipt = await masterChefContract.withdraw(pid, `0x${amount.raw.toString(16)}`, ref)
+          const txReceipt = await masterChefContract.withdraw(pid, `0x${amount.raw.toString(16)}`)
           addTransaction(txReceipt, {
             summary: `Unstake ${amount.toFixed(4)} from ${farmablePool.name} (Pool ID: ${pid})`
           })
@@ -93,5 +91,5 @@ export function useUnstake(
           return txHash
         }
     }
-  }, [addTransaction, masterChefContract, farmablePool, amount, ref])
+  }, [addTransaction, masterChefContract, farmablePool, amount])
 }
