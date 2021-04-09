@@ -102,7 +102,7 @@ const BaoIcon = styled.div`
   :hover {
     transform: rotate(-5deg);
   }
-  img { 
+  img {
     width: 50px;
     height: 50px;
   }
@@ -148,7 +148,7 @@ export default function Header() {
         <HeaderElement>
           <Title href=".">
             <BaoIcon>
-              <img src={Logo} alt="logo"/>
+              <img src={Logo} alt="logo" />
             </BaoIcon>
             <TitleText>
               {/* <img style={{ marginLeft: '4px', marginTop: '4px' }} src={isDark ? WordmarkDark : Wordmark} alt="logo" />*/}
