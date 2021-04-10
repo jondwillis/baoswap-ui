@@ -1,4 +1,4 @@
-import { transparentize } from 'polished'
+import { darken, transparentize } from 'polished'
 import React, { useMemo } from 'react'
 import styled, {
   ThemeProvider as StyledComponentsThemeProvider,
@@ -59,9 +59,9 @@ export function colors(darkMode: boolean): Colors {
     black,
 
     // gradient colors
-    grd1: darkMode ? '#FFC3AB' : '#FFC3AB',
-    grd2: darkMode ? '#fff8ee' : '#fff8ee',
-    grd3: darkMode ? '#FFC3AB' : '#FFC3AB',
+    grd1: darken(darkMode ? 0.05 : 0, '#FFC3AB'),
+    grd2: darken(darkMode ? 0.05 : 0, '#fff8ee'),
+    grd3: darken(darkMode ? 0.05 : 0, '#FFC3AB'),
 
     // text
     text1: darkMode ? '#FFFFFF' : '#000000',
