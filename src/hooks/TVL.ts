@@ -80,7 +80,7 @@ export const useBaocxPrice = (): [Fraction | undefined, Fraction | undefined] =>
   const [, pair] = usePair(BAO, BAOCX)
   const baoPriceUsd = useBaoUsdPrice()
   return [
-    pair ? baoPriceUsd?.multiply(pair.priceOf(BAOCX)).divide(JSBI.BigInt(10)) : undefined,
+    pair ? baoPriceUsd?.divide(JSBI.BigInt(10)).multiply(pair.priceOf(BAOCX)) : undefined,
     pair ? pair.priceOf(BAOCX) : undefined
   ]
 }

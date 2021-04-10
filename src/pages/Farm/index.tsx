@@ -35,7 +35,8 @@ import {
   useAllNewRewardPerBlock,
   useAllPriceOracleDescriptors,
   useAllStakedTVL,
-  useBaoUsdPrice
+  useBaoUsdPrice,
+  useBaocxPrice
 } from '../../hooks/TVL'
 import { FarmState, initialFarmState } from '../../state/farm/reducer'
 import AppBody from '../AppBody'
@@ -119,9 +120,61 @@ export default function Farm() {
 
   const allAPYs = useAllAPYs(userInfo, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
 
+  const [baocxPriceUsd, baocxBaoPrice] = useBaocxPrice()
+  const lockedBaocxBalanceUsd = useMemo(
+    () => (lockedEarnedAmount ? baocxPriceUsd?.multiply(lockedEarnedAmount) : undefined),
+    [baocxPriceUsd, lockedEarnedAmount]
+  )
   return (
     <AppBody>
       <SwapPoolTabs active={'farm'} />
+      <LightCard>
+        <AutoColumn>
+          <RowBetween>
+            <RowBetween>
+              <Text fontSize={16} fontWeight={500}>
+                BAO.cx:
+              </Text>
+            </RowBetween>
+            <b>${baocxPriceUsd ? baocxPriceUsd.toSignificant(5, {}) : '-'}</b>
+          </RowBetween>
+          <RowBetween marginTop="12px">
+            <RowBetween>
+              <Text fontSize={16} fontWeight={500}>
+                BAO per BAO.cx:
+              </Text>
+            </RowBetween>
+            <b>{baocxBaoPrice ? baocxBaoPrice.toSignificant(5, {}) : '-'}</b>
+          </RowBetween>
+          <RowBetween marginTop="12px">
+            <RowFixed>
+              <Text fontSize={16} fontWeight={500}>
+                Locked {rewardToken.symbol}:
+              </Text>
+              <Question
+                text={`Every time you Harvest or change your Stake, you instantly earn 5% of your pending rewards, and the remaining 95% will begin unlocking linearly at xDAI block ${unlockBlock}.`}
+              />
+              <Lock text={`Linear unlock begins in: ${(remainingBlocks / 12 / 60 / 24).toFixed(2)} days`} />
+            </RowFixed>
+            <AutoColumn justify="end">
+              {lockedEarnedAmount ? (
+                <TYPE.body>
+                  <b>{lockedEarnedAmount.toFixed(2, {})}</b>
+                </TYPE.body>
+              ) : (
+                '-'
+              )}
+              {lockedBaocxBalanceUsd ? (
+                <TYPE.body>
+                  <b>${lockedBaocxBalanceUsd.toFixed(2, {})}</b>
+                </TYPE.body>
+              ) : (
+                '-'
+              )}
+            </AutoColumn>
+          </RowBetween>
+        </AutoColumn>
+      </LightCard>
       <AutoColumn gap="lg" justify="center">
         <AutoColumn gap="12px" style={{ width: '100%' }}>
           {chainId && masterChefContract && (
@@ -132,6 +185,7 @@ export default function Farm() {
                   <b title={masterChefContract.address}>{shortenAddress(masterChefContract.address)} ↗</b>
                 </TYPE.body>
               </ExternalLink>
+
               <AutoColumn gap="6px">
                 <RowBetween>
                   <ButtonPrimary
@@ -176,26 +230,6 @@ export default function Farm() {
               </AutoColumn>
             </RowBetween>
           )}
-          <RowBetween padding={'0 8px'}>
-            <RowFixed>
-              <Text fontSize={16} fontWeight={500}>
-                Locked {rewardToken.symbol}:
-              </Text>
-            </RowFixed>
-            <RowFixed>
-              {lockedEarnedAmount ? (
-                <TYPE.body>
-                  <b>{lockedEarnedAmount.toFixed(2, {})}</b>
-                </TYPE.body>
-              ) : (
-                '-'
-              )}
-              <Question
-                text={`Every time you Harvest or change your Stake, you instantly earn 5% of your pending rewards, and the remaining 95% will begin unlocking linearly at xDAI block ${unlockBlock}.`}
-              />
-              <Lock text={`Linear unlock begins in: ${(remainingBlocks / 12 / 60 / 24).toFixed(2)} days`} />
-            </RowFixed>
-          </RowBetween>
 
           <RowBetween padding={'0 8px'}>
             <Text color={theme.text1} fontWeight={500}>
