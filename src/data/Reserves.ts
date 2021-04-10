@@ -131,8 +131,6 @@ export function useUserInfoFarmablePools(pairFarmablePools: FarmablePool[]): [Us
       .filter(({ stakedAmount }) => stakedAmount.greaterThan('0'))
   }, [pairFarmablePools, results, pendingRewardResults, baoRewardToken])
 
-  console.log(userInfoFarmablePool, 'userInfoFarmablePool')
-
   return [userInfoFarmablePool, anyLoading]
 }
 
