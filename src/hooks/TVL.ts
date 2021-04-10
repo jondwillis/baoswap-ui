@@ -9,7 +9,7 @@ import {
   useSingleContractMultipleData
 } from '../state/multicall/hooks'
 import { UNIV2_INTERFACE, useLPContract, useMasterChefContract } from './useContract'
-import { BAO, SUSHI, XDAI_WETH } from '../constants'
+import { BAO, BAOCX, SUSHI, XDAI_WETH } from '../constants'
 import { BigNumber } from '@ethersproject/bignumber'
 import { useAllTotalSupply } from '../data/TotalSupply'
 import { useAllStakedAmounts } from '../data/Staked'
@@ -74,6 +74,15 @@ export const useBaoUsdPrice = (): Fraction | undefined => {
 
     return averagePrice
   }, [allPairs, decimalsResults, priceRawResults])
+}
+
+export const useBaocxPrice = (): [Fraction | undefined, Fraction | undefined] => {
+  const [, pair] = usePair(BAO, BAOCX)
+  const baoPriceUsd = useBaoUsdPrice()
+  return [
+    pair ? baoPriceUsd?.multiply(pair.priceOf(BAOCX)).divide(JSBI.BigInt(10)) : undefined,
+    pair ? pair.priceOf(BAOCX) : undefined
+  ]
 }
 
 function useForeignReserveOf(
