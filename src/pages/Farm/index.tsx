@@ -202,15 +202,13 @@ export default function Farm() {
                       </span>
                     ) : (
                       <span>
-                        <Text color={theme.text5} fontWeight={600}>
-                          Harvest All
-                        </Text>
-                        <BalanceText style={{ flexShrink: 0, textAlign: 'end' }} pr="0.5rem" fontWeight={800}>
+                        <Text fontWeight={700}>Harvest All</Text>
+                        <BalanceText style={{ flexShrink: 0, textAlign: 'end' }} pr="0.5rem" fontWeight={500}>
                           &nbsp;&nbsp;
-                          <UnlockIcon size="14px" /> {unlockedPending?.toFixed(0) || '-'}{' '}
+                          <UnlockIcon size="14px" /> <b>{unlockedPending?.toFixed(0) || '-'} </b>
                           <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
                           <br />
-                          + <LockIcon size="14px" /> {lockedPending?.toFixed(0) || '-'}{' '}
+                          + <LockIcon size="14px" /> <b>{lockedPending?.toFixed(0) || '-'} </b>
                           <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
                         </BalanceText>
                       </span>
