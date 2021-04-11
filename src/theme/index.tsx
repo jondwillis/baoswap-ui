@@ -1,4 +1,4 @@
-import { darken, transparentize } from 'polished'
+import { complement, darken, lighten, transparentize } from 'polished'
 import React, { useMemo } from 'react'
 import styled, {
   ThemeProvider as StyledComponentsThemeProvider,
@@ -59,9 +59,9 @@ export function colors(darkMode: boolean): Colors {
     black,
 
     // gradient colors
-    grd1: darken(darkMode ? 0.05 : 0, '#FFC3AB'),
-    grd2: darken(darkMode ? 0.05 : 0, '#fff8ee'),
-    grd3: darken(darkMode ? 0.05 : 0, '#FFC3AB'),
+    grd1: darken(darkMode ? 0.1 : 0.05, '#fff8ee'),
+    grd2: lighten(darkMode ? 0.05 : 0.05, '#fff8ee'),
+    grd3: darken(darkMode ? 0.1 : 0.1, '#fff8ee'),
 
     // text
     text1: darkMode ? '#FFFFFF' : '#000000',
@@ -71,7 +71,7 @@ export function colors(darkMode: boolean): Colors {
     text5: darkMode ? '#2C2F36' : '#EDEEF2',
 
     // backgrounds / greys
-    bg1: darkMode ? '#212429' : '#FFF8EE',
+    bg1: darkMode ? '#212429' : lighten(0.05, '#FFF8EE'),
     bg2: darkMode ? '#2C2F36' : '#FFFCF5',
     bg3: darkMode ? '#363a46' : '#EDEEF2',
     bg4: darkMode ? '#565A69' : '#CED0D9',
@@ -82,14 +82,14 @@ export function colors(darkMode: boolean): Colors {
     advancedBG: darkMode ? transparentize(0.2, '#212429') : 'rgba(255,255,255,0.6)',
 
     //primary colors
-    primary1: darkMode ? '#f2BfAc' : '#c8a991',
-    primary2: darkMode ? '#F07C12' : '#FF8884',
-    primary3: darkMode ? '#F2E2D7' : '#F2E2D7',
-    primary4: darkMode ? '#F2E2D7' : '#F2E2D7',
-    primary5: darkMode ? '#F2E2D7' : '#F2E2D7',
+    primary1: darken(darkMode ? 0.1 : 0.35, complement(darken(darkMode ? 0.1 : 0.05, '#fff8ee'))),
+    primary2: lighten(darkMode ? 0.05 : 0.1, complement(lighten(darkMode ? 0.05 : 0.05, '#fff8ee'))),
+    primary3: lighten(darkMode ? 0.1 : 0.2, complement(darkMode ? '#363a46' : '#EDEEF2')),
+    primary4: lighten(darkMode ? 0.1 : 0.2, complement(darkMode ? '#565A69' : '#CED0D9')),
+    primary5: lighten(darkMode ? 0.1 : 0.2, complement(darkMode ? '#6C7284' : '#888D9B')),
 
     // color text
-    primaryText1: darkMode ? '#5B3A26' : '#5B3A26',
+    primaryText1: '#FFFFFF',//darkMode ? '#5B3A26' : '#5B3A26',
 
     // secondary colors
     secondary1: darkMode ? '#30cfbf' : '#1974D2',
