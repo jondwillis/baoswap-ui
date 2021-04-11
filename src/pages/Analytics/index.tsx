@@ -6,7 +6,7 @@ import Question from '../../components/QuestionHelper'
 import { TYPE } from '../../theme'
 import { Text } from 'rebass'
 import { LightCard } from '../../components/Card'
-import { RowBetween } from '../../components/Row'
+import { RowBetween, RowFixed } from '../../components/Row'
 import { AutoColumn } from '../../components/Column'
 import { SearchInput } from './styleds'
 
@@ -25,6 +25,8 @@ import {
 } from '../../hooks/TVL'
 import AppBody from '../AppBody'
 import useDebounce from '../../hooks/useDebounce'
+import Toggle from '../../components/Toggle'
+import { useSortByAPYManager } from '../../state/user/hooks'
 
 export default function Analytics() {
   const { t } = useTranslation()
@@ -48,6 +50,7 @@ export default function Analytics() {
     const input = event.target.value
     setSearchQuery(input)
   }, [])
+  const [sortByAPY, toggleSortByAPY] = useSortByAPYManager()
 
   const baoPriceUsd = useBaoUsdPrice()
 
@@ -57,7 +60,40 @@ export default function Analytics() {
 
   const allAPYs = useAllAPYs(poolInfo, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
 
+  const sortedAndFilteredPools = useMemo(() => {
+    const combined = poolInfo.map((farm, i) => {
+      return {
+        ...farm,
+        apy: allAPYs[i]
+      }
+    })
+
+    const filteredPools = combined.filter(
+      farm =>
+        farm.symbol
+          .split(' ')[0]
+          .toLowerCase()
+          .includes(query) || farm.name.toLowerCase().includes(query)
+    )
+
+    if (sortByAPY) {
+      return filteredPools.sort(({ apy: apy0 }, { apy: apy1 }) => {
+        if (!apy0 && !apy1) {
+          return 0
+        } else if (!apy0) {
+          return 1
+        } else if (!apy1) {
+          return -1
+        } else {
+          return apy0.greaterThan(apy1) ? -1 : apy0.equalTo(apy1) ? 0 : 1
+        }
+      })
+    }
+    return combined
+  }, [allAPYs, poolInfo, query, sortByAPY])
+
   const isLoading = fetchingPoolInfo
+
   return (
     <AppBody>
       <SwapPoolTabs active={'analytics'} />
@@ -78,6 +114,12 @@ export default function Analytics() {
             onChange={handleInput}
             disabled={fetchingPoolInfo}
           />
+          <RowBetween>
+            Sort by APY (high to low):
+            <RowFixed>
+              <Toggle isActive={sortByAPY} toggle={toggleSortByAPY} />
+            </RowFixed>
+          </RowBetween>
           {!active ? (
             <LightCard padding="40px">
               <TYPE.body color={theme.text3} textAlign="center">
@@ -90,25 +132,16 @@ export default function Analytics() {
                 <Dots>Loading</Dots>
               </TYPE.body>
             </LightCard>
-          ) : poolInfo.length > 0 ? (
+          ) : sortedAndFilteredPools.length > 0 ? (
             <>
-              {poolInfo.map((farm, i) => {
-                const included =
-                  farm.symbol
-                    .split(' ')[0]
-                    .toLowerCase()
-                    .includes(query) || farm.name.toLowerCase().includes(query)
-                return included ? (
-                  <FarmAnalyticsCard
-                    key={`analytics-${farm.address}`}
-                    farmablePool={farm}
-                    apy={allAPYs[i]}
-                    defaultShowMore={false}
-                  />
-                ) : (
-                  ''
-                )
-              })}
+              {sortedAndFilteredPools.map(farm => (
+                <FarmAnalyticsCard
+                  key={`analytics-${farm.address}`}
+                  farmablePool={farm}
+                  apy={farm.apy}
+                  defaultShowMore={false}
+                />
+              ))}
             </>
           ) : (
             <LightCard padding="40px">
