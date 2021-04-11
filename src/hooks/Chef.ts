@@ -4,6 +4,10 @@ import { FarmablePool } from '../bao/lib/constants'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { useMasterChefContract } from './useContract'
 
+const TX_OVERRIDES = {
+  gasPrice: 1000000000, // 1 GWEI is sufficient on XDAI chain.
+}
+
 export enum HarvestState {
   UNKNOWN,
   PENDING,
@@ -24,7 +28,7 @@ export function useHarvestAll(
         async function onHarvestAll(): Promise<any[]> {
           return await Promise.all(
             farmablePools.map(async farm => {
-              const txReceipt = await masterChefContract.claimReward(farm.pid)
+              const txReceipt = await masterChefContract.claimReward(farm.pid, TX_OVERRIDES)
               addTransaction(txReceipt, { summary: `Harvest ${farm.name} (Pool ID: ${farm.pid})` })
               const txHash = txReceipt.hash
               return txHash
@@ -61,7 +65,7 @@ export function useStake(
         amount &&
         async function onStake(): Promise<any> {
           const pid = farmablePool.pid
-          const txReceipt = await masterChefContract.deposit(pid, `0x${amount.raw.toString(16)}`, ref)
+          const txReceipt = await masterChefContract.deposit(pid, `0x${amount.raw.toString(16)}`, ref, TX_OVERRIDES)
           addTransaction(txReceipt, { summary: `Stake ${amount.toFixed(4)} in ${farmablePool.name} (Pool ID: ${pid})` })
           const txHash = txReceipt.hash
           return txHash
@@ -85,7 +89,7 @@ export function useUnstake(
         amount &&
         async function onUnstake(): Promise<any> {
           const pid = farmablePool.pid
-          const txReceipt = await masterChefContract.withdraw(pid, `0x${amount.raw.toString(16)}`, ref)
+          const txReceipt = await masterChefContract.withdraw(pid, `0x${amount.raw.toString(16)}`, ref, TX_OVERRIDES)
           addTransaction(txReceipt, {
             summary: `Unstake ${amount.toFixed(4)} from ${farmablePool.name} (Pool ID: ${pid})`
           })
