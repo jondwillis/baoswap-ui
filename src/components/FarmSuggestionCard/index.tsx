@@ -9,7 +9,7 @@ import { currencyId } from '../../utils/currencyId'
 import { unwrappedToken } from '../../utils/wrappedCurrency'
 import { ButtonSecondary } from '../Button'
 
-import Card, { GreyCard } from '../Card'
+import Card from '../Card'
 import { AutoColumn } from '../Column'
 import { RowBetween, RowFixed } from '../Row'
 import { useTokenBalance } from '../../state/wallet/hooks'
@@ -59,7 +59,7 @@ export function FarmSuggestionCard({ pair, farmablePool, apy, showUnwrapped = tr
 
   return (
     <>
-      <GreyCard border={border}>
+      <HoverCard border={border}>
         <AutoColumn gap="12px">
           <FixedHeightRow padding="1.5rem 0" onClick={() => setShowMore(!showMore)}>
             <RowFixed>
@@ -130,7 +130,7 @@ export function FarmSuggestionCard({ pair, farmablePool, apy, showUnwrapped = tr
             </FixedHeightRow>
           </AutoColumn>
         </AutoColumn>
-      </GreyCard>
+      </HoverCard>
     </>
   )
 }
