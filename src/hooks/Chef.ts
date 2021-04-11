@@ -5,7 +5,7 @@ import { useTransactionAdder } from '../state/transactions/hooks'
 import { useMasterChefContract } from './useContract'
 
 const TX_OVERRIDES = {
-  gasPrice: 1000000000, // 1 GWEI is sufficient on XDAI chain.
+  gasPrice: 1000000000 // 1 GWEI is sufficient on XDAI chain.
 }
 
 export enum HarvestState {
