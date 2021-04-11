@@ -72,24 +72,24 @@ export function colors(darkMode: boolean): Colors {
 
     // backgrounds / greys
     bg1: darkMode ? '#212429' : lighten(0.05, '#FFF8EE'),
-    bg2: darkMode ? '#2C2F36' : '#FFFCF5',
-    bg3: darkMode ? '#363a46' : '#EDEEF2',
-    bg4: darkMode ? '#565A69' : '#CED0D9',
-    bg5: darkMode ? '#6C7284' : '#888D9B',
+    bg2: darkMode ? lighten(0.05, '#212429') : '#FFF8EE',
+    bg3: darkMode ? lighten(0.2, '#212429') : '#EDEEF2',
+    bg4: darkMode ? lighten(0.25, '#212429') : '#CED0D9',
+    bg5: darkMode ? lighten(0.3, '#212429') : '#888D9B',
 
     //specialty colors
     modalBG: darkMode ? transparentize(0.3, '#212429') : 'rgba(0,0,0,0.3)',
     advancedBG: darkMode ? transparentize(0.2, '#212429') : 'rgba(255,255,255,0.6)',
 
     //primary colors
-    primary1: darken(darkMode ? 0.1 : 0.35, complement(darken(darkMode ? 0.1 : 0.05, '#fff8ee'))),
-    primary2: lighten(darkMode ? 0.05 : 0.1, complement(lighten(darkMode ? 0.05 : 0.05, '#fff8ee'))),
+    primary1: darken(0.2, complement(darken(darkMode ? 0.1 : 0.05, '#fff8ee'))),
+    primary2: lighten(darkMode ? 0.05 : 0.1, complement('#fff8ee')),
     primary3: lighten(darkMode ? 0.1 : 0.2, complement(darkMode ? '#363a46' : '#EDEEF2')),
     primary4: lighten(darkMode ? 0.1 : 0.2, complement(darkMode ? '#565A69' : '#CED0D9')),
     primary5: lighten(darkMode ? 0.1 : 0.2, complement(darkMode ? '#6C7284' : '#888D9B')),
 
     // color text
-    primaryText1: '#FFFFFF',//darkMode ? '#5B3A26' : '#5B3A26',
+    primaryText1: lighten(0.9, darkMode ? '#212429' : '#FFF8EE'),
 
     // secondary colors
     secondary1: darkMode ? '#30cfbf' : '#1974D2',
