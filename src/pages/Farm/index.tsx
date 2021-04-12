@@ -189,7 +189,7 @@ export default function Farm() {
                   </TYPE.body>
                 </ExternalLink>
 
-                <AutoColumn gap="6px">
+                <AutoColumn gap="6px" style={{ marginTop: '6px' }}>
                   <RowBetween>
                     <ButtonPrimary
                       padding="0.5rem"
