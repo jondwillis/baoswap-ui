@@ -39,6 +39,8 @@ import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import AppBody from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 import { addTokenToMetamask } from '../../utils/addTokenToMetamask'
+import { PoolBody } from '../Pool'
+import { usePoolProps } from '../../hooks/Pool'
 
 export default function Swap() {
   const loadedUrlParams = useDefaultsFromURLSearch()
@@ -459,6 +461,10 @@ export default function Swap() {
         </Wrapper>
       </AppBody>
       <AdvancedSwapDetailsDropdown trade={trade} />
+      <div style={{ marginBottom: '10px' }} />
+      <AppBody>
+        <PoolBody {...usePoolProps()} />
+      </AppBody>
     </>
   )
 }

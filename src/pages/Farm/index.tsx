@@ -40,6 +40,8 @@ import {
 } from '../../hooks/TVL'
 import { FarmState, initialFarmState } from '../../state/farm/reducer'
 import AppBody from '../AppBody'
+import { PoolBody } from '../Pool'
+import { usePoolProps } from '../../hooks/Pool'
 
 export default function Farm() {
   const theme = useContext(ThemeContext)
@@ -126,168 +128,174 @@ export default function Farm() {
     [baocxPriceUsd, lockedEarnedAmount]
   )
   return (
-    <AppBody>
-      <SwapPoolTabs active={'farm'} />
-      <LightCard>
-        <AutoColumn>
-          <RowBetween>
+    <>
+      <AppBody>
+        <SwapPoolTabs active={'farm'} />
+        <LightCard>
+          <AutoColumn>
             <RowBetween>
-              <Text fontSize={16} fontWeight={500}>
-                BAO.cx:
-              </Text>
+              <RowBetween>
+                <Text fontSize={16} fontWeight={500}>
+                  BAO.cx:
+                </Text>
+              </RowBetween>
+              <b>${baocxPriceUsd ? baocxPriceUsd.toSignificant(5, {}) : '-'}</b>
             </RowBetween>
-            <b>${baocxPriceUsd ? baocxPriceUsd.toSignificant(5, {}) : '-'}</b>
-          </RowBetween>
-          <RowBetween marginTop="12px">
-            <RowBetween>
-              <Text fontSize={16} fontWeight={500}>
-                BAO per BAO.cx:
-              </Text>
+            <RowBetween marginTop="12px">
+              <RowBetween>
+                <Text fontSize={16} fontWeight={500}>
+                  BAO per BAO.cx:
+                </Text>
+              </RowBetween>
+              <b>{baocxBaoPrice ? baocxBaoPrice.toSignificant(5, {}) : '-'}</b>
             </RowBetween>
-            <b>{baocxBaoPrice ? baocxBaoPrice.toSignificant(5, {}) : '-'}</b>
-          </RowBetween>
-          <RowBetween marginTop="12px">
-            <RowFixed>
-              <Text fontSize={16} fontWeight={500}>
-                Locked {rewardToken.symbol}:
-              </Text>
-              <Question
-                text={`Every time you Harvest or change your Stake, you instantly earn 5% of your pending rewards, and the remaining 95% will begin unlocking linearly at xDAI block ${unlockBlock}.`}
-              />
-              <Lock text={`Linear unlock begins in: ${(remainingBlocks / 12 / 60 / 24).toFixed(2)} days`} />
-            </RowFixed>
-            <AutoColumn justify="end">
-              {lockedEarnedAmount ? (
-                <TYPE.body>
-                  <b>{lockedEarnedAmount.toFixed(2, {})}</b>
-                </TYPE.body>
-              ) : (
-                '-'
-              )}
-              {lockedBaocxBalanceUsd ? (
-                <TYPE.body>
-                  <b>${lockedBaocxBalanceUsd.toFixed(2, {})}</b>
-                </TYPE.body>
-              ) : (
-                '-'
-              )}
-            </AutoColumn>
-          </RowBetween>
-        </AutoColumn>
-      </LightCard>
-      <AutoColumn gap="lg" justify="center">
-        <AutoColumn gap="12px" style={{ width: '100%' }}>
-          {chainId && masterChefContract && (
-            <RowBetween padding={'0 8px'}>
-              <ExternalLink id="link" href={getEtherscanLink(chainId, masterChefContract.address, 'address')}>
-                BaoMasterFarmer Contract
-                <TYPE.body color={theme.text3}>
-                  <b title={masterChefContract.address}>{shortenAddress(masterChefContract.address)} ↗</b>
-                </TYPE.body>
-              </ExternalLink>
-
-              <AutoColumn gap="6px">
-                <RowBetween>
-                  <ButtonPrimary
-                    padding="0.5rem"
-                    onClick={() => handleHarvestAll()}
-                    disabled={attemptingHarvest || !account || v2IsLoading}
-                  >
-                    {attemptingHarvest ? (
-                      <span>
-                        <Dots>Harvesting</Dots>
-                        <IconWrapper pending={attemptingHarvest} success={!attemptingHarvest}>
-                          <Loader />
-                        </IconWrapper>
-                      </span>
-                    ) : (
-                      <span>
-                        <Text fontWeight={700}>Harvest All</Text>
-                        <BalanceText style={{ flexShrink: 0, textAlign: 'end' }} pr="0.5rem" fontWeight={500}>
-                          &nbsp;&nbsp;
-                          <UnlockIcon size="14px" /> <b>{unlockedPending?.toFixed(0) || '-'} </b>
-                          <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
-                          <br />
-                          + <LockIcon size="14px" /> <b>{lockedPending?.toFixed(0) || '-'} </b>
-                          <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
-                        </BalanceText>
-                      </span>
-                    )}
-                  </ButtonPrimary>
-                </RowBetween>
-                {baocxBalance?.greaterThan('0') ? (
-                  <RowBetween>
-                    <ButtonSecondary padding="0.5rem" as={Link} to={`swap/${BAOCX.address}/${BAO.address}`}>
-                      <Text fontWeight={600}>Swap BAO.cx</Text>
-                      <ChevronRight />
-                    </ButtonSecondary>
-                  </RowBetween>
+            <RowBetween marginTop="12px">
+              <RowFixed>
+                <Text fontSize={16} fontWeight={500}>
+                  Locked {rewardToken.symbol}:
+                </Text>
+                <Question
+                  text={`Every time you Harvest or change your Stake, you instantly earn 5% of your pending rewards, and the remaining 95% will begin unlocking linearly at xDAI block ${unlockBlock}.`}
+                />
+                <Lock text={`Linear unlock begins in: ${(remainingBlocks / 12 / 60 / 24).toFixed(2)} days`} />
+              </RowFixed>
+              <AutoColumn justify="end">
+                {lockedEarnedAmount ? (
+                  <TYPE.body>
+                    <b>{lockedEarnedAmount.toFixed(2, {})}</b>
+                  </TYPE.body>
                 ) : (
-                  ''
+                  '-'
+                )}
+                {lockedBaocxBalanceUsd ? (
+                  <TYPE.body>
+                    <b>${lockedBaocxBalanceUsd.toFixed(2, {})}</b>
+                  </TYPE.body>
+                ) : (
+                  '-'
                 )}
               </AutoColumn>
             </RowBetween>
-          )}
-
-          <RowBetween padding={'0 8px'}>
-            <Text color={theme.text1} fontWeight={500}>
-              Your Staked Liquidity Pools:
-            </Text>
-            <Question text="After you add liquidity to a pair, you are able to stake your position to earn BAOcx." />
-          </RowBetween>
-
-          {!account ? (
-            <LightCard padding="40px">
-              <ButtonPrimary onClick={toggleWalletModal}>Connect Wallet</ButtonPrimary>
-            </LightCard>
-          ) : v2IsLoading ? (
-            <LightCard padding="40px">
-              <TYPE.body color={theme.text3} textAlign="center">
-                <Dots>Loading</Dots>
-              </TYPE.body>
-            </LightCard>
-          ) : userInfo?.length > 0 ? (
-            <>
-              {userInfo.map((farmablePool, i) => (
-                <FarmPositionCard
-                  key={farmablePool.address}
-                  farmablePool={farmablePool}
-                  baoPriceUsd={baoPriceUsd}
-                  apy={allAPYs[i]}
-                  allStakedTVL={allStakedTVL[i]}
-                  unstakedLPAmount={tokenBalanceMap[farmablePool.address]}
-                  defaultShowMore={false}
-                />
-              ))}
-            </>
-          ) : (
-            <LightCard padding="40px">
-              {noListSelected ? (
-                <CurrencySearchModal
-                  isOpen={noListSelected}
-                  onCurrencySelect={() => {
-                    /* no-op */
-                  }}
-                  onDismiss={() => {
-                    /* no-op */
-                  }}
-                />
-              ) : (
-                <>
-                  <TYPE.body color={theme.text3} textAlign="center">
-                    No staked liquidity found.
+          </AutoColumn>
+        </LightCard>
+        <AutoColumn gap="lg" justify="center">
+          <AutoColumn gap="12px" style={{ width: '100%' }}>
+            {chainId && masterChefContract && (
+              <RowBetween padding={'0 8px'}>
+                <ExternalLink id="link" href={getEtherscanLink(chainId, masterChefContract.address, 'address')}>
+                  BaoMasterFarmer Contract
+                  <TYPE.body color={theme.text3}>
+                    <b title={masterChefContract.address}>{shortenAddress(masterChefContract.address)} ↗</b>
                   </TYPE.body>
-                  <ButtonPrimary id="join-pool-button" as={Link} style={{ marginTop: 16 }} to="/add/ETH">
-                    <Text fontWeight={500} fontSize={20}>
-                      Add Liquidity
-                    </Text>
-                  </ButtonPrimary>
-                </>
-              )}
-            </LightCard>
-          )}
+                </ExternalLink>
+
+                <AutoColumn gap="6px">
+                  <RowBetween>
+                    <ButtonPrimary
+                      padding="0.5rem"
+                      onClick={() => handleHarvestAll()}
+                      disabled={attemptingHarvest || !account || v2IsLoading}
+                    >
+                      {attemptingHarvest ? (
+                        <span>
+                          <Dots>Harvesting</Dots>
+                          <IconWrapper pending={attemptingHarvest} success={!attemptingHarvest}>
+                            <Loader />
+                          </IconWrapper>
+                        </span>
+                      ) : (
+                        <span>
+                          <Text fontWeight={700}>Harvest All</Text>
+                          <BalanceText style={{ flexShrink: 0, textAlign: 'end' }} pr="0.5rem" fontWeight={500}>
+                            &nbsp;&nbsp;
+                            <UnlockIcon size="14px" /> <b>{unlockedPending?.toFixed(0) || '-'} </b>
+                            <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
+                            <br />
+                            + <LockIcon size="14px" /> <b>{lockedPending?.toFixed(0) || '-'} </b>
+                            <span style={{ flexShrink: 1, fontSize: '8pt' }}>{rewardToken.symbol}</span>
+                          </BalanceText>
+                        </span>
+                      )}
+                    </ButtonPrimary>
+                  </RowBetween>
+                  {baocxBalance?.greaterThan('0') ? (
+                    <RowBetween>
+                      <ButtonSecondary padding="0.5rem" as={Link} to={`swap/${BAOCX.address}/${BAO.address}`}>
+                        <Text fontWeight={600}>Swap BAO.cx</Text>
+                        <ChevronRight />
+                      </ButtonSecondary>
+                    </RowBetween>
+                  ) : (
+                    ''
+                  )}
+                </AutoColumn>
+              </RowBetween>
+            )}
+
+            <RowBetween padding={'0 8px'}>
+              <Text color={theme.text1} fontWeight={500}>
+                Your Staked Liquidity Pools:
+              </Text>
+              <Question text="After you add liquidity to a pair, you are able to stake your position to earn BAOcx." />
+            </RowBetween>
+
+            {!account ? (
+              <LightCard padding="40px">
+                <ButtonPrimary onClick={toggleWalletModal}>Connect Wallet</ButtonPrimary>
+              </LightCard>
+            ) : v2IsLoading ? (
+              <LightCard padding="40px">
+                <TYPE.body color={theme.text3} textAlign="center">
+                  <Dots>Loading</Dots>
+                </TYPE.body>
+              </LightCard>
+            ) : userInfo?.length > 0 ? (
+              <>
+                {userInfo.map((farmablePool, i) => (
+                  <FarmPositionCard
+                    key={farmablePool.address}
+                    farmablePool={farmablePool}
+                    baoPriceUsd={baoPriceUsd}
+                    apy={allAPYs[i]}
+                    allStakedTVL={allStakedTVL[i]}
+                    unstakedLPAmount={tokenBalanceMap[farmablePool.address]}
+                    defaultShowMore={false}
+                  />
+                ))}
+              </>
+            ) : (
+              <LightCard padding="40px">
+                {noListSelected ? (
+                  <CurrencySearchModal
+                    isOpen={noListSelected}
+                    onCurrencySelect={() => {
+                      /* no-op */
+                    }}
+                    onDismiss={() => {
+                      /* no-op */
+                    }}
+                  />
+                ) : (
+                  <>
+                    <TYPE.body color={theme.text3} textAlign="center">
+                      No staked liquidity found.
+                    </TYPE.body>
+                    <ButtonPrimary id="join-pool-button" as={Link} style={{ marginTop: 16 }} to="/add/ETH">
+                      <Text fontWeight={500} fontSize={20}>
+                        Add Liquidity
+                      </Text>
+                    </ButtonPrimary>
+                  </>
+                )}
+              </LightCard>
+            )}
+          </AutoColumn>
         </AutoColumn>
-      </AutoColumn>
-    </AppBody>
+      </AppBody>
+      <div style={{ marginBottom: '10px' }} />
+      <AppBody>
+        <PoolBody {...usePoolProps()} />
+      </AppBody>
+    </>
   )
 }
