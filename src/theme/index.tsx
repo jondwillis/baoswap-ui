@@ -1,4 +1,4 @@
-import { darken, transparentize } from 'polished'
+import { darken, lighten, transparentize } from 'polished'
 import React, { useMemo } from 'react'
 import styled, {
   ThemeProvider as StyledComponentsThemeProvider,
@@ -71,7 +71,7 @@ export function colors(darkMode: boolean): Colors {
     text5: darkMode ? '#2C2F36' : '#EDEEF2',
 
     // backgrounds / greys
-    bg1: darkMode ? '#212429' : '#FFF8EE',
+    bg1: darkMode ? '#212429' : lighten(0.02, '#FFF8EE'),
     bg2: darkMode ? '#2C2F36' : '#FFFCF5',
     bg3: darkMode ? '#363a46' : '#EDEEF2',
     bg4: darkMode ? '#565A69' : '#CED0D9',
@@ -82,7 +82,7 @@ export function colors(darkMode: boolean): Colors {
     advancedBG: darkMode ? transparentize(0.2, '#212429') : 'rgba(255,255,255,0.6)',
 
     //primary colors
-    primary1: darkMode ? '#f2BfAc' : '#c8a991',
+    primary1: darkMode ? darken(0.05, '#FFC3AB') : darken(0.1, '#FFC3AB'),
     primary2: darkMode ? '#F07C12' : '#FF8884',
     primary3: darkMode ? '#F2E2D7' : '#F2E2D7',
     primary4: darkMode ? '#F2E2D7' : '#F2E2D7',
