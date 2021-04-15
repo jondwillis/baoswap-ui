@@ -27,6 +27,7 @@ import AppBody from '../AppBody'
 import useDebounce from '../../hooks/useDebounce'
 import Toggle from '../../components/Toggle'
 import { useSortByAPYManager } from '../../state/user/hooks'
+import { Option } from '../../components/RadioButton'
 
 export default function Analytics() {
   const { t } = useTranslation()
@@ -38,6 +39,7 @@ export default function Analytics() {
   const [poolInfo, fetchingPoolInfo] = usePoolInfoFarmablePools(allFarmablePools, allNewRewardPerBlock)
 
   const [searchQuery, setSearchQuery] = useState('')
+  const [filterPoolType, setFilterPoolType] = useState<'all' | 'sushi' | 'bao'>('all')
 
   const query = useDebounce(
     useMemo(() => searchQuery.toLowerCase(), [searchQuery]),
@@ -50,6 +52,11 @@ export default function Analytics() {
     const input = event.target.value
     setSearchQuery(input)
   }, [])
+
+  const handleFilterPoolType = (filterPoolType: 'all' | 'sushi' | 'bao') => {
+    setFilterPoolType(filterPoolType)
+  }
+
   const [sortByAPY, toggleSortByAPY] = useSortByAPYManager()
 
   const baoPriceUsd = useBaoUsdPrice()
@@ -68,13 +75,16 @@ export default function Analytics() {
       }
     })
 
-    const filteredPools = combined.filter(
-      farm =>
+    const filteredPools = combined.filter(farm => {
+      const nameOrSymbolMatches =
         farm.symbol
           .split(' ')[0]
           .toLowerCase()
           .includes(query) || farm.name.toLowerCase().includes(query)
-    )
+      const poolTypeMatches =
+        filterPoolType === 'all' ? true : filterPoolType === 'sushi' ? farm.isSushi : !farm.isSushi
+      return nameOrSymbolMatches && poolTypeMatches
+    })
 
     if (sortByAPY) {
       return filteredPools.sort(({ apy: apy0 }, { apy: apy1 }) => {
@@ -90,7 +100,7 @@ export default function Analytics() {
       })
     }
     return combined
-  }, [allAPYs, poolInfo, query, sortByAPY])
+  }, [allAPYs, poolInfo, query, sortByAPY, filterPoolType])
 
   const isLoading = fetchingPoolInfo
 
@@ -118,6 +128,35 @@ export default function Analytics() {
             Sort by APY (high to low):
             <RowFixed>
               <Toggle isActive={sortByAPY} toggle={toggleSortByAPY} />
+            </RowFixed>
+          </RowBetween>
+          <RowBetween>
+            Filter Pool Type:
+            <RowFixed>
+              <Option
+                onClick={() => {
+                  handleFilterPoolType('all')
+                }}
+                active={filterPoolType === 'all'}
+              >
+                🍣🌭 ALL
+              </Option>
+              <Option
+                onClick={() => {
+                  handleFilterPoolType('sushi')
+                }}
+                active={filterPoolType === 'sushi'}
+              >
+                🍣 SLP
+              </Option>
+              <Option
+                onClick={() => {
+                  handleFilterPoolType('bao')
+                }}
+                active={filterPoolType === 'bao'}
+              >
+                🌭 BAOLP
+              </Option>
             </RowFixed>
           </RowBetween>
           {!active ? (
