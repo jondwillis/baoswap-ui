@@ -4,6 +4,8 @@ import { FarmablePool } from '../constants/bao'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { useMasterChefContract } from './useContract'
 
+const REFERRAL_ADDRESS = process.env.REFERRAL_ADDRESS || '0x0000000000000000000000000000000000000000'
+
 export enum HarvestState {
   UNKNOWN,
   PENDING,
@@ -64,11 +66,7 @@ export function useStake(
         amount &&
         async function onStake(): Promise<any> {
           const pid = farmablePool.pid
-          const txReceipt = await masterChefContract.deposit(
-            pid,
-            `0x${amount.raw.toString(16)}`,
-            '0x0000000000000000000000000000000000000000'
-          )
+          const txReceipt = await masterChefContract.deposit(pid, `0x${amount.raw.toString(16)}`, REFERRAL_ADDRESS)
           addTransaction(txReceipt, { summary: `Stake ${amount.toFixed(4)} in ${farmablePool.name}` })
           const txHash = txReceipt.hash
           return txHash
@@ -91,11 +89,7 @@ export function useUnstake(
         amount &&
         async function onUnstake(): Promise<any> {
           const pid = farmablePool.pid
-          const txReceipt = await masterChefContract.withdraw(
-            pid,
-            `0x${amount.raw.toString(16)}`,
-            '0x0000000000000000000000000000000000000000'
-          )
+          const txReceipt = await masterChefContract.withdraw(pid, `0x${amount.raw.toString(16)}`, REFERRAL_ADDRESS)
           addTransaction(txReceipt, {
             summary: `Unstake ${amount.toFixed(4)} from ${farmablePool.name}`
           })
