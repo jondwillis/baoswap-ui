@@ -139,7 +139,10 @@ export default function Analytics() {
                 }}
                 active={filterPoolType === 'all'}
               >
-                🍣🌭 ALL
+                <span role="img" aria-label="ALL">
+                  🍣🌭
+                </span>{' '}
+                ALL
               </Option>
               <Option
                 onClick={() => {
@@ -147,7 +150,10 @@ export default function Analytics() {
                 }}
                 active={filterPoolType === 'sushi'}
               >
-                🍣 SLP
+                <span role="img" aria-label="SLP">
+                  🍣
+                </span>{' '}
+                SLP
               </Option>
               <Option
                 onClick={() => {
@@ -155,7 +161,10 @@ export default function Analytics() {
                 }}
                 active={filterPoolType === 'bao'}
               >
-                🌭 BAOLP
+                <span role="img" aria-label="BAOLP">
+                  🌭
+                </span>{' '}
+                BAOLP
               </Option>
             </RowFixed>
           </RowBetween>
