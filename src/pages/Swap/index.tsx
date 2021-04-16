@@ -242,8 +242,8 @@ export default function Swap() {
   ])
 
   const { ethereum } = window
-  const handleAddHnyToMM = useCallback(() => addTokenToMetamask(ethereum, BAOCX), [ethereum])
-  const isHnySelected =
+  const handleAddBaocxToMM = useCallback(() => addTokenToMetamask(ethereum, BAOCX), [ethereum])
+  const isBaocxSelected =
     currencies[Field.INPUT]?.symbol === BAOCX.symbol || currencies[Field.OUTPUT]?.symbol === BAOCX.symbol
 
   return (
@@ -253,9 +253,9 @@ export default function Swap() {
         tokens={urlLoadedTokens}
         onConfirm={handleConfirmTokenWarning}
       />
-      {isHnySelected && (
+      {isBaocxSelected && (
         <ButtonImagePlus
-          onClick={() => handleAddHnyToMM()}
+          onClick={() => handleAddBaocxToMM()}
           style={{
             width: 'auto',
             position: 'absolute',
@@ -264,7 +264,7 @@ export default function Swap() {
             whiteSpace: 'nowrap'
           }}
         >
-          Add HNY to MetaMask
+          Add {BAOCX.symbol} to MetaMask
         </ButtonImagePlus>
       )}
       <AppBody>
