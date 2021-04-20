@@ -2138,11 +2138,11 @@ export const supportedPools = [
       100: '0x743335D8EC69b176AC5AF20B523258254e1D686a'
     },
     tokenAddresses: {
-      100: [tokenMap.ROOK, tokenMap.WETH]
+      100: [tokenMap.WETH, tokenMap.ROOK]
     },
     tokenDecimals: 18,
     name: 'Rook Rice Noodle Roll',
-    symbol: 'ROOK-ETH SUSHILP',
+    symbol: 'ETH-ROOK SUSHILP',
     tokenSymbol: 'ROOK',
     poolType: 'sushi',
     icon: '/roll-fish.png',
