@@ -65,7 +65,7 @@ export function FarmAnalyticsCard({ farmablePool, apy, border, defaultShowMore }
         </FixedHeightRow>
         {showMore && (
           <AutoColumn gap="8px">
-            <FixedHeightRow>
+            <FixedHeightRow style={{ marginTop: 10 }}>
               <RowFixed>
                 <PieChart style={{ marginRight: 10 }} />
                 <Text fontSize={16} fontWeight={500}>
