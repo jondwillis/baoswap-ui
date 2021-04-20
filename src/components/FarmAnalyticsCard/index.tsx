@@ -23,7 +23,7 @@ export function FarmAnalyticsCard({ farmablePool, apy, border, defaultShowMore }
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
 
-  const { accBaoPerShare, stakedAmount, totalSupply, icon, name, poolWeight } = farmablePool
+  const { stakedAmount, totalSupply, icon, name, poolWeight } = farmablePool
 
   const [showMore, setShowMore] = useState(defaultShowMore)
 
@@ -101,19 +101,6 @@ export function FarmAnalyticsCard({ farmablePool, apy, border, defaultShowMore }
                   {stakedAmount &&
                     totalSupply &&
                     `${stakedAmount.toSignificant(8)} (${new Percent(stakedAmount.raw, totalSupply.raw).toFixed(2)}%)`}
-                </Text>
-              </RowFixed>
-            </FixedHeightRow>
-
-            <FixedHeightRow>
-              <RowFixed>
-                <Text fontSize={16} fontWeight={500}>
-                  Acc. Bao/Share:
-                </Text>
-              </RowFixed>
-              <RowFixed>
-                <Text fontSize={16} fontWeight={500}>
-                  {accBaoPerShare ? accBaoPerShare.toSignificant(8) : '-'}
                 </Text>
               </RowFixed>
             </FixedHeightRow>
