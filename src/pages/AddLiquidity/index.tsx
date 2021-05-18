@@ -138,47 +138,50 @@ export default function AddLiquidity({
     const deadlineFromNow = Math.ceil(Date.now() / 1000) + deadline
 
     let estimate
-		let method: (...args: any) => Promise<TransactionResponse>
-		let args: Array<string | string[] | number>
-		let value: BigNumber | null
-		if (currencyA === ETHER || currencyB === ETHER) {
-			const tokenBIsBNB = currencyB === ETHER
-			estimate = router.estimateGas.addLiquidityETH
-			method = router.addLiquidityETH
-			args = [
-				wrappedCurrency(tokenBIsBNB ? currencyA : currencyB, chainId)?.address ?? '', // token
-				(tokenBIsBNB ? parsedAmountA : parsedAmountB).raw.toString(), // token desired
-				amountsMin[tokenBIsBNB ? Field.CURRENCY_A : Field.CURRENCY_B].toString(), // token min
-				amountsMin[tokenBIsBNB ? Field.CURRENCY_B : Field.CURRENCY_A].toString(), // eth min
-				account,
-				deadlineFromNow,
-			]
-			value = BigNumber.from((tokenBIsBNB ? parsedAmountB : parsedAmountA).raw.toString())
-		} else {
-			estimate = router.estimateGas.addLiquidity
-			method = router.addLiquidity
-			args = [
-				wrappedCurrency(currencyA, chainId)?.address ?? '',
-				wrappedCurrency(currencyB, chainId)?.address ?? '',
-				parsedAmountA.raw.toString(),
-				parsedAmountB.raw.toString(),
-				amountsMin[Field.CURRENCY_A].toString(),
-				amountsMin[Field.CURRENCY_B].toString(),
-				account,
-				deadlineFromNow,
-			]
-			value = null
-		}
+    let method: (...args: any) => Promise<TransactionResponse>
+    let args: Array<string | string[] | number>
+    let value: BigNumber | null
+    if (currencyA === ETHER || currencyB === ETHER) {
+      const tokenBIsBNB = currencyB === ETHER
+      estimate = router.estimateGas.addLiquidityETH
+      method = router.addLiquidityETH
+      args = [
+        wrappedCurrency(tokenBIsBNB ? currencyA : currencyB, chainId)?.address ?? '', // token
+        (tokenBIsBNB ? parsedAmountA : parsedAmountB).raw.toString(), // token desired
+        amountsMin[tokenBIsBNB ? Field.CURRENCY_A : Field.CURRENCY_B].toString(), // token min
+        amountsMin[tokenBIsBNB ? Field.CURRENCY_B : Field.CURRENCY_A].toString(), // eth min
+        account,
+        deadlineFromNow
+      ]
+      value = BigNumber.from((tokenBIsBNB ? parsedAmountB : parsedAmountA).raw.toString())
+    } else {
+      estimate = router.estimateGas.addLiquidity
+      method = router.addLiquidity
+      args = [
+        wrappedCurrency(currencyA, chainId)?.address ?? '',
+        wrappedCurrency(currencyB, chainId)?.address ?? '',
+        parsedAmountA.raw.toString(),
+        parsedAmountB.raw.toString(),
+        amountsMin[Field.CURRENCY_A].toString(),
+        amountsMin[Field.CURRENCY_B].toString(),
+        account,
+        deadlineFromNow
+      ]
+      value = null
+    }
 
-		setAttemptingTxn(true)
+    setAttemptingTxn(true)
 
-		estimate(...args, value ? { value } : {})
-			.then((estimatedGasLimit) =>
-				method(...args, {
-					...(value ? { value } : {}),
-					gasLimit: calculateGasMargin(estimatedGasLimit),
-				})
-			)
+    estimate(...args, value ? { value } : {})
+      .then(estimatedGasLimit => {
+        const calculatedGasMargin = calculateGasMargin(estimatedGasLimit)
+        const maxGas = BigNumber.from(1000000)
+        const gasLimit = maxGas.lt(calculatedGasMargin) ? maxGas : calculatedGasMargin
+        return method(...args, {
+          ...(value ? { value } : {}),
+          gasLimit
+        })
+      })
       .then(response => {
         setAttemptingTxn(false)
 
