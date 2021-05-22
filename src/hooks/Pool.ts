@@ -62,19 +62,6 @@ export function usePoolProps(): PoolProps {
     v2Pairs?.length < liquidityTokensWithBalances.length ||
     v2Pairs?.some(V2Pair => !V2Pair)
 
-  const allV2PairsWithLiquidity = useMemo(
-    () => v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)),
-    [v2Pairs]
-  )
-  const allPairCandidatesWithLiquidity = useMemo(
-    () =>
-      pairCandidates.flatMap(([, pair]) => {
-        const farmablePool = allFarmablePools.find(p => p.address === pair?.liquidityToken.address)
-        return farmablePool && pair && pair instanceof Pair && Boolean(pair) ? { pair, farmablePool } : undefined
-      }),
-    [pairCandidates, allFarmablePools]
-  )
-
   const baoPriceUsd = useBaoUsdPrice()
 
   const allNewRewardPerBlock = useAllNewRewardPerBlock(allFarmablePools)
@@ -85,12 +72,30 @@ export function usePoolProps(): PoolProps {
 
   const allAPYs = useAllAPYs(allFarmablePools, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
 
+  const allV2PairsWithLiquidity = useMemo(
+    () => v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)),
+    [v2Pairs]
+  )
+  const allPairCandidatesWithLiquidityAndAPY = useMemo(
+    () =>
+      pairCandidates.flatMap(([, pair]) => {
+        if (!pair) {
+          return []
+        }
+        const farmablePoolIndex = allFarmablePools.map(p => p.address).indexOf(pair?.liquidityToken.address)
+        const farmablePool = allFarmablePools[farmablePoolIndex]
+        return farmablePool && pair && pair instanceof Pair && Boolean(pair)
+          ? { pair, farmablePool, apy: allAPYs[farmablePoolIndex] }
+          : []
+      }),
+    [pairCandidates, allFarmablePools, allAPYs]
+  )
+
   return {
     v2IsLoading,
     allV2PairsWithLiquidity,
     v2PairsBalances,
-    allPairCandidatesWithLiquidity,
-    allAPYs,
+    allPairCandidatesWithLiquidityAndAPY,
     baoPriceUsd
   }
 }

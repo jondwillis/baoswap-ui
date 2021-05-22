@@ -26,8 +26,7 @@ export interface PoolProps {
   v2PairsBalances: {
     [tokenAddress: string]: TokenAmount | undefined
   }
-  allPairCandidatesWithLiquidity: ({ pair: Pair; farmablePool: FarmablePool } | undefined)[]
-  allAPYs: (Fraction | undefined)[]
+  allPairCandidatesWithLiquidityAndAPY: { pair: Pair; farmablePool: FarmablePool; apy: Fraction | undefined }[]
   baoPriceUsd: Fraction | undefined
 }
 
@@ -35,14 +34,38 @@ export function PoolBody({
   v2IsLoading,
   allV2PairsWithLiquidity,
   v2PairsBalances,
-  allPairCandidatesWithLiquidity,
-  allAPYs,
+  allPairCandidatesWithLiquidityAndAPY,
   baoPriceUsd
 }: PoolProps) {
   const theme = useContext(ThemeContext)
   const { account } = useActiveWeb3React()
   return (
     <AutoColumn gap="12px" style={{ width: '100%' }}>
+      {allPairCandidatesWithLiquidityAndAPY.length > 0 && (
+        <>
+          <RowBetween padding={'0 8px'}>
+            <Text color={theme.text1} fontWeight={500}>
+              Farmable Liquidity Suggestions:
+            </Text>
+            <Question text="These liquidity pools are shown because you have a balance in both tokens in the pair, and the LP can be staked." />
+          </RowBetween>
+
+          {allPairCandidatesWithLiquidityAndAPY.map((pfp, i) => {
+            return pfp && pfp.pair.liquidityToken.address ? (
+              <FarmSuggestionCard
+                key={`suggest- ${pfp.pair.liquidityToken.address}-${pfp.pair.token0.address}-${pfp.pair.token1.address}`}
+                pair={pfp.pair}
+                farmablePool={pfp.farmablePool}
+                apy={pfp.apy}
+                baoPriceUsd={baoPriceUsd}
+              />
+            ) : (
+              <></>
+            )
+          })}
+        </>
+      )}
+
       <RowBetween padding={'0 8px'}>
         <Text color={theme.text1} fontWeight={500}>
           Your Liquidity (Unstaked)
@@ -91,42 +114,6 @@ export function PoolBody({
           </StyledInternalLink>
         </Text>
       </div>
-      <RowBetween padding={'0 8px'}>
-        <Text color={theme.text1} fontWeight={500}>
-          Farmable Liquidity Suggestions:
-        </Text>
-        <Question text="These liquidity pools are shown because you have a balance in both tokens in the pair, and the LP can be staked." />
-      </RowBetween>
-
-      {v2IsLoading ? (
-        <LightCard padding="40px">
-          <TYPE.body color={theme.text3} textAlign="center">
-            <Dots>Loading</Dots>
-          </TYPE.body>
-        </LightCard>
-      ) : allPairCandidatesWithLiquidity?.length > 0 ? (
-        <>
-          {allPairCandidatesWithLiquidity.map((pfp, i) => {
-            return pfp && pfp.pair.liquidityToken.address ? (
-              <FarmSuggestionCard
-                key={`suggest- ${pfp.pair.liquidityToken.address}`}
-                pair={pfp.pair}
-                farmablePool={pfp.farmablePool}
-                apy={allAPYs[i]}
-                baoPriceUsd={baoPriceUsd}
-              />
-            ) : (
-              <></>
-            )
-          })}
-        </>
-      ) : (
-        <LightCard padding="40px">
-          <TYPE.body color={theme.text3} textAlign="center">
-            No significant individual token balances found in farmable liquidity pools.
-          </TYPE.body>
-        </LightCard>
-      )}
     </AutoColumn>
   )
 }
