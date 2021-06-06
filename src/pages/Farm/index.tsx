@@ -179,7 +179,12 @@ export default function Farm() {
                   <span role="img" aria-label="warning">
                     ❗️
                   </span>{' '}
-                  xDai Farming has ended and no more BAO.cx rewards will be distributed.
+                  <ExternalLink
+                    href={'https://snapshot.org/#/baovotes.eth/proposal/QmRYVHrX5AgmuX64mWGb94GMZpZiWNeMm5vZQKyYx4QvqM'}
+                  >
+                    xDai Farming has ended
+                  </ExternalLink>{' '}
+                  and no more BAO.cx rewards will be distributed.
                 </Text>
                 <Text color={theme.text3}>
                   <span role="img" aria-label="warning">
