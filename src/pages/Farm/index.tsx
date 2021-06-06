@@ -9,7 +9,7 @@ import { BalanceText } from '../../components/PositionCard'
 import { FarmPositionCard } from '../../components/FarmPositionCard'
 import { ExternalLink, TYPE } from '../../theme'
 import { Text } from 'rebass'
-import { LightCard } from '../../components/Card'
+import { LightCard, BlueCard } from '../../components/Card'
 import { RowBetween, RowFixed } from '../../components/Row'
 import { ButtonPrimary, ButtonSecondary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
@@ -172,6 +172,24 @@ export default function Farm() {
           </AutoColumn>
         </LightCard>
         <AutoColumn gap="lg" justify="center">
+          <RowBetween padding={'12px'} marginBottom={'12px'}>
+            <BlueCard>
+              <AutoColumn>
+                <Text color={theme.text3}>
+                  <span role="img" aria-label="warning">
+                    ❗️
+                  </span>{' '}
+                  xDai Farming has ended and no more BAO.cx rewards will be distributed.
+                </Text>
+                <Text color={theme.text3}>
+                  <span role="img" aria-label="warning">
+                    🏦
+                  </span>{' '}
+                  Your pending and locked BAO.cx is unchanged and will distribute at the unlock block.
+                </Text>
+              </AutoColumn>
+            </BlueCard>
+          </RowBetween>
           <AutoColumn gap="12px" style={{ width: '100%' }}>
             {chainId && masterChefContract && (
               <RowBetween padding={'0 8px'}>

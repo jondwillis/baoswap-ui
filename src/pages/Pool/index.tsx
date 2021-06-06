@@ -16,7 +16,6 @@ import { AutoColumn } from '../../components/Column'
 import { useActiveWeb3React } from '../../hooks'
 import { Dots } from '../../components/swap/styleds'
 import { FarmablePool } from '../../constants/bao'
-import { FarmSuggestionCard } from '../../components/FarmSuggestionCard'
 import AppBody from '../AppBody'
 import { usePoolProps } from '../../hooks/Pool'
 
@@ -30,42 +29,11 @@ export interface PoolProps {
   baoPriceUsd: Fraction | undefined
 }
 
-export function PoolBody({
-  v2IsLoading,
-  allV2PairsWithLiquidity,
-  v2PairsBalances,
-  allPairCandidatesWithLiquidityAndAPY,
-  baoPriceUsd
-}: PoolProps) {
+export function PoolBody({ v2IsLoading, allV2PairsWithLiquidity, v2PairsBalances }: PoolProps) {
   const theme = useContext(ThemeContext)
   const { account } = useActiveWeb3React()
   return (
-    <AutoColumn gap="12px" style={{ width: '100%' }}>
-      {allPairCandidatesWithLiquidityAndAPY.length > 0 && (
-        <>
-          <RowBetween padding={'0 8px'}>
-            <Text color={theme.text1} fontWeight={500}>
-              Farmable Liquidity Suggestions:
-            </Text>
-            <Question text="These liquidity pools are shown because you have a balance in both tokens in the pair, and the LP can be staked." />
-          </RowBetween>
-
-          {allPairCandidatesWithLiquidityAndAPY.map((pfp, i) => {
-            return pfp && pfp.pair.liquidityToken.address ? (
-              <FarmSuggestionCard
-                key={`suggest- ${pfp.pair.liquidityToken.address}-${pfp.pair.token0.address}-${pfp.pair.token1.address}`}
-                pair={pfp.pair}
-                farmablePool={pfp.farmablePool}
-                apy={pfp.apy}
-                baoPriceUsd={baoPriceUsd}
-              />
-            ) : (
-              <></>
-            )
-          })}
-        </>
-      )}
-
+    <AutoColumn>
       <RowBetween padding={'0 8px'}>
         <Text color={theme.text1} fontWeight={500}>
           Your Liquidity (Unstaked)
