@@ -16,18 +16,13 @@ import { useAllFarmablePools } from '../../constants/bao'
 import { FarmAnalyticsCard } from '../../components/FarmAnalyticsCard'
 import { usePoolInfoFarmablePools } from '../../data/Reserves'
 import { useTranslation } from 'react-i18next'
-import {
-  useAllAPYs,
-  useAllNewRewardPerBlock,
-  useAllPriceOracleDescriptors,
-  useAllStakedTVL,
-  useBaoUsdPrice
-} from '../../hooks/TVL'
+import { useAllNewRewardPerBlock } from '../../hooks/TVL'
 import AppBody from '../AppBody'
 import useDebounce from '../../hooks/useDebounce'
 import Toggle from '../../components/Toggle'
 import { useSortByAPYManager } from '../../state/user/hooks'
 import { Option } from '../../components/RadioButton'
+import { Fraction } from 'uniswap-xdai-sdk'
 
 export default function Analytics() {
   const { t } = useTranslation()
@@ -59,19 +54,19 @@ export default function Analytics() {
 
   const [sortByAPY, toggleSortByAPY] = useSortByAPYManager()
 
-  const baoPriceUsd = useBaoUsdPrice()
+  // const baoPriceUsd = useBaoUsdPrice()
 
-  const allPriceOracles = useAllPriceOracleDescriptors(poolInfo)
+  // const allPriceOracles = useAllPriceOracleDescriptors(poolInfo)
 
-  const allStakedTVL = useAllStakedTVL(poolInfo, allPriceOracles, baoPriceUsd)
+  // const allStakedTVL = useAllStakedTVL(poolInfo, allPriceOracles, baoPriceUsd)
 
-  const allAPYs = useAllAPYs(poolInfo, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
+  // const allAPYs = useAllAPYs(poolInfo, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
 
   const sortedAndFilteredPools = useMemo(() => {
-    const combined = poolInfo.map((farm, i) => {
+    const combined = poolInfo.map(farm => {
       return {
         ...farm,
-        apy: allAPYs[i]
+        apy: new Fraction('0', '1')
       }
     })
 
@@ -100,7 +95,7 @@ export default function Analytics() {
       })
     }
     return combined
-  }, [allAPYs, poolInfo, query, sortByAPY, filterPoolType])
+  }, [poolInfo, query, sortByAPY, filterPoolType])
 
   const isLoading = fetchingPoolInfo
 

@@ -8,15 +8,9 @@ import { toV2LiquidityToken, useTrackedTokenPairs } from '../state/user/hooks'
 import { useActiveWeb3React } from '.'
 import { useMemo } from 'react'
 import { PoolProps } from '../pages/Pool'
-import { Pair } from 'uniswap-xdai-sdk'
+import { Fraction, Pair } from 'uniswap-xdai-sdk'
 import { useAllFarmablePools } from '../constants/bao'
-import {
-  useAllAPYs,
-  useAllNewRewardPerBlock,
-  useAllPriceOracleDescriptors,
-  useAllStakedTVL,
-  useBaoUsdPrice
-} from './TVL'
+import { useBaoUsdPrice } from './TVL'
 
 export function usePoolProps(): PoolProps {
   const { account } = useActiveWeb3React()
@@ -64,13 +58,13 @@ export function usePoolProps(): PoolProps {
 
   const baoPriceUsd = useBaoUsdPrice()
 
-  const allNewRewardPerBlock = useAllNewRewardPerBlock(allFarmablePools)
+  // const allNewRewardPerBlock = useAllNewRewardPerBlock(allFarmablePools)
 
-  const allPriceOracles = useAllPriceOracleDescriptors(allFarmablePools)
+  // const allPriceOracles = useAllPriceOracleDescriptors(allFarmablePools)
 
-  const allStakedTVL = useAllStakedTVL(allFarmablePools, allPriceOracles, baoPriceUsd)
+  // const allStakedTVL = useAllStakedTVL(allFarmablePools, allPriceOracles, baoPriceUsd)
 
-  const allAPYs = useAllAPYs(allFarmablePools, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
+  // const allAPYs = useAllAPYs(allFarmablePools, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
 
   const allV2PairsWithLiquidity = useMemo(
     () => v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair)),
@@ -85,10 +79,10 @@ export function usePoolProps(): PoolProps {
         const farmablePoolIndex = allFarmablePools.map(p => p.address).indexOf(pair?.liquidityToken.address)
         const farmablePool = allFarmablePools[farmablePoolIndex]
         return farmablePool && pair && pair instanceof Pair && Boolean(pair)
-          ? { pair, farmablePool, apy: allAPYs[farmablePoolIndex] }
+          ? { pair, farmablePool, apy: new Fraction('0', '1') }
           : []
       }),
-    [pairCandidates, allFarmablePools, allAPYs]
+    [pairCandidates, allFarmablePools]
   )
 
   return {

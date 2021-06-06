@@ -30,14 +30,7 @@ import CurrencySearchModal from '../../components/SearchModal/CurrencySearchModa
 import { useSelectedListUrl } from '../../state/lists/hooks'
 import { useAllFarmablePools } from '../../constants/bao'
 import { BAO, BAOCX } from '../../constants'
-import {
-  useAllAPYs,
-  useAllNewRewardPerBlock,
-  useAllPriceOracleDescriptors,
-  useAllStakedTVL,
-  useBaoUsdPrice,
-  useBaocxPrice
-} from '../../hooks/TVL'
+import { useAllPriceOracleDescriptors, useAllStakedTVL, useBaoUsdPrice, useBaocxPrice } from '../../hooks/TVL'
 import { FarmState, initialFarmState } from '../../state/farm/reducer'
 import AppBody from '../AppBody'
 import { PoolBody } from '../Pool'
@@ -114,13 +107,13 @@ export default function Farm() {
   const selectedListUrl = useSelectedListUrl()
   const noListSelected = !selectedListUrl
 
-  const allNewRewardPerBlock = useAllNewRewardPerBlock(userInfo)
+  // const allNewRewardPerBlock = useAllNewRewardPerBlock(userInfo)
 
   const allPriceOracles = useAllPriceOracleDescriptors(userInfo)
 
   const allStakedTVL = useAllStakedTVL(userInfo, allPriceOracles, baoPriceUsd)
 
-  const allAPYs = useAllAPYs(userInfo, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
+  // const allAPYs = useAllAPYs(userInfo, baoPriceUsd, allNewRewardPerBlock, allStakedTVL)
 
   const [baocxPriceUsd, baocxBaoPrice] = useBaocxPrice()
   const lockedBaocxBalanceUsd = useMemo(
@@ -256,7 +249,7 @@ export default function Farm() {
                     key={farmablePool.address}
                     farmablePool={farmablePool}
                     baoPriceUsd={baoPriceUsd}
-                    apy={allAPYs[i]}
+                    apy={new Fraction('0', '1')}
                     allStakedTVL={allStakedTVL[i]}
                     unstakedLPAmount={tokenBalanceMap[farmablePool.address]}
                     defaultShowMore={false}
